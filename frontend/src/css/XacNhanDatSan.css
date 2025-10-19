@@ -1,0 +1,278 @@
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+body {
+  background: #f3f6fa;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+}
+
+.confirm-container {
+  max-width: 98%;
+  background: white;
+  padding: 35px 45px;
+  border-radius: 20px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.3s ease-in-out;
+  margin: 20px;
+  height: fit-content;
+}
+
+h1 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 30px;
+  font-weight: 700;
+  font-size: 25px;
+  letter-spacing: 1px;
+}
+
+.info-group {
+  margin-bottom: 25px;
+  border-bottom: 1px solid #e0e6ef;
+  padding-bottom: 15px;
+}
+
+.info-group h2 {
+  color: #34495e;
+  font-size: 20px;
+  margin-bottom: 10px;
+  border-left: 4px solid #2980b9;
+  padding-left: 10px;
+}
+
+label {
+  margin-bottom: 5px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th,
+td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #e5e9f0;
+  font-size: 18px;
+  font-weight: 450;
+}
+
+th {
+  background: #f1f4f8;
+  color: #2c3e50;
+  font-weight: 700;
+}
+
+tr:hover {
+  background: #f9fbfd;
+}
+
+input[type="text"],
+input[type="tel"],
+input[type="number"],
+select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #cfd8e3;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: 0.2s;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #2980b9;
+  box-shadow: 0 0 0 2px rgba(41, 128, 185, 0.1);
+}
+
+.total {
+  font-size: 21px;
+  font-weight: bold;
+  color: #27ae60;
+  text-align: right;
+  margin-top: 15px;
+}
+
+.confirm-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 25px;
+}
+
+button {
+  padding: 12px 28px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  transition: all 0.25s;
+}
+
+.btn-back {
+  background: #bdc3c7;
+  color: #2c3e50;
+}
+
+.btn-back:hover {
+  background: #95a5a6;
+}
+
+.btn-confirm {
+  background: #2980b9;
+  color: white;
+}
+
+.btn-confirm:hover {
+  background: #1f6aa5;
+}
+
+.btn-add-service {
+  background: #27ae60;
+  color: white;
+  margin-top: 10px;
+}
+
+.btn-add-service:hover {
+  background: #1f8b4e;
+}
+
+.btn-add-customer {
+  background: #f39c12;
+  color: white;
+  margin-top: 10px;
+}
+
+.btn-add-customer:hover {
+  background: #d68910;
+}
+
+.search-results {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-top: 5px;
+  display: none;
+  position: absolute;
+  width: calc(100% - 10px);
+  z-index: 10;
+}
+
+.search-results div {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.search-results div:hover {
+  background: #f1f1f1;
+}
+
+/* === Classes tách ra từ inline === */
+.flex-row {
+  display: flex;
+  gap: 30px;
+  position: relative;
+}
+
+.flex-col {
+  flex: 1;
+  position: relative;
+}
+
+.flex-col label {
+  margin-bottom: 10px;
+}
+
+.actions-customer {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dich-vu-item {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.input-ten-dv {
+  flex: 1;
+}
+
+.input-gia-dv {
+  width: 120px;
+}
+
+.dichvu-list {
+  margin-top: 10px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#root,
+body,
+html {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.tongTien {
+  font: bold;
+  font-weight: 600;
+  font-size: 21px;
+}
+
+.suggest-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.suggest-table thead th {
+  text-align: left;
+  padding: 8px 12px;
+  background: #f7f9fb;
+  font-weight: 600;
+  font-size: 13px;
+  border-bottom: 1px solid #eee;
+}
+
+.suggest-table tbody td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #f3f3f3;
+  font-size: 14px;
+}
+
+.suggest-table tbody tr:hover {
+  background: #f5fbff;
+}
+
+.xac-nhan-wrapper {
+  display: flex;
+  width: 100%;
+}

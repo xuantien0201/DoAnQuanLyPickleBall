@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Xác nhận đặt sân</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: #f3f6fa;
+      margin: 0;
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .confirm-container {
+      width: 880px;
+      background: white;
+      padding: 35px 45px;
+      border-radius: 20px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 30px;
+    }
+
+    .info-group {
+      margin-bottom: 25px;
+      border-bottom: 1px solid #e0e6ef;
+      padding-bottom: 15px;
+    }
+
+    .info-group h2 {
+      color: #34495e;
+      font-size: 18px;
+      margin-bottom: 10px;
+      border-left: 4px solid #2980b9;
+      padding-left: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #e5e9f0;
+    }
+
+    th {
+      background: #f1f4f8;
+      color: #2c3e50;
+    }
+
+    tr:hover {
+      background: #f9fbfd;
+    }
+
+    input[type="text"], input[type="tel"], input[type="number"], select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #cfd8e3;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: 0.2s;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #2980b9;
+      box-shadow: 0 0 0 2px rgba(41, 128, 185, 0.1);
+    }
+
+    .total {
+      font-size: 18px;
+      font-weight: bold;
+      color: #27ae60;
+      text-align: right;
+      margin-top: 15px;
+    }
+
+    .confirm-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 25px;
+    }
+
+    button {
+      padding: 12px 28px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 15px;
+      transition: all 0.25s;
+    }
+
+    .btn-back {
+      background: #bdc3c7;
+      color: #2c3e50;
+    }
+
+    .btn-back:hover {
+      background: #95a5a6;
+    }
+
+    .btn-confirm {
+      background: #2980b9;
+      color: white;
+    }
+
+    .btn-confirm:hover {
+      background: #1f6aa5;
+    }
+
+    .btn-add-service {
+      background: #27ae60;
+      color: white;
+      margin-top: 10px;
+    }
+
+    .btn-add-service:hover {
+      background: #1f8b4e;
+    }
+
+    .btn-add-customer {
+      background: #f39c12;
+      color: white;
+      margin-top: 10px;
+    }
+
+    .btn-add-customer:hover {
+      background: #d68910;
+    }
+
+    .search-results {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-top: 5px;
+      display: none;
+      position: absolute;
+      width: calc(100% - 10px);
+      z-index: 10;
+    }
+
+    .search-results div {
+      padding: 8px;
+      cursor: pointer;
+    }
+
+    .search-results div:hover {
+      background: #f1f1f1;
+    }
+
+    /* === Classes tách ra từ inline === */
+    .flex-row {
+      display: flex;
+      gap: 20px;
+      position: relative;
+    }
+
+    .flex-col {
+      flex: 1;
+      position: relative;
+    }
+
+    .actions-customer {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .dich-vu-item {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .input-ten-dv {
+      flex: 1;
+    }
+
+    .input-gia-dv {
+      width: 120px;
+    }
+
+    .dichvu-list {
+      margin-top: 10px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="confirm-container">
+    <h1>Xác nhận đặt sân</h1>
+
+    <!-- Bảng danh sách sân đã chọn -->
+    <div class="info-group">
+      <h2>Danh sách sân khách đặt</h2>
+      <table id="table-san">
+        <thead>
+          <tr>
+            <th>Tên sân</th>
+            <th>Loại sân</th>
+            <th>Ngày</th>
+            <th>Giờ bắt đầu</th>
+            <th>Giờ kết thúc</th>
+            <th>Giá / giờ</th>
+            <th>Tổng</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="total" id="tongTien">Tổng cộng: 0đ</div>
+    </div>
+
+    <!-- Thông tin khách hàng -->
+    <div class="info-group">
+      <h2>Thông tin khách hàng</h2>
+
+      <div class="flex-row">
+        <div class="flex-col">
+          <label>Họ và tên:</label>
+          <input type="text" id="tenKhach" placeholder="Nhập họ tên..." oninput="timKiemKhach('ten')" />
+          <div id="search-ten" class="search-results"></div>
+        </div>
+        <div class="flex-col">
+          <label>Số điện thoại:</label>
+          <input type="tel" id="soDienThoai" placeholder="Nhập SĐT..." oninput="timKiemKhach('sdt')" />
+          <div id="search-sdt" class="search-results"></div>
+        </div>
+      </div>
+
+      <div id="actions-customer" class="actions-customer">
+        <button class="btn-add-customer" onclick="themKhachHang()">+ Thêm khách hàng mới</button>
+        <div id="maGiamGiaWrapper" style="display:none;">
+          <label for="maGiamGia">Mã giảm giá:</label>
+          <select id="maGiamGia">
+            <option value="">-- Chọn mã giảm giá --</option>
+            <option value="KM10">Giảm 10%</option>
+            <option value="KM50">Giảm 50.000đ</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dịch vụ thêm -->
+    <div class="info-group">
+      <h2>Dịch vụ thêm</h2>
+      <button class="btn-add-service" onclick="themDichVu()">+ Thêm dịch vụ</button>
+      <div id="dichVuList" class="dichvu-list"></div>
+    </div>
+
+    <!-- Nút xác nhận -->
+    <div class="confirm-buttons">
+      <button class="btn-back" onclick="history.back()">Quay lại</button>
+      <button class="btn-confirm" onclick="xacNhanDatSan()">Xác nhận đặt sân</button>
+    </div>
+  </div>
+
+  <script>
+    const danhSachSan = [
+      { ten: 'Sân A1', loai: '5 người', ngay: '05/10/2025', batDau: '18:00', ketThuc: '19:00', gia: 200000 },
+      { ten: 'Sân B2', loai: '7 người', ngay: '05/10/2025', batDau: '19:00', ketThuc: '21:00', gia: 250000 }
+    ];
+
+    const khachHangData = [
+      { ten: "Nguyễn Văn A", sdt: "0909123456" },
+      { ten: "Trần Thị B", sdt: "0912345678" },
+      { ten: "Lê Văn C", sdt: "0988123456" }
+    ];
+
+    const tbody = document.querySelector("#table-san tbody");
+    let tongTien = 0;
+
+    danhSachSan.forEach(san => {
+      const gio = tinhSoGio(san.batDau, san.ketThuc);
+      const tong = san.gia * gio;
+      tongTien += tong;
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${san.ten}</td>
+        <td>${san.loai}</td>
+        <td>${san.ngay}</td>
+        <td>${san.batDau}</td>
+        <td>${san.ketThuc}</td>
+        <td>${san.gia.toLocaleString()}đ</td>
+        <td>${tong.toLocaleString()}đ</td>
+      `;
+      tbody.appendChild(tr);
+    });
+    document.getElementById("tongTien").textContent = "Tổng cộng: " + tongTien.toLocaleString() + "đ";
+
+    function tinhSoGio(bd, kt) {
+      const [h1,m1] = bd.split(":").map(Number);
+      const [h2,m2] = kt.split(":").map(Number);
+      return (h2 + m2/60) - (h1 + m1/60);
+    }
+
+    function timKiemKhach(field) {
+      const tenVal = document.getElementById("tenKhach").value.toLowerCase();
+      const sdtVal = document.getElementById("soDienThoai").value;
+      const resultTen = document.getElementById("search-ten");
+      const resultSdt = document.getElementById("search-sdt");
+
+      let results = [];
+      if (field === "ten" && tenVal) {
+        results = khachHangData.filter(kh => kh.ten.toLowerCase().includes(tenVal));
+        renderResults(resultTen, results);
+      } else if (field === "sdt" && sdtVal) {
+        results = khachHangData.filter(kh => kh.sdt.includes(sdtVal));
+        renderResults(resultSdt, results);
+      } else {
+        resultTen.style.display = "none";
+        resultSdt.style.display = "none";
+      }
+
+      const hopLe = khachHangData.some(kh => 
+        kh.ten.toLowerCase() === tenVal && kh.sdt === sdtVal
+      );
+      document.getElementById("maGiamGiaWrapper").style.display = hopLe ? "block" : "none";
+    }
+
+    function renderResults(container, results) {
+      if (results.length > 0) {
+        container.innerHTML = results.map(kh => 
+          `<div onclick="chonKhach('${kh.ten}','${kh.sdt}')">${kh.ten} - ${kh.sdt}</div>`
+        ).join("");
+        container.style.display = "block";
+      } else {
+        container.innerHTML = "<div>Không tìm thấy</div>";
+        container.style.display = "block";
+      }
+    }
+
+    function chonKhach(ten, sdt) {
+      document.getElementById("tenKhach").value = ten;
+      document.getElementById("soDienThoai").value = sdt;
+      document.getElementById("search-ten").style.display = "none";
+      document.getElementById("search-sdt").style.display = "none";
+      document.getElementById("maGiamGiaWrapper").style.display = "block";
+    }
+
+    function themDichVu() {
+      const div = document.createElement("div");
+      div.className = "dich-vu-item";
+      div.innerHTML = `
+        <input type="text" class="input-ten-dv" placeholder="Tên dịch vụ" />
+        <input type="number" class="input-gia-dv" placeholder="Giá (đ)" />
+      `;
+      document.getElementById("dichVuList").appendChild(div);
+    }
+
+    function themKhachHang() {
+      alert("Mở form thêm khách hàng mới (chưa kết nối API)");
+    }
+
+    function xacNhanDatSan() {
+      alert("Đặt sân thành công!");
+    }
+  </script>
+</body>
+</html>

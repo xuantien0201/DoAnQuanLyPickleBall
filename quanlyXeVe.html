@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quản lý xé vé</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #f8fafc;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+
+    header {
+      background: #2563eb;
+      color: white;
+      padding: 16px 24px;
+      font-size: 22px;
+      font-weight: 600;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .container {
+      padding: 20px 40px;
+    }
+
+    /* Thanh lọc tìm kiếm */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      background: white;
+      padding: 16px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      margin-bottom: 24px;
+    }
+
+    .filter-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    input[type="text"],
+    input[type="date"] {
+      padding: 6px 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .btn {
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      color: white;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+    }
+
+    .btn-primary {
+      background-color: #2563eb;
+    }
+
+    .btn-success {
+      background-color: #22c55e;
+    }
+
+    .btn-warning {
+      background-color: #f59e0b;
+    }
+
+    .btn-danger {
+      background-color: #ef4444;
+    }
+
+    .btn-secondary {
+      background-color: #6b7280;
+    }
+
+    .status-btn {
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      color: white;
+      padding: 6px 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .status-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    th {
+      background: #f1f5f9;
+      font-weight: 600;
+    }
+
+    tr:hover {
+      background: #f9fafb;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+  <header>Quản lý xé vé</header>
+
+  <div class="container">
+    <!-- Bộ lọc tìm kiếm -->
+    <div class="filter-bar">
+      <div class="filter-left">
+        <input type="text" placeholder="🔍 Tìm theo tên sự kiện" />
+        <label>Từ ngày:</label>
+        <input type="date" />
+        <label>Đến ngày:</label>
+        <input type="date" />
+        <button class="btn btn-primary">Tìm kiếm</button>
+      </div>
+      <button class="btn btn-success">+ Thêm sự kiện</button>
+    </div>
+
+    <!-- Bảng danh sách sự kiện -->
+    <h3>Danh sách sự kiện xé vé</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Tên sự kiện</th>
+          <th>Ngày tổ chức</th>
+          <th>Giờ bắt đầu</th>
+          <th>Giờ kết thúc</th>
+          <th>Sân tham gia</th>
+          <th>Số người tối đa</th>
+          <th>Trạng thái</th>
+          <th>Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Giải Pickleball Cuối Tuần</td>
+          <td>2025-10-20</td>
+          <td>08:00</td>
+          <td>12:00</td>
+          <td>S9, S10, S11, TT</td>
+          <td>32</td>
+          <td>
+            <button class="status-btn btn-secondary">Đang mở</button>
+          </td>
+          <td class="action-buttons">
+            <button class="btn btn-primary">Thêm người</button>
+            <button class="btn btn-warning">Sửa</button>
+            <button class="btn btn-danger">Xóa</button>
+          </td>
+        </tr>
+        <tr>
+          <td>Sự kiện Xé Vé Buổi Tối</td>
+          <td>2025-10-25</td>
+          <td>18:00</td>
+          <td>22:00</td>
+          <td>S12, S13, S14</td>
+          <td>24</td>
+          <td>
+            <button class="status-btn btn-secondary">Đã khóa</button>
+          </td>
+          <td class="action-buttons">
+            <button class="btn btn-primary">Thêm người</button>
+            <button class="btn btn-warning">Sửa</button>
+            <button class="btn btn-danger">Xóa</button>
+          </td>
+        </tr>
+        <tr>
+          <td>Sự kiện Cuối Tháng</td>
+          <td>2025-10-30</td>
+          <td>07:00</td>
+          <td>11:00</td>
+          <td>S1, S2, S3, S4</td>
+          <td>32</td>
+          <td>
+            <button class="status-btn btn-secondary">Đang mở</button>
+          </td>
+          <td class="action-buttons">
+            <button class="btn btn-primary">Thêm người</button>
+            <button class="btn btn-warning">Sửa</button>
+            <button class="btn btn-danger">Xóa</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

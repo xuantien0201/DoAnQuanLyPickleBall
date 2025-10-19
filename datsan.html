@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pickleball Bồ Đề - Đặt sân</title>
+    <style>
+      :root {
+        --bg: #f5f7fb;
+        --panel: #ffffff;
+        --text: #27364b;
+        --muted: #7a8799;
+        --primary: #0a76d3;
+        --primary-light: #1677ff;
+        --primary-bg: #eff6ff;
+        --border: #e0e6ef;
+        --success: #22c55e;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial;
+        background: var(--bg);
+        color: var(--text);
+      }
+
+      .container {
+        width: 100%;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      header {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        padding: 14px 16px;
+        border-radius: 16px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+      }
+      header .left,
+      header .right {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .brand {
+        font-weight: 700;
+        font-size: 18px;
+        color: var(--primary);
+      }
+      .control {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        background: var(--primary-bg);
+        border: 1px solid var(--border);
+        padding: 8px 10px;
+        border-radius: 12px;
+      }
+      .control label {
+        font-size: 16px;
+        color: var(--muted);
+        padding: 0px 5px;
+        font-weight: 400;
+      }
+      .control input,
+      .control select {
+        background: transparent;
+        border: none;
+        color: var(--text);
+        font-weight: 600;
+        outline: none;
+      }
+      .control input[type="date"] {
+        padding: 6px 4px;
+      }
+
+      .legend {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 3px;
+        display: inline-block;
+        border: 1px solid var(--border);
+      }
+      .dot.a {
+        background: var(--primary-light);
+      }
+      .dot.b {
+        background: var(--warning);
+      }
+      .dot.c {
+        background: var(--danger);
+      }
+      .dot.d {
+        background: #9ca3af;
+      }
+
+      .grid-wrapper {
+        margin-top: 18px;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .grid-head,
+      .row {
+        display: grid;
+        grid-template-columns: 100px repeat(8, 1fr);
+      }
+      .grid-head {
+        position: sticky;
+        top: 0;
+        background: var(--primary-bg);
+        z-index: 5;
+      }
+      .cell,
+      .hcell {
+        border-right: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        padding: 10px;
+        text-align: center;
+      }
+      .hcell {
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .side {
+        position: sticky;
+        left: 0;
+        background: #f9fbff;
+        font-weight: 700;
+      }
+      .slot {
+        cursor: pointer;
+        transition: transform 0.05s ease, background 0.2s;
+      }
+      .avail {
+        background: #e8f2ff;
+      }
+      .booked {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+      .selected {
+        background: #fef3c7;
+        color: #78350f;
+      }
+
+      .confirm-area {
+        width: 100%;
+        height: 50px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        margin-top: 15px;
+        padding: 0px 15px;
+        margin-bottom: 50px;
+      }
+      .confirm-area .total {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--primary);
+      }
+      .confirm-area button {
+        font-size: 20px;
+        padding: 5px 15px;
+        border: 2px solid var(--muted);
+        border-radius: 15px;
+        background-color: var(--primary-light);
+        color: white;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- HEADER -->
+      <header>
+        <div class="left">
+          <div class="brand">Pickleball Bồ Đề</div>
+          <div class="control">
+            <label>Ngày</label>
+            <input type="date" value="2025-10-14" />
+          </div>
+          <div class="control">
+            <label>Hình thức đặt sân</label>
+            <select>
+              <option>Đặt sân ngày</option>
+              <option>Đặt sân cố định</option>
+              <option>Xé vé</option>
+            </select>
+          </div>
+        </div>
+        <div class="right legend">
+          <span class="dot a"></span>
+          <small>Còn trống</small>
+          <span class="dot b"></span>
+          <small>Đang chờ</small>
+          <span class="dot c"></span>
+          <small>Đã đặt</small>
+          <span class="dot d"></span>
+          <small>Sự kiện</small>
+        </div>
+      </header>
+
+      <!-- GRID -->
+      <div class="grid-wrapper">
+        <div class="grid-head">
+          <div class="hcell side">Sân / Giờ</div>
+          <div class="hcell">05:00</div>
+          <div class="hcell">06:00</div>
+          <div class="hcell">07:00</div>
+          <div class="hcell">08:00</div>
+          <div class="hcell">09:00</div>
+          <div class="hcell">10:00</div>
+          <div class="hcell">11:00</div>
+          <div class="hcell">12:00</div>
+        </div>
+
+        <!-- ROWS -->
+        <div class="row">
+          <div class="cell side">Sân 1</div>
+          <div class="cell avail"></div>
+          <div class="cell booked"></div>
+          <div class="cell booked"></div>
+          <div class="cell avail"></div>
+          <div class="cell selected"></div>
+          <div class="cell avail"></div>
+          <div class="cell avail"></div>
+          <div class="cell booked"></div>
+        </div>
+
+        <div class="row">
+          <div class="cell side">Sân 2</div>
+          <div class="cell avail"></div>
+          <div class="cell avail"></div>
+          <div class="cell booked"></div>
+          <div class="cell booked"></div>
+          <div class="cell avail"></div>
+          <div class="cell selected"></div>
+          <div class="cell avail"></div>
+          <div class="cell avail"></div>
+        </div>
+
+        <div class="row">
+          <div class="cell side">Sân 3</div>
+          <div class="cell avail"></div>
+          <div class="cell booked"></div>
+          <div class="cell avail"></div>
+          <div class="cell avail"></div>
+          <div class="cell booked"></div>
+          <div class="cell booked"></div>
+          <div class="cell avail"></div>
+          <div class="cell avail"></div>
+        </div>
+      </div>
+
+      <!-- CONFIRM AREA -->
+      <div class="confirm-area">
+        <div class="total">Tổng: 320,000 đ</div>
+        <button>XÁC NHẬN</button>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,16 @@
+
+.app {
+  display: grid;
+  /* grid-template-columns: 260px 1fr; */
+  min-height: 100vh;
+  width: 100%;
+}
+
+.main-content {
+  flex: 1;
+  padding-top: 80px;
+}
+
+.main-content.main-content--admin {
+  padding-top: 0;
+}

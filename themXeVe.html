@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sự kiện Xé Vé</title>
+  <style>
+    body {
+  font-family: "Segoe UI", sans-serif;
+  background-color: #f8fafc;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 900px;
+  margin: 30px auto;
+  background: white;
+  padding: 25px 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+h2, h3 {
+  text-align: center;
+  color: #1e293b;
+}
+
+form {
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.form-group.small {
+  flex: 1;
+}
+
+label {
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+input, select, textarea {
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+textarea {
+  resize: vertical;
+}
+
+/* Lưới sân chia 4 cột */
+.san-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px 16px;
+  background: #f9fafb;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.san-grid label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+button {
+  background-color: #2563eb;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button:hover {
+  background-color: #1e40af;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+th, td {
+  border: 1px solid #e2e8f0;
+  padding: 10px;
+  text-align: center;
+  font-size: 14px;
+}
+
+th {
+  background-color: #f1f5f9;
+  font-weight: 700;
+}
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Quản lý sự kiện Xé Vé</h2>
+
+    <form class="xeve-form">
+      <!-- Bỏ mã sự kiện, chỉ còn tên -->
+      <div class="form-group">
+        <label for="tenSuKien">Tên sự kiện:</label>
+        <input type="text" id="tenSuKien" placeholder="VD: Giải Pickleball Mở Rộng" />
+      </div>
+
+      <!-- Ngày + Giờ bắt đầu + Giờ kết thúc cùng hàng -->
+      <div class="form-row">
+        <div class="form-group small">
+          <label for="ngayToChuc">Ngày tổ chức:</label>
+          <input type="date" id="ngayToChuc" />
+        </div>
+
+        <div class="form-group small">
+          <label for="gioBatDau">Giờ bắt đầu:</label>
+          <input type="time" id="gioBatDau" />
+        </div>
+
+        <div class="form-group small">
+          <label for="gioKetThuc">Giờ kết thúc:</label>
+          <input type="time" id="gioKetThuc" />
+        </div>
+      </div>
+
+      <!-- Danh sách sân chia 4 cột -->
+      <div class="form-group">
+        <label>Chọn sân tham gia (có thể chọn nhiều):</label>
+        <div class="san-grid">
+          <label><input type="checkbox" value="S1"> Sân 1</label>
+          <label><input type="checkbox" value="S2"> Sân 2</label>
+          <label><input type="checkbox" value="S3"> Sân 3</label>
+          <label><input type="checkbox" value="S4"> Sân 4</label>
+          <label><input type="checkbox" value="S5"> Sân 5</label>
+          <label><input type="checkbox" value="S6"> Sân 6</label>
+          <label><input type="checkbox" value="S7"> Sân 7</label>
+          <label><input type="checkbox" value="S8"> Sân 8</label>
+          <label><input type="checkbox" value="S9"> Sân 9</label>
+          <label><input type="checkbox" value="S10"> Sân 10</label>
+          <label><input type="checkbox" value="S11"> Sân 11</label>
+          <label><input type="checkbox" value="S12"> Sân 12</label>
+          <label><input type="checkbox" value="S13"> Sân 13</label>
+          <label><input type="checkbox" value="S14"> Sân 14</label>
+          <label><input type="checkbox" value="S15"> Sân 15</label>
+          <label><input type="checkbox" value="S16"> Sân 16</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="soNguoiToiDa">Số người tối đa:</label>
+        <input type="number" id="soNguoiToiDa" value="32" />
+      </div>
+
+      <div class="form-group">
+        <label for="moTa">Mô tả sự kiện:</label>
+        <textarea id="moTa" rows="3" placeholder="Nhập mô tả chi tiết về sự kiện..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <button type="submit">Tạo sự kiện</button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>
