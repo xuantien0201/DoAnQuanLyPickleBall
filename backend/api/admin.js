@@ -1,21 +1,16 @@
 import express from 'express';
 import { db } from "../config/db.js";
-
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 
 const router = express.Router();
-
-// --- Cấu hình Multer cho tải lên ảnh ---
-
-// Đảm bảo thư mục 'uploads' tồn tại
 const uploadsDir = 'uploads';
+
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir);
 }
 
-// Cấu hình lưu trữ cho ảnh sản phẩm
 const productStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = 'uploads/products';
@@ -29,7 +24,6 @@ const productStorage = multer.diskStorage({
   },
 });
 
-// Cấu hình lưu trữ cho ảnh danh mục
 const categoryStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = 'uploads/categories';
@@ -38,26 +32,24 @@ const categoryStorage = multer.diskStorage({
     }
     cb(null, dir);
   },
+
   filename: (req, file, cb) => {
     cb(null, `category-${Date.now()}${path.extname(file.originalname)}`);
   },
 });
-
 const productUpload = multer({ storage: productStorage });
-const upload = multer({ storage: categoryStorage }); // 'upload' được dùng cho categories
+const upload = multer({ storage: categoryStorage });
 
-// Get all products (admin)
 router.get('/products', async (req, res) => {
   try {
     const [products] = await db.query('SELECT * FROM products ORDER BY created_at DESC');
     res.json(products);
   } catch (error) {
-    console.error("Lỗi khi lấy danh sách sản phẩm:", error);
-    res.status(500).json({ error: 'Lỗi khi lấy danh sách sản phẩm' });
+    console.error('Lỗi khi lấy danh sách sản phẩm:', error);
+    res.status(500).json({ error: 'Không thể lấy danh sách sản phẩm' });
   }
 });
 
-// Create product
 router.post('/products', productUpload.single('image'), async (req, res) => {
   try {
     const { name, description, price, original_price, category, colors, stock, is_new, discount_percent } = req.body;
@@ -81,22 +73,19 @@ router.post('/products', productUpload.single('image'), async (req, res) => {
 
     const [result] = await db.query('INSERT INTO products SET ?', [productData]);
 
-    res.json({ message: 'Tạo sản phẩm thành công', productId: result.insertId });
+    res.json({ message: 'Sản phẩm đã được tạo thành công', productId: result.insertId });
   } catch (error) {
-    console.error("Lỗi khi tạo sản phẩm:", error);
-    res.status(500).json({ error: 'Lỗi khi tạo sản phẩm' });
+    console.error('Lỗi khi tạo sản phẩm:', error);
+    res.status(500).json({ error: 'Không thể tạo sản phẩm' });
   }
 });
 
-// Update product
 router.put('/products/:id', productUpload.single('image'), async (req, res) => {
   try {
     const { name, description, price, original_price, category, colors, stock, is_new, discount_percent } = req.body;
-    let imageUrl = req.body.image_url; // Mặc định là URL cũ
+    let imageUrl = req.body.image_url;
 
-    // Nếu có file mới được tải lên
     if (req.file) {
-      // Xóa file ảnh cũ nếu có
       const [oldProduct] = await db.query('SELECT image_url FROM products WHERE id = ?', [req.params.id]);
       if (oldProduct.length > 0 && oldProduct[0].image_url) {
         try {
@@ -109,7 +98,6 @@ router.put('/products/:id', productUpload.single('image'), async (req, res) => {
           console.error("Lỗi khi xóa ảnh sản phẩm cũ:", e);
         }
       }
-      // Cập nhật URL ảnh mới
       imageUrl = `${req.protocol}://${req.get('host')}/uploads/products/${req.file.filename}`;
     }
 
@@ -131,25 +119,23 @@ router.put('/products/:id', productUpload.single('image'), async (req, res) => {
       [productData, req.params.id]
     );
 
-    res.json({ message: 'Cập nhật sản phẩm thành công' });
+    res.json({ message: 'Sản phẩm đã được cập nhật thành công' });
   } catch (error) {
-    console.error("Lỗi khi cập nhật sản phẩm:", error);
-    res.status(500).json({ error: 'Lỗi khi cập nhật sản phẩm' });
+    console.error('Lỗi khi cập nhật sản phẩm:', error);
+    res.status(500).json({ error: 'Không thể cập nhật sản phẩm' });
   }
 });
 
-// Delete product
 router.delete('/products/:id', async (req, res) => {
   try {
     await db.query('DELETE FROM products WHERE id = ?', [req.params.id]);
-    res.json({ message: 'Xóa sản phẩm thành công' });
+    res.json({ message: 'Sản phẩm đã được xóa thành công' });
   } catch (error) {
-    console.error("Lỗi khi xóa sản phẩm:", error);
-    res.status(500).json({ error: 'Lỗi khi xóa sản phẩm' });
+    console.error('Lỗi khi xóa sản phẩm:', error);
+    res.status(500).json({ error: 'Không thể xóa sản phẩm' });
   }
 });
 
-// Get all orders
 router.get('/orders', async (req, res) => {
   try {
     const [orders] = await db.query(
@@ -162,9 +148,8 @@ router.get('/orders', async (req, res) => {
   }
 });
 
-// Update order status
 router.put('/orders/:id/status', async (req, res) => {
-  await db.beginTransaction(); // Bắt đầu transaction
+  await db.beginTransaction();
   try {
     const { status: newStatus } = req.body;
     const { id: orderId } = req.params;
@@ -174,7 +159,6 @@ router.put('/orders/:id/status', async (req, res) => {
       return res.status(400).json({ error: 'Trạng thái mới là bắt buộc' });
     }
 
-    // Lấy trạng thái hiện tại của đơn hàng
     const [[currentOrder]] = await db.query('SELECT status FROM orders WHERE id = ? FOR UPDATE', [orderId]);
     if (!currentOrder) {
       await db.rollback();
@@ -182,59 +166,51 @@ router.put('/orders/:id/status', async (req, res) => {
     }
     const oldStatus = currentOrder.status;
 
-    // Lấy các sản phẩm trong đơn hàng
     const [orderItems] = await db.query('SELECT product_id, quantity FROM order_items WHERE order_id = ?', [orderId]);
 
-    // Hàm trợ giúp để điều chỉnh tồn kho
-    const adjustStock = async (items, operation) => { // operation: 'reduce' hoặc 'return'
+    const adjustStock = async (items, operation) => {
       for (const item of items) {
-        console.log(`[Điều chỉnh kho] Xử lý: ID Sản phẩm = ${item.product_id}, Số lượng = ${item.quantity}, Hoạt động = ${operation}`);
+        console.log(`[adjustStock] Xử lý item: Product ID = ${item.product_id}, Số lượng = ${item.quantity}, Hoạt động = ${operation}`);
 
         const productIdToQuery = parseInt(item.product_id, 10);
         if (isNaN(productIdToQuery)) {
-          console.error(`[Điều chỉnh kho] ID sản phẩm không hợp lệ: ${item.product_id}. Bỏ qua mục này.`);
-          continue; // Bỏ qua nếu ID không hợp lệ
+          console.error(`[adjustStock] ID sản phẩm không hợp lệ: ${item.product_id}. Bỏ qua item.`);
+          continue;
         }
 
         if (operation === 'reduce') {
-          console.log(`[Điều chỉnh kho] Thử giảm tồn kho cho ID sản phẩm: ${productIdToQuery}`);
-          const [[product]] = await db.query('SELECT stock FROM products WHERE id = ? FOR UPDATE', [productIdToQuery]);
-          
-          console.log(`[Điều chỉnh kho] ID sản phẩm ${productIdToQuery}: Tồn kho hiện tại = ${product ? product.stock : 'Không tìm thấy'}`);
-
+          // Thực hiện truy vấn và lấy kết quả thô
+          const [rows] = await db.query('SELECT stock FROM products WHERE id = ? FOR UPDATE', [productIdToQuery]);
+          const product = rows && rows.length > 0 ? rows[0] : undefined; // Lấy hàng đầu tiên nếu có
           if (!product || product.stock < item.quantity) {
-            console.error(`[Điều chỉnh kho] Kiểm tra tồn kho thất bại cho ID ${productIdToQuery}. Tồn kho: ${product ? product.stock : 0}, Yêu cầu: ${item.quantity}`);
+            console.error(`[adjustStock] Kiểm tra tồn kho thất bại cho Product ID ${productIdToQuery}. Tồn kho hiện tại: ${product ? product.stock : 0}, Yêu cầu: ${item.quantity}`);
             throw new Error(`Không đủ hàng tồn kho cho sản phẩm (ID: ${productIdToQuery}). Chỉ còn ${product ? product.stock : 0} sản phẩm.`);
           }
           await db.query('UPDATE products SET stock = stock - ? WHERE id = ?', [item.quantity, productIdToQuery]);
-          console.log(`[Điều chỉnh kho] Đã giảm thành công tồn kho cho ID ${productIdToQuery} đi ${item.quantity} sản phẩm.`);
+          console.log(`[adjustStock] Đã giảm tồn kho thành công cho Product ID ${productIdToQuery} với số lượng ${item.quantity}`);
         } else if (operation === 'return') {
           await db.query('UPDATE products SET stock = stock + ? WHERE id = ?', [item.quantity, productIdToQuery]);
-          console.log(`[Điều chỉnh kho] Đã hoàn trả thành công tồn kho cho ID ${productIdToQuery} thêm ${item.quantity} sản phẩm.`);
+          console.log(`[adjustStock] Đã hoàn trả tồn kho thành công cho Product ID ${productIdToQuery} với số lượng ${item.quantity}`);
         }
       }
     };
 
-    // Xác định các trạng thái đã trừ kho
     const stockDeductedStatuses = ['Delivered', 'Completed'];
+
     const oldStatusDeductedStock = stockDeductedStatuses.includes(oldStatus);
     const newStatusDeductedStock = stockDeductedStatuses.includes(newStatus);
 
     if (oldStatusDeductedStock && !newStatusDeductedStock) {
-      // Hoàn trả lại hàng vào kho
-      await adjustStock(orderItems, 'hoàn trả vào kho');
+      await adjustStock(orderItems, 'return');
     } else if (!oldStatusDeductedStock && newStatusDeductedStock) {
-      // Trừ hàng khỏi kho
-      await adjustStock(orderItems, 'Trừ khỏi kho');
+      await adjustStock(orderItems, 'reduce');
     }
-
-    // Cập nhật trạng thái đơn hàng
+    // Update the order status in the database
     await db.query('UPDATE orders SET status = ? WHERE id = ?', [newStatus, orderId]);
-
-    await db.commit(); // Hoàn tất transaction
+    await db.commit(); // Commit transaction
     res.json({ message: 'Cập nhật trạng thái đơn hàng thành công' });
   } catch (error) {
-    await db.rollback(); // Hoàn tác transaction nếu có lỗi
+    await db.rollback(); // Rollback transaction if any error occurs
     console.error('Lỗi khi cập nhật trạng thái đơn hàng:', error);
     if (error.message.includes('Không đủ hàng tồn kho')) {
       return res.status(400).json({ error: error.message });
@@ -242,19 +218,15 @@ router.put('/orders/:id/status', async (req, res) => {
     res.status(500).json({ error: 'Không thể cập nhật trạng thái' });
   }
 });
-
-// Get all categories (admin)
 router.get('/categories', async (req, res) => {
   try {
     const [categories] = await db.query('SELECT * FROM categories ORDER BY name');
     res.json(categories);
   } catch (error) {
-    console.error("Lỗi khi lấy danh sách danh mục:", error);
-    res.status(500).json({ error: 'Lỗi khi lấy danh sách danh mục' });
+    console.error('Lỗi khi lấy danh sách danh mục:', error);
+    res.status(500).json({ error: 'Không thể lấy danh sách danh mục' });
   }
 });
-
-// Route để liệt kê các file đã upload (cho mục đích chọn ảnh)
 router.get('/uploads/categories', async (req, res) => {
   try {
     const dir = path.join(process.cwd(), 'uploads', 'categories');
@@ -266,12 +238,10 @@ router.get('/uploads/categories', async (req, res) => {
     }));
     res.json(list);
   } catch (error) {
-    console.error('Lỗi khi đọc thư mục uploads:', error);
-    res.status(500).json({ error: 'Lỗi khi liệt kê các tệp đã tải lên' });
+    console.error('Lỗi khi đọc danh sách tải lên:', error);
+    res.status(500).json({ error: 'Không thể liệt kê các file đã tải lên' });
   }
 });
-
-// Create category
 router.post('/categories', upload.single('image'), async (req, res) => {
   try {
     const { name, slug } = req.body;
@@ -284,14 +254,13 @@ router.post('/categories', upload.single('image'), async (req, res) => {
       [name, slug, imageUrl]
     );
 
-    res.json({ message: 'Tạo danh mục thành công', categoryId: result.insertId });
+    res.json({ message: 'Danh mục đã được tạo thành công', categoryId: result.insertId });
   } catch (error) {
-    console.error("Lỗi khi tạo danh mục:", error);
-    res.status(500).json({ error: 'Lỗi khi tạo danh mục' });
+    console.error('Lỗi khi tạo danh mục:', error);
+    res.status(500).json({ error: 'Không thể tạo danh mục' });
   }
 });
 
-// Update category
 router.put('/categories/:id', upload.single('image'), async (req, res) => {
   try {
     const { name, slug } = req.body;
@@ -304,9 +273,10 @@ router.put('/categories/:id', upload.single('image'), async (req, res) => {
         const oldImageName = oldCategory[0].image_url.split('/').pop();
         const oldImagePath = path.join('uploads', 'categories', oldImageName);
         if (fs.existsSync(oldImagePath)) {
-          fs.unlinkSync(oldImagePath);
+          fs.unlinkSync(oldImagePath); // Xóa file ảnh cũ
         }
       }
+
       imageUrl = `${req.protocol}://${req.get('host')}/${req.file.path.replace(/\\/g, "/")}`;
     }
 
@@ -315,14 +285,13 @@ router.put('/categories/:id', upload.single('image'), async (req, res) => {
       [name, slug, imageUrl, id]
     );
 
-    res.json({ message: 'Cập nhật danh mục thành công' });
+    res.json({ message: 'Danh mục đã được cập nhật thành công' });
   } catch (error) {
-    console.error("Lỗi khi cập nhật danh mục:", error);
-    res.status(500).json({ error: 'Lỗi khi cập nhật danh mục' });
+    console.error('Lỗi khi cập nhật danh mục:', error);
+    res.status(500).json({ error: 'Không thể cập nhật danh mục' });
   }
 });
 
-// Delete category
 router.delete('/categories/:id', async (req, res) => {
   try {
     const [category] = await db.query('SELECT image_url FROM categories WHERE id = ?', [req.params.id]);
@@ -330,15 +299,15 @@ router.delete('/categories/:id', async (req, res) => {
       const imageName = category[0].image_url.split('/').pop();
       const imagePath = path.join('uploads', 'categories', imageName);
       if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
+        fs.unlinkSync(imagePath); // Xóa file ảnh
       }
     }
 
     await db.query('DELETE FROM categories WHERE id = ?', [req.params.id]);
-    res.json({ message: 'Xóa danh mục thành công' });
+    res.json({ message: 'Danh mục đã được xóa thành công' });
   } catch (error) {
-    console.error("Lỗi khi xóa danh mục:", error);
-    res.status(500).json({ error: 'Lỗi khi xóa danh mục' });
+    console.error('Lỗi khi xóa danh mục:', error);
+    res.status(500).json({ error: 'Không thể xóa danh mục' });
   }
 });
 
