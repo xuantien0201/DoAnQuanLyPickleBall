@@ -18,30 +18,27 @@ const Home = () => {
   const fetchNewArrivals = async () => {
     try {
       const response = await axios.get('/api/products/featured/new-arrivals');
-      setNewArrivals(Array.isArray(response.data) ? response.data : []);
+      setNewArrivals(response.data);
     } catch (error) {
       console.error('Lỗi khi tải sản phẩm mới:', error);
-      setNewArrivals([]); // Ensure it's an empty array on error
     }
   };
 
   const fetchOnSaleProducts = async () => {
     try {
       const response = await axios.get('/api/products/featured/on-sale');
-      setOnSaleProducts(Array.isArray(response.data) ? response.data : []);
+      setOnSaleProducts(response.data);
     } catch (error) {
       console.error('Lỗi khi tải sản phẩm giảm giá:', error);
-      setOnSaleProducts([]); // Ensure it's an empty array on error
     }
   };
 
   const fetchCategories = async () => {
     try {
       const response = await axios.get('/api/categories');
-      setCategories(Array.isArray(response.data) ? response.data : []);
+      setCategories(response.data.slice(0, 5));
     } catch (error) {
-      console.error('Error fetching categories:', error);
-      setCategories([]); // Ensure it's an empty array on error
+      console.error('Lỗi khi tải danh mục:', error);
     }
   };
 
@@ -81,7 +78,7 @@ const Home = () => {
             {categories.map((category, index) => (
               <Link
                 key={category.id}
-                to={`/shop?category=${category.name}`}
+                to={`/shop?category=${category.slug}`}
                 className={`category-card category-${index + 1}`}
               >
                 <img

@@ -81,13 +81,25 @@
   width: 100%;
 }
 
-/* ===== Search & Cart ===== */
+/* ===== Actions (Account & Cart) ===== */
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 25px;
 }
 
+.action-icon {
+  display: flex;
+  align-items: center;
+  color: #333;
+  transition: color 0.3s;
+}
+
+.action-icon:hover {
+  color: var(--primary-color, #007bff);
+}
+
+/* ===== Search & Cart ===== */
 .search-form {
   display: flex;
   align-items: center;
@@ -121,6 +133,26 @@
 }
 
 /* ===== Giỏ hàng ===== */
+.cart-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  color: #333;
+  transition: color 0.3s;
+}
+
+.cart-link:hover {
+  color: var(--primary-color, #007bff);
+}
+
+.cart-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
 .cart-icon {
   position: relative;
   display: flex;

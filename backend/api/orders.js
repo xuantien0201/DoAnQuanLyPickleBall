@@ -13,26 +13,26 @@ router.post('/', async (req, res) => {
       // Fields for regular checkout
       fullName, email, phone, address, city,
       // Fields for POS
-      customer,
-      // Common fields
+      customer, 
       notes, paymentMethod, items, total, status
     } = req.body;
 
+   
 
     const orderCode = uuidv4().split('-')[0].toUpperCase();
     let orderData;
     let customerPhone = phone;
-    let initialStatus; // To store the determined initial status
+    let initialStatus; // Để lưu trạng thái ban đầu được xác định
 
-    // Differentiate between POS order and regular checkout order
+    // Phân biệt giữa đơn hàng POS và đơn hàng checkout thông thường
     if (customer && customer.name && customer.phone) {
-      // This is a POS order
+      // Đây là đơn hàng POS
       if (!paymentMethod || !items || items.length === 0) {
-        await db.rollback(); // Rollback before returning
+        await db.rollback(); // Rollback trước khi trả về
         return res.status(400).json({ error: 'Dữ liệu đơn hàng POS không hợp lệ.' });
       }
       customerPhone = customer.phone;
-      initialStatus = status || 'Delivered'; // POS orders are completed immediately
+      initialStatus = status || 'Delivered'; // Đơn hàng POS được hoàn thành ngay lập tức
       orderData = [
         orderCode,
         customer.name,
@@ -46,12 +46,12 @@ router.post('/', async (req, res) => {
         initialStatus
       ];
     } else {
-      // This is a regular checkout order
+      // Đây là đơn hàng checkout thông thường
       if (!fullName || !email || !phone || !address || !city || !paymentMethod || !items || items.length === 0) {
-        await db.rollback(); // Rollback before returning
+        await db.rollback(); 
         return res.status(400).json({ error: 'Vui lòng điền đầy đủ thông tin bắt buộc.' });
       }
-      initialStatus = status || 'Pending'; // Regular orders are pending
+      initialStatus = status || 'Pending'; // Đơn hàng thông thường ở trạng thái chờ xử lý
       orderData = [
         orderCode,
         fullName,
@@ -77,21 +77,23 @@ router.post('/', async (req, res) => {
 
     // Insert into order_items table and potentially reduce stock
     const itemPromises = items.map(async (item) => {
-      // Đảm bảo chúng ta luôn lấy product_id từ item, không phải id của cart_item
-      const productId = item.product_id;
+      let productId;
 
-      if (!productId) {
+      if (customer && customer.name && customer.phone) {
+        productId = item.id; // Đây là đơn hàng POS, item.id chính là product_id
+      } else {
+        productId = item.product_id;
+      }
+
+      if (!productId) { // <--- Đây là dòng 84, nơi lỗi xảy ra
         throw new Error(`Thiếu product_id cho sản phẩm ${item.name || 'không tên'}.`);
       }
 
-
-      // Check stock availability before inserting order item if initial status is 'Delivered'
       if (initialStatus === 'Delivered') {
         const [[productStock]] = await db.query('SELECT stock FROM products WHERE id = ? FOR UPDATE', [productId]);
         if (!productStock || productStock.stock < item.quantity) {
           throw new Error(`Không đủ hàng tồn kho cho sản phẩm ${item.name}. Chỉ còn ${productStock ? productStock.stock : 0} sản phẩm.`);
         }
-        // Reduce stock immediately for 'Delivered' orders
         await db.query('UPDATE products SET stock = stock - ? WHERE id = ?', [item.quantity, productId]);
       }
 
@@ -111,7 +113,6 @@ router.post('/', async (req, res) => {
   } catch (error) {
     await db.rollback();
     console.error('Lỗi khi tạo đơn hàng:', error);
-    // Check if the error is a stock-related error
     if (error.message.includes('Không đủ hàng tồn kho') || error.message.includes('Thiếu product_id')) {
       return res.status(400).json({ error: error.message });
     }
@@ -119,7 +120,6 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Get order details by order_code
 router.get('/:orderCode', async (req, res) => {
   try {
     const [orders] = await db.query('SELECT * FROM orders WHERE order_code = ?', [req.params.orderCode]);

@@ -1,23 +1,20 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import ProductCard from '../../components/ProductCard';
 import '../../css/Shop.css';
 
 const Shop = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [filters, setFilters] = useState({
-    category: '',
-    sort: '',
-    search: '',
-    minPrice: '',
-    maxPrice: '',
-    status: ''
-  });
-  const [searchParams, setSearchParams] = useSearchParams();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
+  const [sortBy, setSortBy] = useState('newest');
+  const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+  const [searchInput, setSearchInput] = useState(searchParams.get('search') || '');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+  const [productStatus, setProductStatus] = useState(searchParams.get('status') || 'all'); // State cho bộ lọc trạng thái
+
 
   useEffect(() => {
     fetchCategories();
@@ -25,40 +22,38 @@ const Shop = () => {
 
   useEffect(() => {
     fetchProducts();
-    fetchCategories();
-  }, [filters, location.search]);
+  }, [selectedCategory, sortBy, searchQuery, productStatus]);
 
   const fetchCategories = async () => {
     try {
       const response = await axios.get('/api/categories');
-      setCategories(Array.isArray(response.data) ? response.data : []);
+      setCategories(response.data);
     } catch (error) {
       console.error('Error fetching categories:', error);
-      setCategories([]);
     }
   };
 
   const fetchProducts = async () => {
     try {
       const params = {
-        sort: filters.sort,
-        ...(filters.category && { category: filters.category }),
-        ...(filters.search && { search: filters.search }),
-        ...(filters.minPrice && { minPrice: filters.minPrice }),
-        ...(filters.maxPrice && { maxPrice: filters.maxPrice }),
-        ...(filters.status && filters.status !== 'all' && { status: filters.status })
+        sort: sortBy,
+        ...(selectedCategory && { category: selectedCategory }),
+        ...(searchQuery && { search: searchQuery }),
+        ...(priceRange.min && { minPrice: priceRange.min }),
+        ...(priceRange.max && { maxPrice: priceRange.max }),
+        ...(productStatus !== 'all' && { status: productStatus }) // Thêm param status nếu không phải 'all'
+
       };
 
       const response = await axios.get('/api/products', { params });
-      setProducts(Array.isArray(response.data) ? response.data : []);
+      setProducts(response.data);
     } catch (error) {
       console.error('Error fetching products:', error);
-      setProducts([]);
     }
   };
 
   const handleCategoryChange = (category) => {
-    setFilters({ ...filters, category });
+    setSelectedCategory(category);
     if (category) {
       searchParams.set('category', category);
     } else {
@@ -68,7 +63,7 @@ const Shop = () => {
   };
 
   const handleStatusChange = (status) => {
-    setFilters({ ...filters, status });
+    setProductStatus(status);
     if (status && status !== 'all') {
       searchParams.set('status', status);
     } else {
@@ -78,7 +73,18 @@ const Shop = () => {
   };
 
   const handleSortChange = (e) => {
-    setFilters({ ...filters, sort: e.target.value });
+    setSortBy(e.target.value);
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    setSearchQuery(searchInput);
+    if (searchInput) {
+      searchParams.set('search', searchInput);
+    } else {
+      searchParams.delete('search');
+    }
+    setSearchParams(searchParams);
   };
 
   const handlePriceFilter = () => {
@@ -86,14 +92,12 @@ const Shop = () => {
   };
 
   const clearFilters = () => {
-    setFilters({
-      category: '',
-      sort: '',
-      search: '',
-      minPrice: '',
-      maxPrice: '',
-      status: ''
-    });
+    setSelectedCategory('');
+    setSortBy('newest');
+    setPriceRange({ min: '', max: '' });
+    setSearchInput('');
+    setSearchQuery('');
+    setProductStatus('all'); // Reset cả bộ lọc trạng thái
     searchParams.delete('category');
     searchParams.delete('search');
     searchParams.delete('status'); // Xóa status khỏi URL
@@ -115,84 +119,81 @@ const Shop = () => {
             {/* Sidebar Filters */}
             <aside className="shop-sidebar">
               <div className="filter-section">
-                <h3>Categories</h3>
-                <div className="filter-options">
-                  <label className="filter-option">
-                    <input
-                      type="radio"
-                      name="category"
-                      checked={filters.category === ''}
-                      onChange={() => handleCategoryChange('')}
-                    />
-                    <span>All Products</span>
-                  </label>
+                <h3>Tìm kiếm</h3>
+                <form className="search-filter" onSubmit={handleSearchSubmit}>
+                  <input
+                    type="text"
+                    placeholder="Tìm kiếm sản phẩm..."
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                  />
+                  <button type="submit" className="btn-apply">Tìm kiếm</button>
+                </form>
+              </div>
+              <div className="filter-section">
+                <h3>Danh mục</h3>
+                <ul className="category-filter-list">
+                  <li
+                    className={`category-item ${selectedCategory === '' ? 'active' : ''}`}
+                    onClick={() => handleCategoryChange('')}
+                  >
+                    Tất cả sản phẩm
+                  </li>
                   {categories.map((category) => (
-                    <label key={category.id} className="filter-option">
-                      <input
-                        type="radio"
-                        name="category"
-                        checked={filters.category === category.slug}
-                        onChange={() => handleCategoryChange(category.slug)}
-                      />
-                      <span>{category.name}</span>
-                    </label>
+                    <li
+                      key={category.id}
+                      className={`category-item ${selectedCategory === category.slug ? 'active' : ''}`}
+                      onClick={() => handleCategoryChange(category.slug)}
+                    >
+                      {category.name}
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
 
               {/* Price Filter */}
               <div className="filter-section">
-                <h3>Price</h3>
+                <h3>Giá</h3>
                 <div className="price-filter">
                   <input
                     type="number"
                     placeholder="Min"
-                    value={filters.minPrice}
-                    onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
+                    value={priceRange.min}
+                    onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
                   />
                   <span>-</span>
                   <input
                     type="number"
                     placeholder="Max"
-                    value={filters.maxPrice}
-                    onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
+                    value={priceRange.max}
+                    onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
                   />
                   <button onClick={handlePriceFilter} className="btn-apply">Apply</button>
                 </div>
               </div>
               {/* Thêm bộ lọc trạng thái sản phẩm */}
               <div className="filter-section">
-                <h3>Product Type</h3>
+                <h3>Loại sản phẩm</h3>
                 <div className="filter-options">
                   <label className="filter-option">
                     <input
                       type="radio"
                       name="status"
-                      value="all"
-                      checked={filters.status === 'all'}
-                      onChange={() => handleStatusChange('all')}
-                    />
-                    <span>All Products</span>
-                  </label>
-                  <label className="filter-option">
-                    <input
-                      type="radio"
-                      name="status"
                       value="new"
-                      checked={filters.status === 'new'}
+                      checked={productStatus === 'new'}
                       onChange={() => handleStatusChange('new')}
                     />
-                    <span>New Arrivals</span>
+                    <span>Sản phẩm mới</span>
                   </label>
                   <label className="filter-option">
                     <input
                       type="radio"
                       name="status"
                       value="sale"
-                      checked={filters.status === 'sale'}
+                      checked={productStatus === 'sale'}
                       onChange={() => handleStatusChange('sale')}
                     />
-                    <span>On Sale</span>
+                    <span>Sản phẩm đang giảm giá</span>
                   </label>
                 </div>
               </div>
@@ -208,33 +209,16 @@ const Shop = () => {
                 </div>
 
                 <div className="sort-controls">
-                  <label>Sort by:</label>
-                  <select value={filters.sort} onChange={handleSortChange}>
-                    <option value="newest">Newest</option>
-                    <option value="price_asc">Price: Low to High</option>
-                    <option value="price_desc">Price: High to Low</option>
-                    <option value="name_asc">Name: A to Z</option>
-                    <option value="name_desc">Name: Z to A</option>
+                  <label>Lọc theo:</label>
+                  <select value={sortBy} onChange={handleSortChange}>
+                    <option value="newest">Mới nhất</option>
+                    <option value="price_asc">Giá: Từ Thấp đến Cao</option>
+                    <option value="price_desc">Giá: Từ Cao đến Thấp</option>
+                    <option value="name_asc">Tên: A to Z</option>
+                    <option value="name_desc">Tên: Z to A</option>
                   </select>
                 </div>
 
-                <div className="view-controls">
-                  <button className="view-btn active">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                      <rect x="3" y="3" width="7" height="7" />
-                      <rect x="14" y="3" width="7" height="7" />
-                      <rect x="3" y="14" width="7" height="7" />
-                      <rect x="14" y="14" width="7" height="7" />
-                    </svg>
-                  </button>
-                  <button className="view-btn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                      <rect x="3" y="3" width="18" height="4" />
-                      <rect x="3" y="10" width="18" height="4" />
-                      <rect x="3" y="17" width="18" height="4" />
-                    </svg>
-                  </button>
-                </div>
               </div>
 
               {products.length === 0 ? (

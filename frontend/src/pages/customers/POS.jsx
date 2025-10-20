@@ -19,15 +19,34 @@ export function POS() {
             .catch(err => console.error("Lỗi khi tải sản phẩm:", err));
     }, []);
 
-    const addToCart = (product) => {
+    const addToCart = (productToAdd) => { // Đổi tên tham số để tránh nhầm lẫn với state 'products'
+        console.log('POS - Sản phẩm được thêm vào giỏ hàng:', productToAdd);
         setCart(currentCart => {
-            const existingItem = currentCart.find(item => item.id === product.id);
-            if (existingItem) {
-                return currentCart.map(item =>
-                    item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-                );
+            const existingItem = currentCart.find(item => item.id === productToAdd.id);
+
+            // Lấy thông tin tồn kho thực tế từ danh sách sản phẩm
+            const actualProduct = products.find(p => p.id === productToAdd.id);
+            if (!actualProduct) {
+                alert('Không tìm thấy thông tin tồn kho cho sản phẩm này.');
+                return currentCart;
             }
-            return [...currentCart, { ...product, quantity: 1 }];
+
+            if (existingItem) {
+                const newQuantity = existingItem.quantity + 1;
+                if (newQuantity > actualProduct.stock) {
+                    alert(`Không đủ hàng tồn kho cho ${productToAdd.name}. Chỉ còn ${actualProduct.stock} sản phẩm.`);
+                    return currentCart;
+                }
+                return currentCart.map(item =>
+                    item.id === productToAdd.id ? { ...item, quantity: newQuantity } : item
+                );
+            } else {
+                if (1 > actualProduct.stock) { // Thêm 1 sản phẩm
+                    alert(`Không đủ hàng tồn kho cho ${productToAdd.name}. Chỉ còn ${actualProduct.stock} sản phẩm.`);
+                    return currentCart;
+                }
+                return [...currentCart, { ...productToAdd, quantity: 1 }];
+            }
         });
     };
 
@@ -35,8 +54,25 @@ export function POS() {
         setCart(currentCart => {
             return currentCart.map(item => {
                 if (item.id === productId) {
+                    // Lấy thông tin tồn kho thực tế từ danh sách sản phẩm
+                    const actualProduct = products.find(p => p.id === productId);
+                    if (!actualProduct) {
+                        alert('Không tìm thấy thông tin tồn kho cho sản phẩm này.');
+                        return item; // Không thay đổi số lượng nếu không có thông tin tồn kho
+                    }
+
                     const newQuantity = item.quantity + amount;
-                    return newQuantity > 0 ? { ...item, quantity: newQuantity } : null;
+
+                    if (newQuantity <= 0) {
+                        return null; // Xóa sản phẩm nếu số lượng <= 0
+                    }
+
+                    // Kiểm tra tồn kho chỉ khi tăng số lượng
+                    if (amount > 0 && newQuantity > actualProduct.stock) {
+                        alert(`Không đủ hàng tồn kho cho ${item.name}. Chỉ còn ${actualProduct.stock} sản phẩm.`);
+                        return item; // Không cập nhật số lượng
+                    }
+                    return { ...item, quantity: newQuantity };
                 }
                 return item;
             }).filter(Boolean); // Lọc bỏ sản phẩm có số lượng <= 0
@@ -78,17 +114,20 @@ export function POS() {
         }
 
         try {
+            const itemsToSend = cart.map(item => ({
+                id: item.id, // Đây là product ID
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity
+            }));
+
+            console.log('POS Checkout - Dữ liệu items đang được gửi:', itemsToSend); // THÊM DÒNG NÀY
+
             const response = await fetch('/api/orders', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    // Ánh xạ lại cấu trúc giỏ hàng cho phù hợp với backend
-                    items: cart.map(item => ({
-                        id: item.id,
-                        name: item.name, // Thêm tên sản phẩm
-                        price: item.price,
-                        quantity: item.quantity
-                    })),
+                    items: itemsToSend, // Sử dụng mảng đã log
                     total,
                     paymentMethod: paymentMethod,
                     status: 'Delivered',
@@ -116,7 +155,7 @@ export function POS() {
             <div className="pos-products">
                 <input
                     type="text"
-                    placeholder="Search products..."
+                    placeholder="Tìm kiếm sản phẩm..." // Đã sửa tiếng Việt
                     className="pos-search"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -127,6 +166,7 @@ export function POS() {
                             <img src={product.image_url || '/images/default-product.png'} alt={product.name} />
                             <p>{product.name}</p>
                             <span>{product.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+                            <p className="product-stock">Tồn kho: {product.stock}</p> {/* THÊM DÒNG NÀY */}
                         </div>
                     ))}
                 </div>
@@ -135,50 +175,50 @@ export function POS() {
             {/* Sidebar / Invoice */}
             <aside className="pos-sidebar">
                 <div className="current-sale-card">
-                    <h3 className="sale-title">Current Sale</h3>
+                    <h3 className="sale-title">Đơn hàng hiện tại</h3> 
 
                     <div className="sale-items">
                         {cart.length === 0 ? (
-                            <div className="empty-sale">No items</div>
+                            <div className="empty-sale">Chưa có sản phẩm</div> 
                         ) : cart.map(item => (
-                            <div className="sale-item" key={item.id}>
-                                <div className="sale-item-left">
-                                    <div className="sale-item-name">{item.name}</div>
-                                    <div className="sale-item-sub">
-                                        <span className="price">{item.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
-                                        <span className="qty">× {item.quantity}</span>
-                                    </div>
-                                </div>
-                                <div className="sale-item-controls">
-                                    <button className="qty-btn" onClick={() => updateQuantity(item.id, -1)}>-</button>
-                                    <button className="qty-btn" onClick={() => updateQuantity(item.id, 1)}>+</button>
-                                    <button className="remove-btn" onClick={() => removeItem(item.id)}>🗑️</button>
+                        <div className="sale-item" key={item.id}>
+                            <div className="sale-item-left">
+                                <div className="sale-item-name">{item.name}</div>
+                                <div className="sale-item-sub">
+                                    <span className="price">{item.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+                                    <span className="qty">× {item.quantity}</span>
                                 </div>
                             </div>
+                            <div className="sale-item-controls">
+                                <button className="qty-btn" onClick={() => updateQuantity(item.id, -1)}>-</button>
+                                <button className="qty-btn" onClick={() => updateQuantity(item.id, 1)}>+</button>
+                                <button className="remove-btn" onClick={() => removeItem(item.id)}>🗑️</button>
+                            </div>
+                        </div>
                         ))}
                     </div>
 
                     <div className="sale-summary">
-                        <div className="summary-row"><span>Subtotal:</span><span>{subtotal.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span></div>
-                        <div className="summary-total-row"><span>Total:</span><span>{total.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span></div>
+                        <div className="summary-row"><span>Tổng phụ:</span><span>{subtotal.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span></div> {/* Đã sửa tiếng Việt */}
+                        <div className="summary-total-row"><span>Tổng cộng:</span><span>{total.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span></div> {/* Đã sửa tiếng Việt */}
                     </div>
 
                     <form className="sale-form" onSubmit={(e) => { e.preventDefault(); handleCheckout(); }}>
-                        <label>Customer Name *</label>
-                        <input type="text" placeholder="Enter customer name" value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
+                        <label>Tên khách hàng *</label> {/* Đã sửa tiếng Việt */}
+                        <input type="text" placeholder="Nhập tên khách hàng" value={customerName} onChange={(e) => setCustomerName(e.target.value)} /> {/* Đã sửa tiếng Việt */}
 
-                        <label>Phone Number *</label>
-                        <input type="text" placeholder="Enter phone number" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} />
+                        <label>Số điện thoại *</label> {/* Đã sửa tiếng Việt */}
+                        <input type="text" placeholder="Nhập số điện thoại" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} /> {/* Đã sửa tiếng Việt */}
 
-                        <label>Payment Method *</label>
+                        <label>Phương thức thanh toán *</label> {/* Đã sửa tiếng Việt */}
                         <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
                             <option>Tiền mặt</option>
                             <option>Chuyển khoản</option>
                         </select>
 
                         <div className="sale-actions">
-                            <button type="button" className="btn-clear" onClick={clearAll}>Clear</button>
-                            <button type="submit" className="btn-complete">Complete Sale</button>
+                            <button type="button" className="btn-clear" onClick={clearAll}>Xóa tất cả</button> {/* Đã sửa tiếng Việt */}
+                            <button type="submit" className="btn-complete">Hoàn tất thanh toán</button> {/* Đã sửa tiếng Việt */}
                         </div>
                     </form>
                 </div>

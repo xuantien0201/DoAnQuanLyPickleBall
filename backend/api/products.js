@@ -8,50 +8,52 @@ router.get('/', async (req, res) => {
   try {
     const { category, sort, search, minPrice, maxPrice, status } = req.query;
 
-    let query = 'SELECT * FROM products WHERE 1=1';
+    // Join with categories table to filter by category slug
+    let query = 'SELECT p.* FROM products p JOIN categories c ON p.category = c.name WHERE 1=1';
     const params = [];
 
     if (category) {
-      query += ' AND category = ?';
+      // Filter by category slug from the categories table
+      query += ' AND c.slug = ?';
       params.push(category);
     }
 
     if (search) {
-      query += ' AND (name LIKE ? OR description LIKE ?)';
+      query += ' AND (p.name LIKE ? OR p.description LIKE ?)';
       params.push(`%${search}%`, `%${search}%`);
     }
 
     if (minPrice) {
-      query += ' AND price >= ?';
+      query += ' AND p.price >= ?';
       params.push(minPrice);
     }
 
     if (maxPrice) {
-      query += ' AND price <= ?';
+      query += ' AND p.price <= ?';
       params.push(maxPrice);
     }
 
     // Lọc theo trạng thái sản phẩm
     if (status === 'new') {
-      query += ' AND is_new = true';
+      query += ' AND p.is_new = true';
     } else if (status === 'sale') {
       // Giả sử sản phẩm giảm giá có original_price > price
-      query += ' AND original_price IS NOT NULL AND price < original_price';
+      query += ' AND p.original_price IS NOT NULL AND p.price < p.original_price';
     }
 
     // Sorting
     if (sort === 'price_asc') {
-      query += ' ORDER BY price ASC';
+      query += ' ORDER BY p.price ASC';
     } else if (sort === 'price_desc') {
-      query += ' ORDER BY price DESC';
+      query += ' ORDER BY p.price DESC';
     } else if (sort === 'name_asc') {
-      query += ' ORDER BY name ASC';
+      query += ' ORDER BY p.name ASC';
     } else if (sort === 'name_desc') {
-      query += ' ORDER BY name DESC';
+      query += ' ORDER BY p.name DESC';
     } else if (sort === 'newest') {
-      query += ' ORDER BY created_at DESC';
+      query += ' ORDER BY p.created_at DESC';
     } else {
-      query += ' ORDER BY id DESC';
+      query += ' ORDER BY p.id DESC';
     }
 
     const [products] = await db.query(query, params);
