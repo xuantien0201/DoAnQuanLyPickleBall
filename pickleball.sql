@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 20, 2025 lúc 04:00 AM
+-- Thời gian đã tạo: Th10 20, 2025 lúc 05:54 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.0.30
 
@@ -88,18 +88,8 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`id`, `order_code`, `customer_name`, `customer_email`, `customer_phone`, `shipping_address`, `shipping_city`, `notes`, `payment_method`, `total_amount`, `status`, `created_at`) VALUES
-(21, '01C71901', 'Tien Tran', 'xtien1812@gmail.com', '0912312312', '1231', 'HaNoi', '4', 'cod', 5000000, 'Delivered', '2025-10-19 15:22:50'),
-(25, '6DBBD0C9', 'Nguyen trung', '443@gmail.com', '3333312', '1231', 'HaNoi', '444', 'cod', 400000, 'Delivered', '2025-10-19 16:32:00'),
-(26, '21109F3B', 'Nguyen trung', '443@gmail.com', '3333312', '1231', 'HaNoi', '63', 'cod', 800000, 'Delivered', '2025-10-19 16:35:46'),
-(27, '5EB6F352', '4', '312@gmail.com', '111111111', '1231', 'HaNoi', '333', 'qr', 5000000, 'Delivered', '2025-10-19 16:38:28'),
-(28, '679E5CB5', '4', '312@gmail.com', '0984747372', '1231', 'HaNoi', '333', 'qr', 5000000, 'Delivered', '2025-10-19 16:42:44'),
-(29, 'FF68B091', '4', '312@gmail.com', '0984747372', '1231', 'HaNoi', '4', 'cod', 10000000, 'Processing', '2025-10-19 16:47:45'),
-(30, '3455C9B1', '4', '312@gmail.com', '0984747372', '1231', 'HaNoi', '444', 'cod', 5400000, 'Delivered', '2025-10-19 16:48:41'),
-(31, '273D03DF', '445', '312@gmail.com', '0984747372', '1231', 'HaNoi', '444', 'cod', 2400000, 'Delivered', '2025-10-19 17:08:34'),
-(37, 'ABE08E8D', '33', NULL, '44', NULL, NULL, NULL, 'Tiền mặt', 5000000, 'Cancelled', '2025-10-19 17:37:09'),
-(39, '6D7594D0', '33', NULL, '44', NULL, NULL, NULL, 'Tiền mặt', 1200000, 'Cancelled', '2025-10-19 17:39:26'),
-(40, 'F8AC871D', '4', NULL, '5', NULL, NULL, NULL, 'Chuyển khoản', 400000, 'Delivered', '2025-10-19 17:43:17'),
-(41, 'BB528D8F', '445', '312@gmail.com', '0984747372', '1231', 'HaNoi', '4', 'cod', 400000, 'Delivered', '2025-10-20 01:08:27');
+(42, '19078709', '445', '312@gmail.com', '0984747372', '1231', 'HaNoi', '444', 'cod', 4800000, 'Pending', '2025-10-20 02:25:35'),
+(43, 'EAF0AF92', '445', '312@gmail.com', '0984747372', '1231', 'HaNoi', '6', 'cod', 4800000, 'Pending', '2025-10-20 02:31:30');
 
 -- --------------------------------------------------------
 
@@ -122,19 +112,8 @@ CREATE TABLE `order_items` (
 --
 
 INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `product_name`, `quantity`, `price`, `color`) VALUES
-(28, 21, 21, 'Tyson Mcguffin Magnus 3-14mm', 1, 5000000, 'Black'),
-(32, 25, 22, 'Cuốn cán', 1, 400000, 'Black'),
-(33, 26, 23, 'Cuốn cán', 2, 400000, 'Black'),
-(34, 27, 21, 'Tyson Mcguffin Magnus 3-14mm', 1, 5000000, 'Black'),
-(35, 28, 21, 'Tyson Mcguffin Magnus 3-14mm', 1, 5000000, 'Black'),
-(36, 29, 21, 'Tyson Mcguffin Magnus 3-14mm', 2, 5000000, 'Black'),
-(37, 30, 21, 'Tyson Mcguffin Magnus 3-14mm', 1, 5000000, 'Black'),
-(38, 30, 23, 'Cuốn cán', 1, 400000, 'Black'),
-(39, 31, 23, 'Cuốn cán', 6, 400000, 'Black'),
-(40, 37, 21, 'Tyson Mcguffin Magnus 3-14mm', 1, 5000000, NULL),
-(41, 39, 23, 'Cuốn cán', 3, 400000, NULL),
-(42, 40, 23, 'Cuốn cán', 1, 400000, NULL),
-(43, 41, 25, 'Vợt', 1, 400000, 'Black');
+(44, 42, 28, 'Anna Bright Scorpeus 3 14mm', 1, 4800000, 'Pink'),
+(45, 43, 28, 'Anna Bright Scorpeus 3 14mm', 1, 4800000, 'Pink');
 
 -- --------------------------------------------------------
 
@@ -165,13 +144,12 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `name`, `description`, `price`, `original_price`, `category`, `image_url`, `colors`, `rating`, `reviews_count`, `stock`, `is_new`, `discount_percent`, `created_at`, `updated_at`) VALUES
-(21, 'Tyson Mcguffin Magnus 3-14mm', 'ok', 5000000, 7000000, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760887292430.webp', '[\"Black\"]', 0.0, 0, 1, 0, 0, '2025-10-19 15:21:32', '2025-10-19 17:38:48'),
-(28, 'Anna Bright Scorpeus 3 14mm', 'Vợt nhẹ với khả năng kiểm soát tuyệt vời, dòng signature của Anna Bright.', 4800000, NULL, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760925530248.webp', '[\"Pink\",\"White\"]', 4.8, 110, 40, 0, NULL, '2025-10-20 01:43:44', '2025-10-20 01:58:50'),
-(29, 'Ben Johns Blue Lightning Set', 'Bộ vợt và phụ kiện Ben Johns phiên bản Blue Lightning.', 5200000, NULL, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760925520526.webp', '[\"Blue\",\"Silver\"]', 4.9, 200, 30, 0, NULL, '2025-10-20 01:43:44', '2025-10-20 01:58:57'),
+(28, 'Anna Bright Scorpeus 3 14mm', 'Vợt nhẹ với khả năng kiểm soát tuyệt vời, dòng signature của Anna Bright.', 4800000, NULL, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760925530248.webp', '[\"Pink\",\"White\"]', 4.8, 110, 40, 1, NULL, '2025-10-20 01:43:44', '2025-10-20 02:07:56'),
+(29, 'Ben Johns Blue Lightning Set', 'Bộ vợt và phụ kiện Ben Johns phiên bản Blue Lightning.', 5200000, NULL, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760925520526.webp', '[\"Blue\",\"Silver\"]', 4.9, 200, 30, 1, NULL, '2025-10-20 01:43:44', '2025-10-20 02:08:00'),
 (30, 'Ben Johns Hyperion 3 14mm', 'Vợt Ben Johns Hyperion thế hệ 3, dày 14mm.', 4950000, 5500000, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760925515107.webp', '[\"Black\",\"Yellow\"]', 4.8, 180, 60, 0, 10, '2025-10-20 01:43:44', '2025-10-20 01:59:01'),
-(31, 'Ben Johns Perseus 3 14mm', 'Vợt Ben Johns Perseus thế hệ 3, dày 14mm, tối ưu sức mạnh.', 4900000, NULL, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760925509481.webp', '[\"Black\",\"Red\"]', 4.9, 210, 55, 0, NULL, '2025-10-20 01:43:44', '2025-10-20 01:59:04'),
-(32, 'Ben Johns Perseus 3 16mm', 'Vợt Ben Johns Perseus thế hệ 3, dày 16mm, tăng cường kiểm soát.', 5100000, NULL, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760925500714.webp', '[\"Black\",\"Gold\"]', 4.9, 250, 45, 0, NULL, '2025-10-20 01:43:44', '2025-10-20 01:59:07'),
-(33, 'Collin Johns Scorpeus 3 16mm', 'Vợt Collin Johns Scorpeus thế hệ 3, dày 16mm.', 4750000, NULL, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760925494391.webp', '[\"Blue\",\"White\"]', 4.8, 130, 65, 0, NULL, '2025-10-20 01:43:44', '2025-10-20 01:59:11'),
+(31, 'Ben Johns Perseus 3 14mm', 'Vợt Ben Johns Perseus thế hệ 3, dày 14mm, tối ưu sức mạnh.', 4900000, NULL, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760925509481.webp', '[\"Black\",\"Red\"]', 4.9, 210, 55, 0, 10, '2025-10-20 01:43:44', '2025-10-20 02:08:36'),
+(32, 'Ben Johns Perseus 3 16mm', 'Vợt Ben Johns Perseus thế hệ 3, dày 16mm, tăng cường kiểm soát.', 5100000, NULL, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760925500714.webp', '[\"Black\",\"Gold\"]', 4.9, 250, 45, 1, NULL, '2025-10-20 01:43:44', '2025-10-20 02:08:06'),
+(33, 'Collin Johns Scorpeus 3 16mm', 'Vợt Collin Johns Scorpeus thế hệ 3, dày 16mm.', 4750000, NULL, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760925494391.webp', '[\"Blue\",\"White\"]', 4.8, 130, 65, 1, NULL, '2025-10-20 01:43:44', '2025-10-20 02:08:09'),
 (34, 'Joola Agassi Set', 'Bộ vợt Joola Agassi phiên bản đặc biệt.', 5500000, 6000000, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760925489056.webp', '[\"Black\",\"Neon\"]', 4.7, 80, 25, 0, 8, '2025-10-20 01:43:44', '2025-10-20 01:59:14'),
 (35, 'Joola Britto Hearts', 'Vợt Joola phiên bản Britto Hearts nghệ thuật.', 4600000, NULL, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760925482860.webp', '[\"Multicolor\"]', 4.6, 70, 35, 0, NULL, '2025-10-20 01:43:44', '2025-10-20 01:58:02'),
 (36, 'Joola Collin Johns 16mm Gen3', 'Vợt Joola Collin Johns Gen 3, dày 16mm.', 5300000, NULL, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760925474314.webp', '[\"Silver\",\"Blue\"]', 4.9, 140, 50, 0, NULL, '2025-10-20 01:43:44', '2025-10-20 01:57:54'),
@@ -209,11 +187,11 @@ INSERT INTO `products` (`id`, `name`, `description`, `price`, `original_price`, 
 (68, 'Mens Club Shorts Navy', 'Quần short nam màu navy.', 1950000, 2500000, 'Quần áo', 'http://localhost:3000/uploads/products/product-1760925123012.webp', '[\"Navy\"]', 4.7, 85, 130, 0, NULL, '2025-10-20 01:43:44', '2025-10-20 01:52:03'),
 (69, 'Womens Club Skirt Blue Breeze', 'Chân váy nữ màu xanh.', 1430000, 1800000, 'Quần áo', 'http://localhost:3000/uploads/products/product-1760925107214.webp', '[\"Blue\"]', 4.9, 60, 70, 0, NULL, '2025-10-20 01:43:44', '2025-10-20 01:51:47'),
 (70, 'Womens Club Novelty Polo Dress', 'Váy polo nữ màu trắng.', 2860000, 3000000, 'Quần áo', 'http://localhost:3000/uploads/products/product-1760925054080.webp', '[\"White\"]', 4.8, 55, 60, 0, NULL, '2025-10-20 01:43:44', '2025-10-20 01:50:54'),
-(71, 'Giày Nikecourt Air Zoom Vapor Pro 2', 'Giày tennis Nikecourt Air Zoom Vapor Pro 2.', 2849999, 3000000, 'Quần áo', 'http://localhost:3000/uploads/products/product-1760924938678.webp', '[\"White\",\"Black\"]', 4.9, 120, 10, 0, NULL, '2025-10-20 01:43:44', '2025-10-20 01:48:58'),
-(72, 'Giày Pickleball Asics', 'Giày pickleball Asics.', 2500000, 2800000, 'Quần áo', 'http://localhost:3000/uploads/products/product-1760924875745.webp', '[\"Blue\",\"Yellow\"]', 4.8, 100, 90, 0, 11, '2025-10-20 01:43:44', '2025-10-20 01:47:55'),
+(71, 'Giày Nikecourt Air Zoom Vapor Pro 2', 'Giày tennis Nikecourt Air Zoom Vapor Pro 2.', 2849999, 3000000, 'Giày', 'http://localhost:3000/uploads/products/product-1760924938678.webp', '[\"White\",\"Black\"]', 4.9, 120, 10, 0, NULL, '2025-10-20 01:43:44', '2025-10-20 02:13:41'),
+(72, 'Giày Pickleball Asics', 'Giày pickleball Asics.', 2500000, 2800000, 'Giày', 'http://localhost:3000/uploads/products/product-1760924875745.webp', '[\"Blue\",\"Yellow\"]', 4.8, 100, 90, 0, 11, '2025-10-20 01:43:44', '2025-10-20 02:13:49'),
 (73, 'Giày Pickleball Asics 1042a211400', 'Giày pickleball Asics 1042a211400.', 2850000, 3200000, 'Quần áo', 'http://localhost:3000/uploads/products/product-1760924830006.webp', '[\"Red\",\"White\"]', 4.8, 90, 75, 0, NULL, '2025-10-20 01:43:44', '2025-10-20 01:49:25'),
-(74, 'Giày Nikecourt Air Zoom Vapor Pro 2', 'Giày Nikecourt Air Zoom Vapor Pro 2.', 2850000, 3200000, 'Quần áo', 'http://localhost:3000/uploads/products/product-1760924795156.webp', '[\"Black\",\"Gold\"]', 4.9, 150, 65, 0, NULL, '2025-10-20 01:43:44', '2025-10-20 01:49:32'),
-(75, 'Giày Nike Zoom Gp Challenge 1 Premium', 'Giày Nike Zoom GP Challenge 1 Premium.', 2999000, 3500000, 'Quần áo', 'http://localhost:3000/uploads/products/product-1760924763695.webp', '[\"White\",\"Multicolor\"]', 4.9, 110, 50, 0, NULL, '2025-10-20 01:43:44', '2025-10-20 01:49:38');
+(74, 'Giày Nikecourt Air Zoom Vapor Pro 2', 'Giày Nikecourt Air Zoom Vapor Pro 2.', 2850000, 3200000, 'Giày', 'http://localhost:3000/uploads/products/product-1760924795156.webp', '[\"Black\",\"Gold\"]', 4.9, 150, 65, 0, NULL, '2025-10-20 01:43:44', '2025-10-20 02:14:03'),
+(75, 'Giày Nike Zoom Gp Challenge 1 Premium', 'Giày Nike Zoom GP Challenge 1 Premium.', 2999000, 3500000, 'Giày', 'http://localhost:3000/uploads/products/product-1760924763695.webp', '[\"White\",\"Multicolor\"]', 4.9, 110, 50, 0, NULL, '2025-10-20 01:43:44', '2025-10-20 02:13:58');
 
 -- --------------------------------------------------------
 
@@ -290,7 +268,8 @@ INSERT INTO `tbl_datsan` (`MaDatSan`, `MaSan`, `MaKH`, `MaNV`, `NgayLap`, `GioVa
 (32, 'S3', 'KH001', 'NV001', '2025-10-19', '11:00:00', '12:00:00', 1, 100000, 0, 100000, '', 'pending', 'Đặt sân ngày'),
 (33, 'S4', 'KH001', 'NV001', '2025-10-19', '14:00:00', '15:00:00', 1, 100000, 0, 100000, '', 'pending', 'Đặt sân ngày'),
 (34, 'S5', 'KH003', 'NV001', '2025-10-19', '16:00:00', '17:00:00', 1, 160000, 0, 160000, '', 'pending', 'Đặt sân ngày'),
-(35, 'S5', 'KH003', 'NV001', '2025-10-19', '18:00:00', '19:00:00', 1, 160000, 0, 160000, '', 'pending', 'Đặt sân ngày');
+(35, 'S5', 'KH003', 'NV001', '2025-10-19', '18:00:00', '19:00:00', 1, 160000, 0, 160000, '', 'pending', 'Đặt sân ngày'),
+(36, 'S13', 'KH001', 'NV001', '2025-10-20', '11:00:00', '13:00:00', 2, 200000, 0, 200000, '', 'pending', 'Đặt sân ngày');
 
 -- --------------------------------------------------------
 
@@ -524,7 +503,7 @@ ALTER TABLE `tbl_xeve_sukien`
 -- AUTO_INCREMENT cho bảng `cart_items`
 --
 ALTER TABLE `cart_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
 
 --
 -- AUTO_INCREMENT cho bảng `categories`
@@ -536,13 +515,13 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT cho bảng `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT cho bảng `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
 -- AUTO_INCREMENT cho bảng `products`
@@ -560,7 +539,7 @@ ALTER TABLE `reviews`
 -- AUTO_INCREMENT cho bảng `tbl_datsan`
 --
 ALTER TABLE `tbl_datsan`
-  MODIFY `MaDatSan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `MaDatSan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT cho bảng `tbl_xeve_datve`
