@@ -27,6 +27,21 @@ const Cart = () => {
     }
   };
 
+  const handleQuantityChange = (item, value) => {
+  const newQuantity = parseInt(value, 10);
+
+  if (isNaN(newQuantity) || newQuantity < 1) {
+    return; // Không cập nhật nếu nhập số không hợp lệ
+  }
+
+  if (newQuantity > item.stock) {
+    alert(`Chỉ còn ${item.stock} sản phẩm trong kho.`);
+    return;
+  }
+
+  updateQuantity(item.id, newQuantity);
+};
+
   const subtotal = getCartTotal();
   const total = subtotal; // Total is now the same as subtotal
 
@@ -92,7 +107,13 @@ const Cart = () => {
                   <div className="cart-quantity">
                     <div className="quantity-selector">
                       <button onClick={() => decrementQuantity(item)}>-</button>
-                      <input type="text" value={item.quantity} readOnly />
+                      <input
+                        type="number"
+                        value={item.quantity}
+                        min="1"
+                        max={item.stock}
+                        onChange={(e) => handleQuantityChange(item, e.target.value)}
+                      />
                       <button
                         onClick={() => incrementQuantity(item)}
                         disabled={item.quantity >= item.stock} // Vô hiệu hóa nút nếu đạt tồn kho

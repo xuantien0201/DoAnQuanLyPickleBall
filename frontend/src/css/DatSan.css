@@ -34,7 +34,7 @@ body {
 }
 
 /* HEADER */
-header {
+.datsan-header {
   /* width: 1500px; */
   display: flex;
   gap: 12px;
@@ -47,8 +47,8 @@ header {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
 }
 
-header .left,
-header .right {
+.datsan-header .left,
+.datsan-header .right {
   display: flex;
   gap: 12px;
   align-items: center;

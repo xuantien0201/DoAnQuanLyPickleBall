@@ -11,13 +11,29 @@ export function POS() {
     const [customerPhone, setCustomerPhone] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('Tiền mặt');
 
+    // Thêm state cho phân trang
+    const [currentPage, setCurrentPage] = useState(1);
+    const [productsPerPage] = useState(12); // Số sản phẩm trên mỗi trang cho POS
+    const [totalProducts, setTotalProducts] = useState(0); // Tổng số sản phẩm từ backend
+
     useEffect(() => {
-        // Lấy danh sách sản phẩm từ API
-        fetch('/api/products')
-            .then(res => res.json())
-            .then(data => setProducts(data))
-            .catch(err => console.error("Lỗi khi tải sản phẩm:", err));
-    }, []);
+        const fetchProducts = async () => {
+            try {
+                // Lấy danh sách sản phẩm từ API với tham số phân trang
+                const response = await fetch(`/api/products?page=${currentPage}&limit=${productsPerPage}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch products');
+                }
+                const data = await response.json();
+                setProducts(data.products);
+                setTotalProducts(data.totalCount); // Cập nhật tổng số sản phẩm
+            } catch (err) {
+                console.error("Lỗi khi tải sản phẩm:", err);
+            }
+        };
+
+        fetchProducts();
+    }, [currentPage, productsPerPage]); // Thêm currentPage và productsPerPage vào dependencies
 
     const addToCart = (productToAdd) => { // Đổi tên tham số để tránh nhầm lẫn với state 'products'
         console.log('POS - Sản phẩm được thêm vào giỏ hàng:', productToAdd);
@@ -90,6 +106,7 @@ export function POS() {
         setPaymentMethod('Tiền mặt');
     };
 
+    // filteredProducts bây giờ sẽ lọc trên các sản phẩm đã được phân trang
     const filteredProducts = products.filter(product =>
         product.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -149,6 +166,35 @@ export function POS() {
             alert(`Có lỗi xảy ra khi thanh toán: ${error.message}`);
         }
     };
+    const handleQuantityChange = (item, value) => {
+        const newQuantity = parseInt(value, 10);
+
+        if (isNaN(newQuantity) || newQuantity < 1) return;
+
+        const actualProduct = products.find(p => p.id === item.id);
+        if (!actualProduct) return;
+
+        if (newQuantity > actualProduct.stock) {
+            alert(`Chỉ còn ${actualProduct.stock} sản phẩm trong kho.`);
+            return;
+        }
+
+        setCart(currentCart =>
+            currentCart.map(i =>
+                i.id === item.id ? { ...i, quantity: newQuantity } : i
+            )
+        );
+    };
+
+    // Tính toán tổng số trang
+    const totalPages = Math.ceil(totalProducts / productsPerPage);
+
+    // Hàm xử lý thay đổi trang
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+        // Có thể cuộn lên đầu trang nếu muốn
+        // window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     return (
         <div className="pos-container">
@@ -170,31 +216,57 @@ export function POS() {
                         </div>
                     ))}
                 </div>
+
+                {/* Thêm phân trang */}
+                {totalPages > 1 && (
+                    <div className="pagination">
+                        {[...Array(totalPages)].map((_, index) => (
+                            <button
+                                key={index + 1}
+                                className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}
+                                onClick={() => handlePageChange(index + 1)}
+                            >
+                                {index + 1}
+                            </button>
+                        ))}
+                    </div>
+                )}
             </div>
 
             {/* Sidebar / Invoice */}
             <aside className="pos-sidebar">
                 <div className="current-sale-card">
-                    <h3 className="sale-title">Đơn hàng hiện tại</h3> 
+                    <h3 className="sale-title">Đơn hàng hiện tại</h3>
 
                     <div className="sale-items">
                         {cart.length === 0 ? (
-                            <div className="empty-sale">Chưa có sản phẩm</div> 
+                            <div className="empty-sale">Chưa có sản phẩm</div>
                         ) : cart.map(item => (
-                        <div className="sale-item" key={item.id}>
-                            <div className="sale-item-left">
-                                <div className="sale-item-name">{item.name}</div>
-                                <div className="sale-item-sub">
-                                    <span className="price">{item.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
-                                    <span className="qty">× {item.quantity}</span>
+                            <div className="sale-item" key={item.id}>
+                                <div className="sale-item-left">
+                                    <div className="sale-item-name">{item.name}</div>
+                                    <div className="sale-item-sub">
+                                        <span className="price">{item.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+                                        <span className="qty">× {item.quantity}</span>
+                                    </div>
                                 </div>
+                                <div className="sale-item-controls">
+                                    <button className="qty-btn" onClick={() => updateQuantity(item.id, -1)}>-</button>
+
+                                    <input
+                                        type="number"
+                                        className="qty-input"
+                                        value={item.quantity}
+                                        min="1"
+                                        max={products.find(p => p.id === item.id)?.stock || 1}
+                                        onChange={(e) => handleQuantityChange(item, e.target.value)}
+                                    />
+
+                                    <button className="qty-btn" onClick={() => updateQuantity(item.id, 1)}>+</button>
+                                    <button className="remove-btn" onClick={() => removeItem(item.id)}>🗑️</button>
+                                </div>
+
                             </div>
-                            <div className="sale-item-controls">
-                                <button className="qty-btn" onClick={() => updateQuantity(item.id, -1)}>-</button>
-                                <button className="qty-btn" onClick={() => updateQuantity(item.id, 1)}>+</button>
-                                <button className="remove-btn" onClick={() => removeItem(item.id)}>🗑️</button>
-                            </div>
-                        </div>
                         ))}
                     </div>
 

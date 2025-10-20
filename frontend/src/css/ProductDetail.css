@@ -77,8 +77,6 @@
 
 .gallery-main .badge {
   position: absolute;
-  top: 20px;
-  left: 20px;
   padding: 8px 16px;
   border-radius: 4px;
   font-size: 0.85rem;
@@ -88,11 +86,20 @@
 
 .badge-new {
   background: var(--success);
+  top: 20px;
+  /* Đặt top để căn chỉnh với badge-discount */
+  left: 20px;
+  /* Đặt left để ở góc trên bên trái */
 }
 
 .badge-discount {
   background: var(--error);
-  top: 70px;
+  top: 20px;
+  /* Căn chỉnh với badge-new */
+  right: 20px;
+  /* Di chuyển sang góc phải */
+  left: auto;
+  /* Đảm bảo không có left */
 }
 
 /* Product Info */
@@ -381,6 +388,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }

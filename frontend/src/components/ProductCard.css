@@ -47,7 +47,9 @@
 
 .badge-discount {
   background: var(--error);
-  top: 50px;
+  top: 15px;
+  right: 15px;
+  left: auto;
 }
 
 .add-to-cart-btn {
@@ -116,20 +118,19 @@
 
 .product-price {
   display: flex;
-  flex-direction: column;
-  /* Hiển thị theo chiều dọc */
-  align-items: flex-start;
-  gap: 2px;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 8px;
 }
 
 .current-price {
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: var(--text-dark);
 }
 
 .original-price {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: var(--text-light);
   text-decoration: line-through;
 }
@@ -141,12 +142,10 @@
 
 .product-stock .in-stock {
   color: #28a745;
-  /* Màu xanh lá cây cho còn hàng */
   font-weight: bold;
 }
 
 .product-stock .out-of-stock {
   color: #dc3545;
-  /* Màu đỏ cho hết hàng */
   font-weight: bold;
 }

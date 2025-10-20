@@ -211,7 +211,7 @@ export function DatSan() {
     <div className="dat-san-wrapper">
       <Sidebar />
       <div className="container">
-        <header>
+        <header className="datsan-header">
           <div className="left">
             <div className="brand">Pickleball Bồ Đề</div>
 

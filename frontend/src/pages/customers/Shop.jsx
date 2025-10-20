@@ -14,7 +14,9 @@ const Shop = () => {
   const [searchInput, setSearchInput] = useState(searchParams.get('search') || '');
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [productStatus, setProductStatus] = useState(searchParams.get('status') || 'all'); // State cho bộ lọc trạng thái
-
+  const [currentPage, setCurrentPage] = useState(1); // Thêm state cho trang hiện tại
+  const [productsPerPage] = useState(12); // Số sản phẩm trên mỗi trang
+  const [totalProducts, setTotalProducts] = useState(0); // Tổng số sản phẩm
 
   useEffect(() => {
     fetchCategories();
@@ -22,7 +24,7 @@ const Shop = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [selectedCategory, sortBy, searchQuery, productStatus]);
+  }, [selectedCategory, sortBy, searchQuery, productStatus, currentPage]); // Thêm currentPage vào dependencies
 
   const fetchCategories = async () => {
     try {
@@ -41,12 +43,14 @@ const Shop = () => {
         ...(searchQuery && { search: searchQuery }),
         ...(priceRange.min && { minPrice: priceRange.min }),
         ...(priceRange.max && { maxPrice: priceRange.max }),
-        ...(productStatus !== 'all' && { status: productStatus }) // Thêm param status nếu không phải 'all'
-
+        ...(productStatus !== 'all' && { status: productStatus }), // Thêm param status nếu không phải 'all'
+        page: currentPage, // Thêm tham số trang
+        limit: productsPerPage // Thêm tham số giới hạn sản phẩm
       };
 
       const response = await axios.get('/api/products', { params });
-      setProducts(response.data);
+      setProducts(response.data.products); // Cập nhật sản phẩm từ phản hồi
+      setTotalProducts(response.data.totalCount); // Cập nhật tổng số sản phẩm
     } catch (error) {
       console.error('Error fetching products:', error);
     }
@@ -54,6 +58,7 @@ const Shop = () => {
 
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);
+    setCurrentPage(1); // Reset về trang 1 khi thay đổi danh mục
     if (category) {
       searchParams.set('category', category);
     } else {
@@ -64,6 +69,7 @@ const Shop = () => {
 
   const handleStatusChange = (status) => {
     setProductStatus(status);
+    setCurrentPage(1); // Reset về trang 1 khi thay đổi trạng thái
     if (status && status !== 'all') {
       searchParams.set('status', status);
     } else {
@@ -74,11 +80,13 @@ const Shop = () => {
 
   const handleSortChange = (e) => {
     setSortBy(e.target.value);
+    setCurrentPage(1); // Reset về trang 1 khi thay đổi sắp xếp
   };
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     setSearchQuery(searchInput);
+    setCurrentPage(1); // Reset về trang 1 khi tìm kiếm
     if (searchInput) {
       searchParams.set('search', searchInput);
     } else {
@@ -88,6 +96,7 @@ const Shop = () => {
   };
 
   const handlePriceFilter = () => {
+    setCurrentPage(1); // Reset về trang 1 khi lọc giá
     fetchProducts();
   };
 
@@ -98,11 +107,21 @@ const Shop = () => {
     setSearchInput('');
     setSearchQuery('');
     setProductStatus('all'); // Reset cả bộ lọc trạng thái
+    setCurrentPage(1); // Reset trang hiện tại
     searchParams.delete('category');
     searchParams.delete('search');
     searchParams.delete('status'); // Xóa status khỏi URL
     setSearchParams(searchParams);
   };
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // Cuộn lên đầu trang
+  };
+
+  const totalPages = Math.ceil(totalProducts / productsPerPage);
+  const startIndex = (currentPage - 1) * productsPerPage + 1;
+  const endIndex = Math.min(currentPage * productsPerPage, totalProducts);
 
   return (
     <div className="shop-page">
@@ -123,11 +142,13 @@ const Shop = () => {
                 <form className="search-filter" onSubmit={handleSearchSubmit}>
                   <input
                     type="text"
-                    placeholder="Tìm kiếm sản phẩm..."
+                    placeholder="Tìm kiếm..."
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                   />
-                  <button type="submit" className="btn-apply">Tìm kiếm</button>
+                  <button type="submit" className="search-btn">
+                    <i className="fas fa-search"></i>
+                  </button>
                 </form>
               </div>
               <div className="filter-section">
@@ -205,7 +226,13 @@ const Shop = () => {
             <div className="shop-main">
               <div className="shop-controls">
                 <div className="results-info">
-                  <span>{products.length} Products</span>
+                  {totalProducts > 0 ? (
+                    <span>
+                      Hiển thị {startIndex}–{endIndex} trong số {totalProducts} kết quả
+                    </span>
+                  ) : (
+                    <span>Không có sản phẩm nào</span>
+                  )}
                 </div>
 
                 <div className="sort-controls">
@@ -233,9 +260,18 @@ const Shop = () => {
                 </div>
               )}
 
-              {products.length > 12 && (
-                <div className="load-more">
-                  <button className="btn btn-outline">Show More</button>
+              {/* Thay thế nút "Show More" bằng phân trang */}
+              {totalPages > 1 && (
+                <div className="pagination">
+                  {[...Array(totalPages)].map((_, index) => (
+                    <button
+                      key={index + 1}
+                      className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}
+                      onClick={() => handlePageChange(index + 1)}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
                 </div>
               )}
             </div>

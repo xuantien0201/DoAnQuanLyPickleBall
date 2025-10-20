@@ -295,3 +295,8 @@
     flex-direction: column;
   }
 }
+.cart-page input[type=number]::-webkit-inner-spin-button,
+.cart-page input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

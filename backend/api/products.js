@@ -6,10 +6,47 @@ const router = express.Router();
 // Get all products with optional filters and sorting
 router.get('/', async (req, res) => {
   try {
-    const { category, sort, search, minPrice, maxPrice, status } = req.query;
+    const { category, sort, search, minPrice, maxPrice, status, page, limit } = req.query;
+
+    const currentPage = parseInt(page) || 1;
+    const productsPerPage = parseInt(limit) || 12; // Mặc định 12 sản phẩm mỗi trang
+    const offset = (currentPage - 1) * productsPerPage;
+
+    // Build the base query for counting total products
+    // Thay đổi INNER JOIN thành LEFT JOIN ở đây
+    let countQuery = 'SELECT COUNT(p.id) AS totalCount FROM products p LEFT JOIN categories c ON p.category = c.name WHERE 1=1';
+    const countParams = [];
+
+    // Apply filters to count query
+    if (category) {
+      countQuery += ' AND c.slug = ?';
+      countParams.push(category);
+    }
+    if (search) {
+      countQuery += ' AND (p.name LIKE ? OR p.description LIKE ?)';
+
+      countParams.push(`%${search}%`, `%${search}%`);
+    }
+    if (minPrice) {
+      countQuery += ' AND p.price >= ?';
+      countParams.push(minPrice);
+    }
+    if (maxPrice) {
+      countQuery += ' AND p.price <= ?';
+      countParams.push(maxPrice);
+    }
+    if (status === 'new') {
+      countQuery += ' AND p.is_new = true';
+    } else if (status === 'sale') {
+      countQuery += ' AND p.original_price IS NOT NULL AND p.price < p.original_price';
+    }
+
+    const [totalCountResult] = await db.query(countQuery, countParams);
+    const totalCount = totalCountResult[0].totalCount;
 
     // Join with categories table to filter by category slug
-    let query = 'SELECT p.* FROM products p JOIN categories c ON p.category = c.name WHERE 1=1';
+    // Thay đổi INNER JOIN thành LEFT JOIN ở đây
+    let query = 'SELECT p.* FROM products p LEFT JOIN categories c ON p.category = c.name WHERE 1=1';
     const params = [];
 
     if (category) {
@@ -53,11 +90,16 @@ router.get('/', async (req, res) => {
     } else if (sort === 'newest') {
       query += ' ORDER BY p.created_at DESC';
     } else {
-      query += ' ORDER BY p.id DESC';
+      // Thay đổi thứ tự sắp xếp mặc định để hiển thị đa dạng hơn
+      query += ' ORDER BY c.name ASC, p.name ASC'; // Sắp xếp theo tên danh mục, sau đó theo tên sản phẩm
     }
 
+    // Add LIMIT and OFFSET for pagination
+    query += ' LIMIT ? OFFSET ?';
+    params.push(productsPerPage, offset);
+
     const [products] = await db.query(query, params);
-    res.json(products);
+    res.json({ products, totalCount }); // Trả về cả sản phẩm và tổng số lượng
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to fetch products' });

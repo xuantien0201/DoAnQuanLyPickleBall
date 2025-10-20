@@ -220,7 +220,7 @@ const AdminProducts = () => {
                                     </td>
                                     <td>
                                         <span className={`status ${product.stock > 0 ? 'active' : 'out-of-stock'}`}>
-                                            {product.stock > 0 ? 'Active' : 'Out of Stock'}
+                                            {product.stock > 0 ? 'Còn hàng' : 'Hết hàng'}
                                         </span>
                                     </td>
                                     <td>
