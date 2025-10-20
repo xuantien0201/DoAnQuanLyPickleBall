@@ -36,7 +36,7 @@ const ProductCard = ({ product }) => {
           onClick={handleAddToCart}
           disabled={product.stock === 0} // Vô hiệu hóa nếu hết hàng
         >
-          Add to cart
+          Thêm vào giỏ hàng
         </button>
       </div>
       <div className="product-info">

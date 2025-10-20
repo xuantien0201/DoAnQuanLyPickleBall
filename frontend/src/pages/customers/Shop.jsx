@@ -108,8 +108,8 @@ const Shop = () => {
     <div className="shop-page">
       <div className="shop-header">
         <div className="container">
-          <h1>Shop Page</h1>
-          <p>Let's design the place you always imagined.</p>
+          <h1>Chào mừng đến với Cửa Hàng</h1>
+          <p>Tìm kiếm mọi thứ bạn cần cho bộ môn Pickleball tại đây.</p>
         </div>
       </div>
 
