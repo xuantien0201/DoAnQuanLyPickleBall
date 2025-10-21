@@ -3,18 +3,16 @@ import khachhangRouter from "./khachhang/index.js";
 import sanRouter from "./san/index.js"; // nếu có
 import xeveRouter from "./xeve/index.js"; // nếu có
 
-import adminRouter from './admin.js';
-import productRouter from './products.js';
-import categoryRouter from './categories.js';
-import cartRouter from './cart.js';
-import orderRouter from './orders.js';
+import adminRouter from './admin/index.js';
+import customersRouter from './customers/index.js';
+
+import orderRouter from './customers/orders/index.js';
 
 const router = express.Router();
 
 router.use('/admin', adminRouter);
-router.use('/products', productRouter);
-router.use('/categories', categoryRouter);
-router.use('/cart', cartRouter);
+router.use('/customers', customersRouter);
+
 router.use('/orders', orderRouter);
 
 router.use("/khachhang", khachhangRouter);

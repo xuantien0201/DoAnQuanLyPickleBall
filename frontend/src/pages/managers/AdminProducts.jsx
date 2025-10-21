@@ -22,18 +22,30 @@ const AdminProducts = () => {
         is_new: false,
         discount_percent: 0
     });
-    const [imageFile, setImageFile] = useState(null); // State cho file ảnh
-    const [imagePreview, setImagePreview] = useState(''); // State xem trước ảnh
+    const [imageFile, setImageFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState('');
+
+    // State cho tìm kiếm và phân trang
+    const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [productsPerPage] = useState(10);
+    const [totalProducts, setTotalProducts] = useState(0);
 
     useEffect(() => {
         fetchProducts();
         fetchCategories();
-    }, []);
+    }, [currentPage, searchTerm]); // Trigger fetch khi trang hoặc từ khóa tìm kiếm thay đổi
 
     const fetchProducts = async () => {
         try {
-            const response = await axios.get('/api/admin/products');
-            setProducts(response.data);
+            const params = {
+                page: currentPage,
+                limit: productsPerPage,
+                search: searchTerm,
+            };
+            const response = await axios.get('/api/admin/products', { params });
+            setProducts(response.data.products);
+            setTotalProducts(response.data.totalCount);
         } catch (error) {
             console.error('Error fetching products:', error);
         }
@@ -41,8 +53,9 @@ const AdminProducts = () => {
 
     const fetchCategories = async () => {
         try {
-            const response = await axios.get('/api/categories');
-            setCategories(response.data);
+            // Lấy tất cả danh mục cho dropdown, không phân trang
+            const response = await axios.get('/api/admin/categories');
+            setCategories(response.data.categories);
         } catch (error) {
             console.error('Error fetching categories:', error);
         }
@@ -161,9 +174,20 @@ const AdminProducts = () => {
         }
     };
 
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+        setCurrentPage(1); // Reset về trang đầu tiên khi tìm kiếm
+    };
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+
+    const totalPages = Math.ceil(totalProducts / productsPerPage);
+
     return (
-        <div className="admin-container"> {/* Thêm container chung */}
-            <Sidebar /> {/* Thêm Sidebar */}
+        <div className="admin-container">
+            <Sidebar />
             <div className="admin-content">
                 <div className="admin-products-header">
                     <h2>Product Management</h2>
@@ -171,6 +195,14 @@ const AdminProducts = () => {
                         + Add New Product
                     </button>
                 </div>
+
+                <input
+                    type="text"
+                    placeholder="Tìm kiếm sản phẩm theo tên, mô tả..."
+                    className="admin-search-bar"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                />
 
                 <div className="products-table-container">
                     <table className="products-table">
@@ -190,7 +222,7 @@ const AdminProducts = () => {
                                 <tr key={product.id}>
                                     <td>
                                         <img
-                                            src={product.image_url}
+                                            src={product.image_url || '/images/default-product.png'}
                                             alt={product.name}
                                             className="product-thumb"
                                         />
@@ -246,6 +278,20 @@ const AdminProducts = () => {
                         </tbody>
                     </table>
                 </div>
+
+                {totalPages > 1 && (
+                    <div className="pagination">
+                        {[...Array(totalPages)].map((_, index) => (
+                            <button
+                                key={index + 1}
+                                className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}
+                                onClick={() => handlePageChange(index + 1)}
+                            >
+                                {index + 1}
+                            </button>
+                        ))}
+                    </div>
+                )}
 
                 {/* Modal */}
                 {showModal && (

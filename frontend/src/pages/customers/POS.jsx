@@ -19,8 +19,16 @@ export function POS() {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                // Lấy danh sách sản phẩm từ API với tham số phân trang
-                const response = await fetch(`/api/products?page=${currentPage}&limit=${productsPerPage}`);
+                // Lấy danh sách sản phẩm từ API với tham số phân trang và tìm kiếm
+                const params = new URLSearchParams({
+                    page: currentPage,
+                    limit: productsPerPage,
+                });
+                if (searchTerm) {
+                    params.append('search', searchTerm);
+                }
+
+                const response = await fetch(`/api/admin/products?${params.toString()}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch products');
                 }
@@ -33,7 +41,7 @@ export function POS() {
         };
 
         fetchProducts();
-    }, [currentPage, productsPerPage]); // Thêm currentPage và productsPerPage vào dependencies
+    }, [currentPage, productsPerPage, searchTerm]); // Thêm searchTerm vào dependencies
 
     const addToCart = (productToAdd) => { // Đổi tên tham số để tránh nhầm lẫn với state 'products'
         console.log('POS - Sản phẩm được thêm vào giỏ hàng:', productToAdd);
@@ -106,11 +114,7 @@ export function POS() {
         setPaymentMethod('Tiền mặt');
     };
 
-    // filteredProducts bây giờ sẽ lọc trên các sản phẩm đã được phân trang
-    const filteredProducts = products.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
+    // filteredProducts không còn cần thiết vì backend đã xử lý việc lọc
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const total = subtotal;
 
@@ -140,14 +144,14 @@ export function POS() {
 
             console.log('POS Checkout - Dữ liệu items đang được gửi:', itemsToSend); // THÊM DÒNG NÀY
 
-            const response = await fetch('/api/orders', {
+            const response = await fetch('/api/customers/orders', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     items: itemsToSend, // Sử dụng mảng đã log
                     total,
                     paymentMethod: paymentMethod,
-                    status: 'Delivered',
+                    status: 'da_giao',
                     customer: {
                         name: customerName,
                         phone: customerPhone
@@ -186,6 +190,12 @@ export function POS() {
         );
     };
 
+    // Xử lý thay đổi tìm kiếm và reset trang về 1
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+        setCurrentPage(1);
+    };
+
     // Tính toán tổng số trang
     const totalPages = Math.ceil(totalProducts / productsPerPage);
 
@@ -204,10 +214,10 @@ export function POS() {
                     placeholder="Tìm kiếm sản phẩm..." // Đã sửa tiếng Việt
                     className="pos-search"
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={handleSearchChange}
                 />
                 <div className="product-grid">
-                    {filteredProducts.map(product => (
+                    {products.map(product => (
                         <div key={product.id} className="product-card-pos" onClick={() => addToCart(product)}>
                             <img src={product.image_url || '/images/default-product.png'} alt={product.name} />
                             <p>{product.name}</p>

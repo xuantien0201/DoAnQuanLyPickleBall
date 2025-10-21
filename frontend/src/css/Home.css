@@ -1,50 +1,77 @@
-/* Hero Section */
+/* === HERO SECTION (Redesign) === */
 .hero {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  min-height: 600px;
-  background: var(--bg-light);
-}
-
-.hero-content {
   display: flex;
   align-items: center;
-  padding: 60px 0;
-  background: linear-gradient(to right, rgba(0, 0, 0, 0.2), transparent);
-
-}
-
-.hero-text h1 {
-  font-size: 3.5rem;
-  font-weight: 600;
-  line-height: 1.2;
-  margin-bottom: 20px;
-  color: var(--text-dark);
-}
-
-.hero-text p {
-  font-size: 1.1rem;
-  color: var(--text-gray);
-  line-height: 1.8;
-  max-width: 500px;
-  margin-bottom: 30px;
-}
-
-.hero-btn {
-  padding: 16px 40px;
-  font-size: 1.1rem;
-}
-
-.hero-image {
+  justify-content: space-between;
+  padding: 80px 100px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #eaf1f9 100%);
+  min-height: 600px;
   position: relative;
   overflow: hidden;
 }
 
+.hero::before {
+  content: "";
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle at center, rgba(0, 128, 255, 0.1), transparent 70%);
+  z-index: 0;
+}
+
+.hero-content {
+  flex: 1;
+  z-index: 1;
+  animation: fadeInUp 1.2s ease;
+}
+
+.hero-text h1 {
+  font-size: 3.8rem;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 24px;
+  line-height: 1.2;
+}
+
+.hero-text span {
+  color: var(--primary-color);
+}
+
+.hero-text p {
+  font-size: 1.15rem;
+  color: #555;
+  line-height: 1.8;
+  margin-bottom: 36px;
+  max-width: 520px;
+}
+
+.hero-btn {
+  background: var(--primary-color);
+  color: white;
+  padding: 16px 40px;
+  font-size: 1.1rem;
+  border-radius: 50px;
+}
+
+.hero-btn:hover {
+  background: #004aad;
+}
+
+.hero-image {
+  flex: 1;
+  z-index: 1;
+  text-align: right;
+  position: relative;
+}
+
 .hero-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+  width: 120%;
+  max-width: 700px;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  transition: transform 0.5s ease;
 }
 
 .hero-overlay {

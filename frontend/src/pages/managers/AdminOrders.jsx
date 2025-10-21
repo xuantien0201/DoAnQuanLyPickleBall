@@ -8,14 +8,24 @@ const AdminOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  useEffect(() => {
-    fetchOrders();
-  }, []);
+  // State cho tìm kiếm và phân trang
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [ordersPerPage] = useState(10);
+  const [totalOrders, setTotalOrders] = useState(0);
+
+  useEffect(() => { fetchOrders(); }, [currentPage, searchTerm]);
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get('/api/admin/orders');
-      setOrders(response.data);
+      const params = {
+        page: currentPage,
+        limit: ordersPerPage,
+        search: searchTerm,
+      };
+      const response = await axios.get('/api/admin/orders', { params });
+      setOrders(response.data.orders);
+      setTotalOrders(response.data.totalCount);
     } catch (error) {
       console.error('Lỗi khi tải đơn hàng:', error);
     }
@@ -24,7 +34,7 @@ const AdminOrders = () => {
   const viewOrderDetails = async (orderCode) => {
     try {
       // API này đã được tạo ở các bước trước
-      const response = await axios.get(`/api/orders/${orderCode}`);
+      const response = await axios.get(`/api/customers/orders/${orderCode}`);
       setSelectedOrder(response.data);
       setShowModal(true);
     } catch (error) {
@@ -34,33 +44,47 @@ const AdminOrders = () => {
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
-      await axios.put(`/api/admin/orders/${orderId}/status`, { status: newStatus });
-      alert('Cập nhật trạng thái thành công!');
-      fetchOrders(); // Tải lại danh sách đơn hàng
-      // Cập nhật trạng thái trong modal nếu đang mở
+      const response = await axios.put(`/api/admin/orders/${orderId}/status`, { status: newStatus });
+      const data = response.data;
+
+      // ✅ Hiển thị thông báo thành công
+      alert(data.message || 'Cập nhật trạng thái đơn hàng thành công!');
+
+      // ✅ Hiển thị các thông báo tồn kho chi tiết nếu có
+      if (data.stockMessages && data.stockMessages.length > 0) {
+        const fullMessage = data.stockMessages.join('\n');
+        alert('Thông tin kho:\n' + fullMessage);
+      }
+
+      // ✅ Làm mới danh sách đơn hàng
+      fetchOrders();
+
+      // ✅ Cập nhật trong modal nếu đang mở
       if (selectedOrder && selectedOrder.id === orderId) {
         setSelectedOrder({ ...selectedOrder, status: newStatus });
       }
+
     } catch (error) {
       console.error('Lỗi khi cập nhật trạng thái:', error);
-      alert('Cập nhật trạng thái thất bại.');
+      alert(error.response?.data?.error || 'Cập nhật trạng thái thất bại.');
     }
   };
 
   const getStatusInfo = (status) => {
     const statuses = {
-      Pending: { color: 'warning', text: 'Chờ xử lý' },
-      Processing: { color: 'info', text: 'Đang xử lý' },
-      Shipped: { color: 'primary', text: 'Đã gửi' },
-      Delivered: { color: 'success', text: 'Hoàn thành' },
-      Cancelled: { color: 'danger', text: 'Đã hủy' }
+      cho_xac_nhan: { color: 'warning', text: 'Chờ xác nhận' },
+      dang_xu_ly: { color: 'info', text: 'Đang xử lý' },
+      dang_giao: { color: 'primary', text: 'Đang giao hàng' },
+      da_giao: { color: 'success', text: 'Đã giao hàng' },
+      da_huy: { color: 'danger', text: 'Đã hủy' },
+      giao_that_bai: { color: 'danger', text: 'Giao thất bại' },
     };
     return statuses[status] || { color: 'secondary', text: status };
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleString('vi-VN');
-  };
+
+  const formatDate = (d) => new Date(d).toLocaleString('vi-VN');
+
 
   const closeModal = () => {
     setShowModal(false);
@@ -78,9 +102,32 @@ const AdminOrders = () => {
       case 'Chuyển khoản':
         return '📱 Chuyển khoản';
       default:
-        return method; 
+        return method;
     }
   };
+  const getNextStatusOptions = (current) => {
+    switch (current) {
+      case 'cho_xac_nhan':
+        return ['dang_xu_ly', 'da_huy'];
+      case 'dang_xu_ly':
+        return ['dang_giao', 'da_huy'];
+      case 'dang_giao':
+        return ['da_giao', 'giao_that_bai'];
+      default:
+        return [];
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const totalPages = Math.ceil(totalOrders / ordersPerPage);
 
   return (
     <div className="admin-orders-page">
@@ -89,6 +136,14 @@ const AdminOrders = () => {
         <div className="admin-orders-header">
           <h2>Quản lý Đơn hàng</h2>
         </div>
+
+        <input
+          type="text"
+          placeholder="Tìm kiếm theo mã ĐH, tên, SĐT khách hàng..."
+          className="admin-search-bar"
+          value={searchTerm}
+          onChange={handleSearchChange}
+        />
 
         <div className="orders-table-container">
           <table className="orders-table">
@@ -110,7 +165,7 @@ const AdminOrders = () => {
                   <td>
                     <div className="customer-info">
                       <div>{order.customer_name}</div>
-                      <div className="email">{order.customer_email}</div>
+                      <div className="phone">{order.customer_phone}</div>
                     </div>
                   </td>
                   <td>{formatDate(order.created_at)}</td>
@@ -126,12 +181,15 @@ const AdminOrders = () => {
                       value={order.status}
                       onChange={(e) => updateOrderStatus(order.id, e.target.value)}
                     >
-                      <option value="Pending">Chờ xử lý</option>
-                      <option value="Processing">Đang xử lý</option>
-                      <option value="Shipped">Đã gửi</option>
-                      <option value="Delivered">Hoàn thành</option>
-                      <option value="Cancelled">Đã hủy</option>
+                      <option value={order.status}>{getStatusInfo(order.status).text}</option>
+                      {getNextStatusOptions(order.status).map((next) => (
+                        <option key={next} value={next}>
+                          {getStatusInfo(next).text}
+                        </option>
+                      ))}
                     </select>
+
+
                   </td>
                   <td>
                     <button className="btn-view" onClick={() => viewOrderDetails(order.order_code)}>
@@ -144,6 +202,20 @@ const AdminOrders = () => {
           </table>
           {orders.length === 0 && <div className="no-orders"><p>Không có đơn hàng nào.</p></div>}
         </div>
+
+        {totalPages > 1 && (
+          <div className="pagination">
+            {[...Array(totalPages)].map((_, index) => (
+              <button
+                key={index + 1}
+                className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}
+                onClick={() => handlePageChange(index + 1)}
+              >
+                {index + 1}
+              </button>
+            ))}
+          </div>
+        )}
 
         {showModal && selectedOrder && (
           <div className="modal-overlay" onClick={closeModal}>

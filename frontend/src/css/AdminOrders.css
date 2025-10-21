@@ -25,6 +25,46 @@
   margin-bottom: 20px;
 }
 
+/* Thêm CSS cho thanh tìm kiếm và phân trang */
+.admin-search-bar {
+  width: 100%;
+  max-width: 400px;
+  padding: 10px 15px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+  margin-bottom: 20px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30px;
+  gap: 8px;
+}
+
+.page-item {
+  padding: 8px 14px;
+  border: 1px solid #ddd;
+  background: white;
+  color: #333;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.page-item:hover {
+  background: #f0f0f0;
+}
+
+.page-item.active {
+  background: var(--primary-color, #007bff);
+  color: white;
+  border-color: var(--primary-color, #007bff);
+  font-weight: 600;
+}
+
 .orders-stats {
   display: flex;
   gap: 20px;

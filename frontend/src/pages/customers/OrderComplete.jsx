@@ -13,7 +13,7 @@ const OrderComplete = () => {
 
   const fetchOrder = async () => {
     try {
-      const response = await axios.get(`/api/orders/${orderCode}`);
+      const response = await axios.get(`/api/customers/orders/${orderCode}`);
       setOrder(response.data);
     } catch (error) {
       console.error('Error fetching order:', error);
@@ -55,6 +55,7 @@ const OrderComplete = () => {
             {order.items && order.items.slice(0, 3).map((item, index) => (
               <div key={item.id} className="item-preview">
                 <div className="item-image">
+                  {item.image_url && <img src={item.image_url} alt={item.product_name} />}
                   <span className="item-badge">{index + 1}</span>
                 </div>
               </div>
@@ -78,7 +79,7 @@ const OrderComplete = () => {
             </div>
             <div className="detail-item">
               <span className="detail-label">Total:</span>
-              <span className="detail-value">${order.total}</span>
+              <span className="detail-value">${order.total_amount ? order.total_amount.toFixed(2) : '0.00'}</span>
             </div>
             <div className="detail-item">
               <span className="detail-label">Payment method:</span>
@@ -99,22 +100,22 @@ const OrderComplete = () => {
           <div className="info-grid">
             <div className="info-card">
               <h4>Shipping Address</h4>
-              <p>{order.first_name} {order.last_name}</p>
-              <p>{order.street_address}</p>
-              <p>{order.town_city}, {order.state} {order.zip_code}</p>
-              <p>{order.country}</p>
+              <p>{order.customer_name}</p> {/* Sử dụng customer_name */}
+              <p>{order.shipping_address}</p> {/* Sử dụng shipping_address */}
+              <p>{order.shipping_city}</p> {/* Sử dụng shipping_city */}
+              {/* Các trường như street_address, town_city, state, zip_code, country không có trong backend hiện tại */}
             </div>
 
             <div className="info-card">
               <h4>Contact Information</h4>
-              <p>Email: {order.email}</p>
-              <p>Phone: {order.phone}</p>
+              <p>Email: {order.customer_email}</p> {/* Sử dụng customer_email */}
+              <p>Phone: {order.customer_phone}</p> {/* Sử dụng customer_phone */}
             </div>
 
             <div className="info-card">
               <h4>Payment & Shipping</h4>
               <p>Payment: {order.payment_method === 'card' ? 'Credit Card' : 'Paypal'}</p>
-              <p>Shipping: {order.shipping_method}</p>
+              {/* Trường shipping_method không có trong backend hiện tại */}
             </div>
           </div>
         </div>
@@ -125,6 +126,9 @@ const OrderComplete = () => {
           <div className="items-list">
             {order.items && order.items.map((item) => (
               <div key={item.id} className="order-item">
+                <div className="item-image-container">
+                  {item.image_url && <img src={item.image_url} alt={item.product_name} />}
+                </div>
                 <div className="item-info">
                   <h4>{item.product_name}</h4>
                   {item.color && <p>Color: {item.color}</p>}
@@ -138,17 +142,10 @@ const OrderComplete = () => {
           </div>
 
           <div className="order-totals">
-            <div className="total-row">
-              <span>Subtotal:</span>
-              <span>${order.subtotal}</span>
-            </div>
-            <div className="total-row">
-              <span>Shipping:</span>
-              <span>${order.shipping_cost}</span>
-            </div>
+            {/* Các trường Subtotal và Shipping Cost không được lưu riêng biệt trong backend hiện tại */}
             <div className="total-row grand-total">
               <span>Total:</span>
-              <span>${order.total}</span>
+              <span>${order.total_amount ? order.total_amount.toFixed(2) : '0.00'}</span>
             </div>
           </div>
         </div>
