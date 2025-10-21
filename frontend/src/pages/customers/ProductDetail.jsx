@@ -22,7 +22,7 @@ const ProductDetail = () => {
 
   const fetchProduct = async () => {
     try {
-      const response = await axios.get(`/api/products/${id}`);
+      const response = await axios.get(`/api/client/products/${id}`);
       setProduct(response.data);
       
       // Parse colors and set first as default
@@ -32,7 +32,7 @@ const ProductDetail = () => {
       }
 
       // Fetch related products
-      const relatedResponse = await axios.get('/api/products', {
+      const relatedResponse = await axios.get('/api/client/products', {
         params: { category: response.data.category }
       });
       setRelatedProducts(relatedResponse.data.filter(p => p.id !== parseInt(id)).slice(0, 4));

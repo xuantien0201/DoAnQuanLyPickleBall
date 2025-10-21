@@ -4,16 +4,14 @@ import sanRouter from "./san/index.js"; // nếu có
 import xeveRouter from "./xeve/index.js"; // nếu có
 
 import adminRouter from './admin/index.js';
-import customersRouter from './customers/index.js';
+import customersRouter from './client/index.js';
 
-import orderRouter from './customers/orders/index.js';
+import orderRouter from './client/orders/index.js';
 
 const router = express.Router();
 
 router.use('/admin', adminRouter);
-router.use('/customers', customersRouter);
-
-router.use('/orders', orderRouter);
+router.use('/client', customersRouter);
 
 router.use("/khachhang", khachhangRouter);
 router.use("/san", sanRouter);

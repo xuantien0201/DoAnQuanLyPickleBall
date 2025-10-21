@@ -15,14 +15,18 @@ const AdminCategories = () => {
     slug: '',
     image_url: ''
   });
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [searchTerm]);
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('/api/customers/categories');
+      const params = {
+        search: searchTerm,
+      };
+      const response = await axios.get('/api/client/categories', { params });
       setCategories(response.data);
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -31,11 +35,29 @@ const AdminCategories = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+
+    // Hàm tạo slug mới, hỗ trợ bỏ dấu tiếng Việt
+    const createSlug = (str) => {
+      return str
+        .toLowerCase() // 1. Chuyển thành chữ thường
+        .trim() // 2. Xóa khoảng trắng đầu/cuối
+        .normalize('NFD') // 3. Chuẩn hóa Unicode (tách dấu ra khỏi chữ)
+        .replace(/[\u0300-\u036f]/g, '') // 4. Xóa các ký tự dấu
+        .replace(/đ/g, 'd') // 5. Chuyển 'đ' thành 'd'
+        .replace(/[^a-z0-9\s]/g, '') // 6. Xóa các ký tự đặc biệt (giữ lại chữ, số, khoảng trắng)
+        .replace(/\s+/g, '-'); // 7. Thay thế khoảng trắng bằng dấu gạch ngang
+    };
+
     setCurrentCategory({
       ...currentCategory,
       [name]: value,
-      ...(name === 'name' && { slug: value.toLowerCase().replace(/\s+/g, '-') })
+      // 👇 Sửa lại logic tạo slug ở đây
+      ...(name === 'name' && { slug: createSlug(value) })
     });
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
   };
 
   const handleFileChange = (e) => {
@@ -45,6 +67,7 @@ const AdminCategories = () => {
       setImagePreview(URL.createObjectURL(file));
     }
   };
+
 
   const openAddModal = () => {
     setEditMode(false);
@@ -74,7 +97,7 @@ const AdminCategories = () => {
     const formData = new FormData();
     formData.append('name', currentCategory.name);
     formData.append('slug', currentCategory.slug);
-    
+
     if (imageFile) {
       formData.append('image', imageFile);
     } else if (editMode) {
@@ -111,18 +134,26 @@ const AdminCategories = () => {
     }
   };
 
-  // Bọc nội dung component trong một layout chung với Sidebar
   return (
-    <div className="admin-container"> {/* Thêm container chung */}
-      <Sidebar /> {/* Thêm Sidebar vào đây */}
-      
-      {/* Đây là nội dung gốc của trang AdminCategories */}
+    <div className="admin-container">
+      <Sidebar />
+
       <div className="admin-content">
         <div className="admin-categories-header">
           <h2>Category Management</h2>
           <button className="btn btn-primary" onClick={openAddModal}>
             + Add New Category
           </button>
+        </div>
+
+        <div className="admin-search-wrapper">
+          <input
+            type="text"
+            placeholder="🔍 Tìm kiếm theo tên danh mục..."
+            className="admin-search-bar"
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
         </div>
 
         <div className="categories-grid">

@@ -44,7 +44,7 @@ const Checkout = () => {
         total
       };
 
-      const response = await axios.post('/api/customers/orders', orderData);
+      const response = await axios.post('/api/client/orders', orderData);
 
       if (response.data.orderCode) {
         await clearCart();

@@ -17,7 +17,7 @@ const Home = () => {
 
   const fetchNewArrivals = async () => {
     try {
-      const response = await axios.get('/api/products/featured/new-arrivals');
+      const response = await axios.get('/api/client/products/featured/new-arrivals');
       setNewArrivals(response.data);
     } catch (error) {
       console.error('Lỗi khi tải sản phẩm mới:', error);
@@ -26,7 +26,7 @@ const Home = () => {
 
   const fetchOnSaleProducts = async () => {
     try {
-      const response = await axios.get('/api/products/featured/on-sale');
+      const response = await axios.get('/api/client/products/featured/on-sale');
       setOnSaleProducts(response.data);
     } catch (error) {
       console.error('Lỗi khi tải sản phẩm giảm giá:', error);
@@ -35,7 +35,7 @@ const Home = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('/api/categories');
+      const response = await axios.get('/api/client/categories');
       setCategories(response.data.slice(0, 5));
     } catch (error) {
       console.error('Lỗi khi tải danh mục:', error);

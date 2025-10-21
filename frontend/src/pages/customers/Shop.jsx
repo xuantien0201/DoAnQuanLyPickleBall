@@ -28,7 +28,7 @@ const Shop = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('/api/customers/categories');
+      const response = await axios.get('/api/client/categories');
       setCategories(response.data);
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -48,7 +48,7 @@ const Shop = () => {
         limit: productsPerPage // Thêm tham số giới hạn sản phẩm
       };
 
-      const response = await axios.get('/api/customers/products', { params });
+      const response = await axios.get('/api/client/products', { params });
       setProducts(response.data.products); // Cập nhật sản phẩm từ phản hồi
       setTotalProducts(response.data.totalCount); // Cập nhật tổng số sản phẩm
     } catch (error) {

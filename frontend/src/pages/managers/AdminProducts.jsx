@@ -196,13 +196,15 @@ const AdminProducts = () => {
                     </button>
                 </div>
 
-                <input
-                    type="text"
-                    placeholder="Tìm kiếm sản phẩm theo tên, mô tả..."
-                    className="admin-search-bar"
-                    value={searchTerm}
-                    onChange={handleSearchChange}
-                />
+                <div className="admin-search-wrapper">
+                    <input
+                        type="text"
+                        placeholder="🔍 Tìm kiếm theo mã HĐ, tên, SĐT khách hàng..."
+                        className="admin-search-bar"
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                    />
+                </div>
 
                 <div className="products-table-container">
                     <table className="products-table">

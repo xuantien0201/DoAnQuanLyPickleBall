@@ -13,7 +13,7 @@ const OrderComplete = () => {
 
   const fetchOrder = async () => {
     try {
-      const response = await axios.get(`/api/customers/orders/${orderCode}`);
+      const response = await axios.get(`/api/client/orders/${orderCode}`);
       setOrder(response.data);
     } catch (error) {
       console.error('Error fetching order:', error);

@@ -53,7 +53,12 @@
   border-radius: 4px;
   transition: all 0.3s;
 }
-
+/* Thêm vào AdminOrders.css */
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* 👈 Thay thế cho style={{ marginLeft: '10px' }} */
+}
 .page-item:hover {
   background: #f0f0f0;
 }
@@ -208,6 +213,22 @@
 
 .btn-view:hover {
   background: #333;
+}
+
+/* Thêm kiểu cho nút xóa */
+.btn-delete {
+  padding: 8px 16px;
+  background: #dc3545; /* Màu đỏ cho nút xóa */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+}
+
+.btn-delete:hover {
+  background: #c82333; /* Màu đỏ đậm hơn khi hover */
 }
 
 .no-orders {

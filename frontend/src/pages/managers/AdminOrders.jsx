@@ -34,7 +34,7 @@ const AdminOrders = () => {
   const viewOrderDetails = async (orderCode) => {
     try {
       // API này đã được tạo ở các bước trước
-      const response = await axios.get(`/api/customers/orders/${orderCode}`);
+      const response = await axios.get(`/api/client/orders/${orderCode}`);
       setSelectedOrder(response.data);
       setShowModal(true);
     } catch (error) {
@@ -94,7 +94,7 @@ const AdminOrders = () => {
   const renderPaymentMethod = (method) => {
     switch (method) {
       case 'cod':
-        return '💰 Thanh toán khi nhận hàng';
+        return '💰 COD ';
       case 'qr':
         return '📱 Chuyển khoản QR';
       case 'Tiền mặt':
@@ -129,6 +129,19 @@ const AdminOrders = () => {
 
   const totalPages = Math.ceil(totalOrders / ordersPerPage);
 
+  const deleteOrder = async (orderId, orderCode) => {
+    if (window.confirm(`Bạn có chắc chắn muốn xóa đơn hàng ${orderCode} này không? Hành động này không thể hoàn tác.`)) {
+      try {
+        await axios.delete(`/api/admin/orders/${orderId}`);
+        alert(`Đơn hàng ${orderCode} đã được xóa thành công.`);
+        fetchOrders(); // Làm mới danh sách đơn hàng sau khi xóa
+      } catch (error) {
+        console.error('Lỗi khi xóa đơn hàng:', error);
+        alert(error.response?.data?.error || 'Xóa đơn hàng thất bại.');
+      }
+    }
+  };
+
   return (
     <div className="admin-orders-page">
       <Sidebar />
@@ -137,19 +150,23 @@ const AdminOrders = () => {
           <h2>Quản lý Đơn hàng</h2>
         </div>
 
-        <input
-          type="text"
-          placeholder="Tìm kiếm theo mã ĐH, tên, SĐT khách hàng..."
-          className="admin-search-bar"
-          value={searchTerm}
-          onChange={handleSearchChange}
-        />
+        <div className="admin-search-wrapper">
+          <input
+            type="text"
+            placeholder="🔍 Tìm kiếm theo mã HĐ, tên, SĐT khách hàng..."
+            className="admin-search-bar"
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+        </div>
+
+
 
         <div className="orders-table-container">
           <table className="orders-table">
             <thead>
               <tr>
-                <th>Mã ĐH</th>
+                <th>Mã HĐ</th>
                 <th>Khách hàng</th>
                 <th>Ngày đặt</th>
                 <th>Tổng tiền</th>
@@ -192,9 +209,20 @@ const AdminOrders = () => {
 
                   </td>
                   <td>
-                    <button className="btn-view" onClick={() => viewOrderDetails(order.order_code)}>
-                      Xem chi tiết
-                    </button>
+                    <div className="action-buttons">
+                      <button
+                        className="btn-view"
+                        onClick={() => viewOrderDetails(order.order_code)}
+                      >
+                        Xem chi tiết
+                      </button>
+                      <button
+                        className="btn-delete"
+                        onClick={() => deleteOrder(order.id, order.order_code)}
+                      >
+                        Xóa
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -235,6 +263,12 @@ const AdminOrders = () => {
                   <h4>Địa chỉ giao hàng</h4>
                   <p>{selectedOrder.shipping_address}, {selectedOrder.shipping_city}</p>
                 </div>
+                {selectedOrder.notes && (
+                  <div className="detail-section">
+                    <h4>Ghi chú của khách hàng</h4>
+                    <p className="order-notes">{selectedOrder.notes}</p>
+                  </div>
+                )}
                 <div className="detail-section">
                   <h4>Sản phẩm</h4>
                   <table className="items-table">

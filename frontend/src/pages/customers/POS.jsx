@@ -144,7 +144,7 @@ export function POS() {
 
             console.log('POS Checkout - Dữ liệu items đang được gửi:', itemsToSend); // THÊM DÒNG NÀY
 
-            const response = await fetch('/api/customers/orders', {
+            const response = await fetch('/api/client/orders', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
