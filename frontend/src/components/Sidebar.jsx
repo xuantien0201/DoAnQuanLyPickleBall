@@ -56,21 +56,17 @@ export function Sidebar() {
             <span className="ic">🗓️</span>
             <span>Trở về Trang chủ</span>
           </Link>
-          <Link className="slink" to="#">
-            <span className="ic">🎟️</span>
-            <span>Khuyến mãi</span>
-          </Link>
           <Link className="slink active" to="/nhanvien">
             <span className="ic">👥</span>
             <span>Nhân viên</span>
           </Link>
-          <Link className="slink" to="#">
+          <Link className="slink" to="/nhacungcap">
             <span className="ic">📇</span>
-            <span>Khách hàng</span>
+            <span>Nhà cung cấp</span>
           </Link>
-          <Link className="slink" to="#">
+          <Link className="slink" to="/nhaphang">
             <span className="ic">🎟️</span>
-            <span>Khuyến mãi</span>
+            <span>Nhập hàng</span>
           </Link>
         </nav>
 

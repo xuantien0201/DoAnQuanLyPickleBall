@@ -11,6 +11,8 @@ import orderRouter from './client/orders/index.js';
 import nhanvienRouter from "./nhanvien/index.js"; 
 import calamRouter from "./calam/index.js";
 import taikhoanRouter from "./taikhoan/index.js";
+import nhacungcapRouter from "./nhacungcap/index.js";
+import phieunhapRouter from "./phieunhap/index.js";
 const router = express.Router();
 
 router.use('/admin', adminRouter);
@@ -23,6 +25,8 @@ router.use("/santhang", sanThangRouter);
 router.use("/nhanvien", nhanvienRouter);
 router.use("/calam", calamRouter);
 router.use("/taikhoan", taikhoanRouter);
+router.use("/nhacungcap", nhacungcapRouter);
+router.use("/phieunhap", phieunhapRouter);
 
 export default router;
 

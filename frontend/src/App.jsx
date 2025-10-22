@@ -2,8 +2,6 @@ import './App.css'
 import { Routes, Route } from 'react-router'
 import { useLocation } from 'react-router-dom';
 
-
-import { NhapHang } from './pages/managers/NhapHang'
 import { DatSanNgay } from './pages/managers/DatSanNgay'
 import { DatSanThang } from './pages/managers/DatSanThang'
 import { XacNhanDatSan } from './pages/managers/XacNhanDatSan'
@@ -30,11 +28,17 @@ import Login from "./pages/login/Login";
 import Register from "./pages/login/Register";
 import ForgotPassword from "./pages/login/ForgotPassword";
 import { NhanVien } from './pages/managers/NhanVien'
+import NhapHangDashboard from './pages/managers/NhapHangDashboard'
+import QuanLyNhaCungCap from './pages/managers/QuanLyNhaCungCap'
+import NhapHang from './pages/managers/NhapHang'
+import LichSuNhapHang from './pages/managers/LichSuNhapHang'
 
 
 function App() {
   const location = useLocation();
-  const noHeaderFooterRoutes = ['/xacnhansan','/dat-san','/xeve', '/categories', '/products', '/orders', '/santhang'];
+  const noHeaderFooterRoutes = ['/xacnhansan','/dat-san','/xeve', '/categories', '/products', '/orders', '/santhang', 
+    '/nhaphang', '/nhacungcap', '/taophieunhap', '/lichsunhap'
+  ];
   const hideHeaderFooter = noHeaderFooterRoutes.includes(location.pathname);
   return (
     <div className="app">
@@ -67,6 +71,10 @@ function App() {
       <Route path="login" element={<Login />} />
       <Route path="register" element={<Register />} />
       <Route path="forgot-password" element={<ForgotPassword />} />
+      <Route path="nhaphang" element={<NhapHangDashboard />} />
+          <Route path="nhacungcap" element={<QuanLyNhaCungCap />} />
+          <Route path="taophieunhap" element={<NhapHang />} />
+          <Route path="lichsunhap" element={<LichSuNhapHang />} />
       
         </Routes>
       </main>
