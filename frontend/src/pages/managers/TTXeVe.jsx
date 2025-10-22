@@ -32,7 +32,6 @@ export function TTXeVe() {
           </div>
         </div>
       </div>
-
     );
   }
 
@@ -68,7 +67,7 @@ export function TTXeVe() {
     if (isLoading) return;
 
     try {
-      // Validate dữ liệu
+      // 1️⃣ Kiểm tra dữ liệu đầu vào
       if (!ten?.trim() || !sdt?.trim() || !soVe) {
         alert("⚠️ Vui lòng nhập đầy đủ họ tên, số điện thoại và số vé!");
         return;
@@ -80,15 +79,19 @@ export function TTXeVe() {
 
       setIsLoading(true);
 
-      // 1️⃣ Thêm khách hàng
+      // 2️⃣ Sinh mã khách hàng ngẫu nhiên dạng KH700714
+      const randomPart = Math.floor(100000 + Math.random() * 900000); // 6 số ngẫu nhiên
+      const maKH = `KH${randomPart}`;
+
+      // 3️⃣ Gửi yêu cầu thêm khách hàng
       const resKh = await fetch(API_KHACHHANG, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          MaKH: maKH, // ✅ thêm mã khách hàng
           TenKh: ten,
           SDT: sdt,
           DiaChi: "",
-          Email: ""
         }),
       });
 
@@ -97,22 +100,19 @@ export function TTXeVe() {
         throw new Error(dataKh.message || "Lỗi thêm khách hàng!");
       }
 
-      const maKH = dataKh.insertedId; // ID khách hàng từ backend
-      console.log("✅ Thêm khách hàng thành công, MaKH:", maKH);
+      console.log("✅ Thêm khách hàng thành công:", maKH);
 
-      // 2️⃣ Thêm đặt vé
+      // 4️⃣ Chuẩn bị payload đặt vé
       const payload = {
         MaXeVe: parseInt(maXeVe, 10),
         MaKH: maKH,
         NguoiLap: "NV001",
         SoLuongSlot: parseInt(soVe, 10),
         GhiChu: `Thanh toán bằng ${method}`,
-        ThoiGianDangKy: new Date()
-          .toISOString()
-          .slice(0, 19)
-          .replace("T", " "),
+        ThoiGianDangKy: new Date().toISOString().slice(0, 19).replace("T", " "),
       };
 
+      // 5️⃣ Gửi yêu cầu thêm đặt vé
       const resDatVe = await fetch(API_DATVE, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -127,7 +127,7 @@ export function TTXeVe() {
       alert("🎉 Thanh toán & đặt vé thành công!");
       console.log("✅ Kết quả đặt vé:", dataDatVe);
 
-      navigate("/qlyxeve");
+      navigate("/xeve");
     } catch (err) {
       console.error("❌ Lỗi khi xác nhận thanh toán:", err);
       alert(err.message || "Đã xảy ra lỗi, vui lòng thử lại!");
@@ -137,7 +137,7 @@ export function TTXeVe() {
   };
 
   return (
-    <div className="tt-xeve-wrapper">
+    <div className="dat-san-wrapper">
       <Sidebar />
 
       <div className="tt-container">
@@ -148,28 +148,55 @@ export function TTXeVe() {
           <div className="tt-info-box">
             <h3>Thông tin đặt vé</h3>
             <div className="tt-info-item">
-              👤 <span>Tên khách: <b>{ten}</b></span>
+              👤{" "}
+              <span>
+                Tên khách: <b>{ten}</b>
+              </span>
             </div>
             <div className="tt-info-item">
-              📞 <span>SĐT: <b>{sdt}</b></span>
+              📞{" "}
+              <span>
+                SĐT: <b>{sdt}</b>
+              </span>
             </div>
             <div className="tt-info-item">
-              🎉 <span>Sự kiện: <b>{tenSuKien}</b></span>
+              🎉{" "}
+              <span>
+                Sự kiện: <b>{tenSuKien}</b>
+              </span>
             </div>
             <div className="tt-info-item">
-              📅 <span>Ngày tổ chức: <b>{ngayToChucDisplay}</b></span>
+              📅{" "}
+              <span>
+                Ngày tổ chức: <b>{ngayToChucDisplay}</b>
+              </span>
             </div>
             <div className="tt-info-item">
-              🏟️ <span>Sân: <b>{danhSachSan}</b></span>
+              🏟️{" "}
+              <span>
+                Sân: <b>{danhSachSan}</b>
+              </span>
             </div>
             <div className="tt-info-item">
-              🕒 <span>Giờ: <b>{gioBatDauDisplay} - {gioKetThucDisplay}</b></span>
+              🕒{" "}
+              <span>
+                Giờ:{" "}
+                <b>
+                  {gioBatDauDisplay} - {gioKetThucDisplay}
+                </b>
+              </span>
             </div>
             <div className="tt-info-item">
-              🎫 <span>Số vé: <b>{soVe}</b></span>
+              🎫{" "}
+              <span>
+                Số vé: <b>{soVe}</b>
+              </span>
             </div>
             <div className="tt-info-item">
-              💰 <span>Tổng tiền: <b>{Number(soVe) * 100000} ₫</b></span>
+              💰{" "}
+              <span>
+                Tổng tiền: <b>{Number(soVe) * 100000} ₫</b>
+              </span>
             </div>
           </div>
 
@@ -187,10 +214,10 @@ export function TTXeVe() {
                   {m === "tt-qr"
                     ? "QR Pay"
                     : m === "tt-vnpay"
-                      ? "VNPay"
-                      : m === "tt-zalopay"
-                        ? "ZaloPay"
-                        : "Tiền mặt"}
+                    ? "VNPay"
+                    : m === "tt-zalopay"
+                    ? "ZaloPay"
+                    : "Tiền mặt"}
                 </button>
               ))}
             </div>
@@ -200,12 +227,19 @@ export function TTXeVe() {
                 <div className="tt-qr-section">
                   <img src={mbBank} alt="QR Code" />
                   <div className="tt-bank-info">
-                    <p><b>Tên tài khoản:</b> Nguyen Trung Nguyen</p>
-                    <p><b>Số tài khoản:</b> 0345137842</p>
-                    <p><b>Ngân hàng:</b> MB Bank</p>
+                    <p>
+                      <b>Tên tài khoản:</b> Nguyen Trung Nguyen
+                    </p>
+                    <p>
+                      <b>Số tài khoản:</b> 0345137842
+                    </p>
+                    <p>
+                      <b>Ngân hàng:</b> MB Bank
+                    </p>
                   </div>
                   <div className="tt-note">
-                    Vui lòng chuyển khoản <b>{Number(soVe) * 100000} ₫</b> và gửi ảnh xác nhận sau khi thanh toán.
+                    Vui lòng chuyển khoản <b>{Number(soVe) * 100000} ₫</b> và
+                    gửi ảnh xác nhận sau khi thanh toán.
                     <br />
                     Hệ thống sẽ giữ vé của bạn trong <b>5 phút</b>.
                   </div>

@@ -21,7 +21,11 @@ export function Sidebar() {
           </Link>
           <Link className="slink" to="/dat-san">
             <span className="ic">🗓️</span>
-            <span>Đặt sân</span>
+            <span>Đặt sân ngày</span>
+          </Link>
+          <Link className="slink" to="/santhang">
+            <span className="ic">🗓️</span>
+            <span>Đặt sân tháng</span>
           </Link>
           <Link className="slink" to="/xeve">
             <span className="ic">🗓️</span>

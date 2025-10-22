@@ -5,7 +5,8 @@ import { useLocation } from 'react-router-dom';
 
 import { NhapHang } from './pages/managers/NhapHang'
 import { NhanVien } from './pages/managers/NhanVien'
-import { DatSan } from './pages/managers/DatSan'
+import { DatSanNgay } from './pages/managers/DatSanNgay'
+import { DatSanThang } from './pages/managers/DatSanThang'
 import { XacNhanDatSan } from './pages/managers/XacNhanDatSan'
 import { QlyXeVe } from './pages/managers/QlyXeVe'
 import { ThemXeVe } from './pages/managers/ThemXeVe'
@@ -27,7 +28,7 @@ import AdminOrders from './pages/managers/AdminOrders';
 
 function App() {
   const location = useLocation();
-  const noHeaderFooterRoutes = ['/xacnhansan', '/dat-san', '/xeve', '/categories', '/products', '/orders'];
+  const noHeaderFooterRoutes = ['/xacnhansan','/dat-san','/xeve', '/categories', '/products', '/orders', '/santhang'];
   const hideHeaderFooter = noHeaderFooterRoutes.includes(location.pathname);
   return (
     <div className="app">
@@ -36,7 +37,8 @@ function App() {
         <Routes>
           {/* <Route index element={<DatSan />} /> */}
           <Route path="/" element={<Home />} />
-          <Route path="dat-san" element={<DatSan />} />
+          <Route path="dat-san" element={<DatSanNgay />} />
+          <Route path="santhang" element={<DatSanThang />} />
           <Route path="nhanvien" element={<NhanVien />} />
           <Route path="nhaphang" element={<NhapHang />} />
           <Route path="xacnhansan" element={<XacNhanDatSan />} />

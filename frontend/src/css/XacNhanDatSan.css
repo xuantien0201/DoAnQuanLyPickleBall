@@ -12,15 +12,30 @@ body {
   min-height: 100vh;
 }
 
-.confirm-container {
-  max-width: 98%;
-  background: white;
-  padding: 35px 45px;
-  border-radius: 20px;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.1);
-  animation: fadeIn 0.3s ease-in-out;
-  margin: 20px;
+.xacnhan-container {
+  display: flex;
   height: fit-content;
+  width: 100%;
+  background: white;
+  overflow: hidden;
+}
+
+/* CONTAINER
+.sanngay-container {
+  display: flex;
+  height: fit-content;
+  width: 100%;
+  background: var(--bg);
+  overflow: hidden;
+} */
+
+/* MAIN CONTENT (phần bên phải Sidebar) */
+.xacnhan-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  overflow-y: auto;
 }
 
 h1 {
@@ -222,16 +237,13 @@ button {
     opacity: 0;
     transform: translateY(15px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-#root,
-body,
-html {
+#root, body, html {
   width: 100%;
   height: 100%;
   margin: 0;
@@ -248,7 +260,7 @@ html {
   width: 100%;
   border-collapse: collapse;
   background: #fff;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
   border-radius: 6px;
   overflow: hidden;
 }
@@ -272,7 +284,158 @@ html {
   background: #f5fbff;
 }
 
-.xac-nhan-wrapper {
-  display: flex;
+.table-san-thang {
   width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.table-san-thang th {
+  background-color: #2563eb;
+  color: white;
+  padding: 8px;
+  text-align: center;
+}
+
+.table-san-thang td {
+  border-bottom: 1px solid #e5e7eb;
+  text-align: center;
+  padding: 8px;
+}
+
+.table-san-thang tr:hover {
+  background-color: #f1f5f9;
+}
+
+.total-summary {
+  text-align: right;
+  margin-top: 12px;
+  font-size: 1rem;
+}
+
+.total-summary select {
+  margin-left: 10px;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.total {
+  color: #059669;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 cột đều nhau */
+  gap: 20px;
+  margin-bottom: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Cột thông tin khách hàng (cột 1-2 gộp) */
+.info-customer {
+  grid-column: span 2; /* chiếm 2 cột đầu */
+  display: grid;
+  grid-template-columns: 120px 1fr; /* label 120px, value chiếm phần còn lại */
+  gap: 10px 10px;
+}
+
+.grid-row {
+  display: contents; /* cho phép label và value nằm cùng hàng trong grid */
+}
+
+.grid-label {
+  font-weight: 600;
+  color: #333;
+  align-self: center;
+}
+
+.grid-value {
+  background-color: #f9f9f9;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  color: #333;
+}
+
+.grid-value:hover {
+  background-color: #e0f0ff;
+}
+
+/* Cột QR code (cột 3) */
+.info-qr {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+}
+
+.qr-image {
+  width: 180px;
+  height: 180px;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.qr-note {
+  font-size: 14px;
+  color: #666;
+  font-style: italic;
+}
+
+/* Cột thông tin ngân hàng (cột 4) */
+.info-bank {
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  padding: 15px 20px;
+  border: 1px solid #e1e1e1;
+}
+
+.info-bank h3 {
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: #222;
+}
+
+.info-bank p {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Responsive */
+@media (max-width: 1000px) {
+  .info-grid {
+    grid-template-columns: repeat(2, 1fr); /* còn 2 cột khi thu nhỏ */
+  }
+
+  .info-customer {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 600px) {
+  .info-grid {
+    grid-template-columns: 1fr; /* xếp dọc */
+  }
+
+  .info-customer {
+    grid-template-columns: 100px 1fr;
+  }
+
+  .qr-image {
+    width: 130px;
+    height: 130px;
+  }
 }

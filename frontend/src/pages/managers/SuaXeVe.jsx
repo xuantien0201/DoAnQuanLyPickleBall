@@ -19,7 +19,7 @@ export function SuaXeVe({ MaXeVe, onClose, onUpdated }) {
     const fetchData = async () => {
       try {
         const res = await fetch(
-          `http://localhost:3000/api/xeve/getXeVeById/${MaXeVe}`
+          `http://localhost:3000/api/xeve/sukien/getXeVeById/${MaXeVe}`
         );
         if (!res.ok) throw new Error("Không thể tải dữ liệu sự kiện");
 

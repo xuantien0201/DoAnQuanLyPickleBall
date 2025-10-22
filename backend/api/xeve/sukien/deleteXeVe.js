@@ -1,5 +1,5 @@
 // 📄 api/xeve/deleteXeVe.js
-import { db } from "../../config/db.js";
+import { db } from "../../../config/db.js";
 
 export async function deleteXeVe(req, res) {
   try {

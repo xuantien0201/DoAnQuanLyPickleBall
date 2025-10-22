@@ -1,0 +1,505 @@
+import React, { useEffect, useState } from "react";
+import "../../css/DatSanNgay.css";
+import { Sidebar } from "../../components/Sidebar";
+import { Link } from "react-router";
+import { useNavigate } from "react-router"; // thêm đầu file
+
+export function DatSanNgay() {
+  const navigate = useNavigate();
+  const openingHour = 5;
+  const closingHour = 24;
+  const slotMinutes = 60;
+
+  const [courts, setCourts] = useState([]);
+  const [bookedSlots, setBookedSlots] = useState({});
+  const [eventSlots, setEventSlots] = useState({});
+  const [monthlySlots, setMonthlySlots] = useState({});
+  const [selectedSlots, setSelectedSlots] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
+
+  const API_BASE = "http://localhost:3000/api/san";
+
+  const timeSlots = () => {
+    const total = (closingHour - openingHour) * (60 / slotMinutes);
+    return Array.from({ length: total }, (_, i) => i);
+  };
+
+  const slotToLabel = (i) => {
+    const minutes = openingHour * 60 + i * slotMinutes;
+    const h = String(Math.floor(minutes / 60)).padStart(2, "0");
+    const m = String(minutes % 60).padStart(2, "0");
+    return `${h}:${m}`;
+  };
+
+  const fetchDatSanThang = async (date, courtsArg = []) => {
+    try {
+      // 🔹 Chuẩn hóa ngày hiện tại
+      const formatDate = (dateStr) => {
+        if (!dateStr) return "";
+        const d = new Date(dateStr);
+        if (isNaN(d)) return dateStr;
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const day = String(d.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      };
+
+      const dateFormatted = formatDate(date.split("T")[0]);
+
+      // 🔹 Lấy danh sách sân tháng từ API
+      const res = await fetch("http://localhost:3000/api/santhang/list");
+      if (!res.ok) throw new Error("Lỗi khi lấy danh sách đặt sân tháng");
+      const result = await res.json();
+      const data = Array.isArray(result) ? result : result.data || [];
+
+      if (!Array.isArray(data)) {
+        console.error("⚠️ API không trả về mảng hợp lệ:", result);
+        return;
+      }
+
+      const mapThang = {};
+      const allSanThang = [];
+
+      for (const item of data) {
+        // --- Parse danh sách ngày ---
+        let danhSachNgay = [];
+        try {
+          if (!item.DanhSachNgay) danhSachNgay = [];
+          else if (Array.isArray(item.DanhSachNgay))
+            danhSachNgay = item.DanhSachNgay;
+          else danhSachNgay = JSON.parse(item.DanhSachNgay);
+        } catch {
+          // fallback nếu JSON parse lỗi
+          danhSachNgay = (item.DanhSachNgay || "")
+            .replace(/[\[\]"]/g, "")
+            .split(",")
+            .map((x) => x.trim());
+        }
+
+        // 🔹 Chuẩn hóa toàn bộ ngày
+        const ngayKhongGio = danhSachNgay.map(formatDate);
+        const isTodayIncluded = ngayKhongGio.includes(dateFormatted);
+
+        // --- Parse danh sách sân ---
+        let danhSachSan = [];
+        try {
+          if (!item.DanhSachSan) danhSachSan = [];
+          else if (Array.isArray(item.DanhSachSan))
+            danhSachSan = item.DanhSachSan;
+          else danhSachSan = JSON.parse(item.DanhSachSan);
+        } catch {
+          danhSachSan = (item.DanhSachSan || "")
+            .replace(/[\[\]"]/g, "")
+            .split(",")
+            .map((s) => s.trim());
+        }
+
+        // --- Lưu toàn bộ dữ liệu để debug ---
+        allSanThang.push({
+          MaDatSanThang: item.MaDatSanThang,
+          DanhSachSan: danhSachSan,
+          DanhSachNgay: ngayKhongGio,
+          GioBatDau: item.GioBatDau,
+          GioKetThuc: item.GioKetThuc,
+          TrangThai: item.TrangThai,
+          GhiChu: item.GhiChu,
+        });
+
+        // --- Chỉ render nếu ngày đang chọn nằm trong danh sách ---
+        if (!isTodayIncluded) continue;
+
+        // --- Xác định vị trí slot ---
+        const [startH, startM] = (item.GioBatDau || "00:00:00")
+          .split(":")
+          .map(Number);
+        const [endH, endM] = (item.GioKetThuc || "00:00:00")
+          .split(":")
+          .map(Number);
+        const startIndex = Math.floor(
+          (startH * 60 + startM - openingHour * 60) / slotMinutes
+        );
+        const endIndex = Math.floor(
+          (endH * 60 + endM - openingHour * 60) / slotMinutes
+        );
+
+        danhSachSan.forEach((san) => {
+          const courtNum = san.replace(/\D/g, "");
+          const ci = courtsArg.findIndex(
+            (c) => c.MaSan.replace(/\D/g, "") === courtNum
+          );
+          if (ci === -1) return;
+          if (!mapThang[ci]) mapThang[ci] = [];
+
+          mapThang[ci].push({
+            start: startIndex,
+            end: endIndex,
+            khach: item.GhiChu || "Khách tháng",
+            MaDatSanThang: item.MaDatSanThang,
+          });
+        });
+      }
+
+      // 🔹 Cập nhật state (sau khi xử lý toàn bộ)
+      setMonthlySlots(mapThang);
+      setAllMonthlyData?.(allSanThang);
+    } catch (err) {
+      console.error("❌ Lỗi khi lấy sân tháng:", err);
+    }
+  };
+
+  // 🔹 Lấy danh sách sân + sự kiện
+  const fetchCourts = async (date) => {
+    try {
+      const resCourts = await fetch(`${API_BASE}?date=${date}`);
+      if (!resCourts.ok) throw new Error("Lỗi khi lấy danh sách sân");
+      let courtsData = await resCourts.json();
+
+      // sắp xếp theo thứ tự sân
+      const lower = courtsData.filter((c) => +c.MaSan.replace(/\D/g, "") < 10);
+      const higher = courtsData.filter(
+        (c) => +c.MaSan.replace(/\D/g, "") >= 10
+      );
+      courtsData = [...lower, ...higher];
+      setCourts(courtsData);
+
+      // sự kiện
+      const resEvent = await fetch(
+        `http://localhost:3000/api/xeve/sukien/date?date=${date}`
+      );
+
+      let eventData = [];
+      if (resEvent.ok) {
+        eventData = await resEvent.json();
+        eventData = eventData.filter((ev) => {
+          const localDate = new Date(ev.NgayToChuc).toLocaleDateString(
+            "sv-SE",
+            { timeZone: "Asia/Ho_Chi_Minh" }
+          );
+          return localDate === date;
+        });
+      }
+
+      // map sự kiện vào sân
+      const eventSlotMap = {};
+      eventData.forEach((ev) => {
+        const courtNames = ev.DanhSachSan.split(",").map((s) =>
+          s.trim().replace(/^S/, "")
+        );
+        const [startH, startM] = ev.ThoiGianBatDau.split(":").map(Number);
+        const [endH, endM] = ev.ThoiGianKetThuc.split(":").map(Number);
+
+        const startIndex = Math.floor(
+          (startH * 60 + startM - openingHour * 60) / slotMinutes
+        );
+        const endIndex = Math.floor(
+          (endH * 60 + endM - openingHour * 60) / slotMinutes
+        );
+
+        courtsData.forEach((court, ci) => {
+          const courtNum = court.MaSan.replace(/\D/g, "");
+          if (courtNames.includes(courtNum)) {
+            if (!eventSlotMap[ci]) eventSlotMap[ci] = [];
+            eventSlotMap[ci].push({
+              start: startIndex,
+              end: endIndex,
+              name: ev.TenSuKien,
+              startTime: ev.ThoiGianBatDau,
+              endTime: ev.ThoiGianKetThuc,
+            });
+          }
+        });
+      });
+      setEventSlots(eventSlotMap);
+
+      // map lịch đặt sân
+      const booked = {};
+      courtsData.forEach((court, ci) => {
+        booked[ci] = [];
+        if (court.bookedSlots) {
+          court.bookedSlots.forEach((slot) => {
+            const [startH, startM] = slot.GioVao.split(":").map(Number);
+            const [endH, endM] = slot.GioRa.split(":").map(Number);
+            const startIndex = Math.floor(
+              (startH * 60 + startM - openingHour * 60) / slotMinutes
+            );
+            const endIndex = Math.floor(
+              (endH * 60 + endM - openingHour * 60) / slotMinutes
+            );
+            for (let i = startIndex; i < endIndex; i++) booked[ci].push(i);
+          });
+        }
+      });
+      setBookedSlots(booked);
+
+      await fetchDatSanThang(date, courtsData);
+    } catch (err) {
+      console.error("❌ Lỗi lấy dữ liệu sân/booked:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchCourts(selectedDate);
+  }, [selectedDate]);
+
+  // ✅ Lấy giá theo giờ
+  const getPrice = (court, slotIndex) => {
+    const hour = openingHour + slotIndex;
+    return hour >= 16
+      ? Number(court.GiaThueSau16) || 0
+      : Number(court.GiaThueTruoc16) || 0;
+  };
+
+  // ✅ Xử lý chọn/hủy slot
+  const handleSlotClick = (ci, slotIndex) => {
+    const key = `${ci}-${slotIndex}`;
+    const court = courts[ci];
+    const price = getPrice(court, slotIndex);
+
+    if (bookedSlots[ci]?.includes(slotIndex)) return;
+    if (
+      eventSlots[ci]?.some((ev) => slotIndex >= ev.start && slotIndex < ev.end)
+    )
+      return;
+
+    let newSelected = [...selectedSlots];
+    let newTotal = total;
+
+    if (newSelected.includes(key)) {
+      // Hủy chọn
+      newSelected = newSelected.filter((k) => k !== key);
+      newTotal -= price;
+    } else {
+      // Chọn mới
+      newSelected.push(key);
+      newTotal += price;
+    }
+
+    setSelectedSlots(newSelected);
+    setTotal(newTotal);
+  };
+
+  // 🔹 Vẽ lưới hiển thị sân (gộp booked theo khách + sự kiện)
+  const buildGrid = () => {
+    const gridEl = document.getElementById("grid");
+    if (!gridEl) return;
+    gridEl.innerHTML = "";
+
+    const slots = timeSlots();
+
+    // Header
+    const headWrapper = document.createElement("div");
+    headWrapper.className = "grid-head-wrapper";
+    const head = document.createElement("div");
+    head.className = "grid-head";
+
+    const blank = document.createElement("div");
+    blank.className = "hcell side";
+    blank.textContent = "Sân / Giờ";
+    head.appendChild(blank);
+
+    slots.forEach((i) => {
+      const h = document.createElement("div");
+      h.className = "hcell";
+      h.textContent = slotToLabel(i);
+      head.appendChild(h);
+    });
+    headWrapper.appendChild(head);
+    gridEl.appendChild(headWrapper);
+
+    // Rows
+    const rowsWrapper = document.createElement("div");
+    rowsWrapper.className = "grid-rows-wrapper";
+
+    courts.forEach((court, ci) => {
+      const row = document.createElement("div");
+      row.className = "row";
+
+      const side = document.createElement("div");
+      side.className = "cell side";
+      side.textContent = court.TenSan || `Sân ${ci + 1}`;
+      row.appendChild(side);
+
+      for (let i = 0; i < slots.length; i++) {
+        const key = `${ci}-${i}`;
+
+        // Kiểm tra event
+        const ev = eventSlots[ci]?.find((ev) => i >= ev.start && i < ev.end);
+        if (ev) {
+          if (i === ev.start) {
+            const eventCell = document.createElement("div");
+            eventCell.className = "cell slot event";
+            eventCell.textContent = ev.name;
+            eventCell.style.gridColumn = `span ${ev.end - ev.start}`;
+            eventCell.style.textAlign = "center";
+            eventCell.style.fontWeight = "500";
+            eventCell.style.backgroundColor = "#d4b0ff";
+            row.appendChild(eventCell);
+          }
+          continue; // bỏ qua các ô đã hiển thị
+        }
+
+        // Kiểm tra sân tháng
+        const thangSlot = monthlySlots[ci]?.find(
+          (m) => i >= m.start && i < m.end
+        );
+        if (thangSlot) {
+          if (i === thangSlot.start) {
+            const thangCell = document.createElement("div");
+            thangCell.className = "cell slot month";
+            thangCell.textContent = thangSlot.khach;
+            thangCell.style.gridColumn = `span ${
+              thangSlot.end - thangSlot.start
+            }`;
+            thangCell.style.backgroundColor = "#5cc9a7";
+            thangCell.style.color = "#fff";
+            thangCell.style.textAlign = "center";
+            row.appendChild(thangCell);
+          }
+          continue;
+        }
+
+        // Kiểm tra booked
+        const bookedSlot = court.bookedSlots?.find((b) => {
+          const [startH, startM] = b.GioVao.split(":").map(Number);
+          const [endH, endM] = b.GioRa.split(":").map(Number);
+          const startIndex = Math.floor(
+            (startH * 60 + startM - openingHour * 60) / slotMinutes
+          );
+          const endIndex = Math.floor(
+            (endH * 60 + endM - openingHour * 60) / slotMinutes
+          );
+          return i >= startIndex && i < endIndex;
+        });
+
+        if (bookedSlot) {
+          if (
+            i ===
+            Math.floor(
+              (bookedSlot.GioVao.split(":")[0] * 60 +
+                Number(bookedSlot.GioVao.split(":")[1]) -
+                openingHour * 60) /
+                slotMinutes
+            )
+          ) {
+            const [startH, startM] = bookedSlot.GioVao.split(":").map(Number);
+            const [endH, endM] = bookedSlot.GioRa.split(":").map(Number);
+            const startIndex = Math.floor(
+              (startH * 60 + startM - openingHour * 60) / slotMinutes
+            );
+            const endIndex = Math.floor(
+              (endH * 60 + endM - openingHour * 60) / slotMinutes
+            );
+
+            const bookedCell = document.createElement("div");
+            bookedCell.className = "cell slot booked";
+            bookedCell.textContent = bookedSlot.KhachHang || "";
+            bookedCell.style.gridColumn = `span ${endIndex - startIndex}`;
+            bookedCell.style.backgroundColor = "#fa4f4fff";
+            bookedCell.style.color = "#ffffff";
+            bookedCell.style.borderRight = "1px solid #fff";
+            row.appendChild(bookedCell);
+          }
+          continue;
+        }
+
+        // Ô trống để chọn
+        const cell = document.createElement("div");
+        cell.className = "cell slot avail";
+        cell.dataset.court = ci;
+        cell.dataset.slot = i;
+        cell.addEventListener("click", () => handleSlotClick(ci, i));
+        if (selectedSlots.includes(key)) {
+          cell.style.backgroundColor = "#f9e07aff"; // vàng khi chọn
+          cell.style.border = "1px solid black"; // vàng khi chọn
+        }
+        row.appendChild(cell);
+      }
+
+      rowsWrapper.appendChild(row);
+    });
+
+    gridEl.appendChild(rowsWrapper);
+  };
+
+  useEffect(() => {
+    if (courts.length > 0) buildGrid();
+  }, [courts, bookedSlots, eventSlots, selectedSlots, monthlySlots]);
+
+  const handleDateChange = (e) => {
+    setSelectedDate(e.target.value);
+    setSelectedSlots([]);
+    setTotal(0);
+  };
+
+  const handleConfirm = () => {
+    if (selectedSlots.length === 0) {
+      alert("Vui lòng chọn ít nhất 1 ô sân!");
+      return;
+    }
+
+    // tạo dữ liệu để gửi sang XacNhanDatSan
+    const bookingData = {
+      date: selectedDate,
+      selectedSlots: selectedSlots.map((key) => {
+        const [ci, slotIndex] = key.split("-").map(Number);
+        return { courtIndex: ci, slotIndex };
+      }),
+      bookingType: "Đặt sân ngày",
+    };
+
+    // lưu vào localStorage để XacNhanDatSan đọc
+    localStorage.setItem("bookingData", JSON.stringify(bookingData));
+
+    // navigate sang trang xác nhận
+    navigate("/xacnhansan");
+  };
+
+  return (
+    <div className="sanngay-container">
+      <Sidebar />
+
+      <div className="sanngay-content">
+        <header className="datsan-header">
+          <div className="left">
+            <div className="brand">Pickleball Bồ Đề</div>
+            <div className="control">
+              <label>Ngày</label>
+              <input
+                id="date"
+                type="date"
+                value={selectedDate}
+                onChange={handleDateChange}
+              />
+            </div>
+          </div>
+
+          <div className="right legend">
+            <span className="dot a"></span>
+            <small>Còn trống</small>
+            <span className="dot c"></span>
+            <small>Đã đặt</small>
+            <span className="dot d"></span>
+            <small>Sự kiện</small>
+            <span className="dot s"></span>
+            <small>Đang chọn</small>
+            <span className="dot m"></span>
+            <small>Đặt tháng</small>
+          </div>
+        </header>
+
+        <div className="grid-wrapper" id="grid"></div>
+
+        <div className="confirm-area">
+          <div className="total">Tổng: {total.toLocaleString("vi-VN")} đ</div>
+          <button className="btn-confirm" onClick={handleConfirm}>
+            <Link to="/xacnhansan"></Link>
+            XÁC NHẬN
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
