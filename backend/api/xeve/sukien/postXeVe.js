@@ -1,5 +1,5 @@
 // 📄 api/xeve/postXeVe.js
-import { db } from "../../config/db.js";
+import { db } from "../../../config/db.js";
 
 export async function postXeVe(req, res) {
   try {
