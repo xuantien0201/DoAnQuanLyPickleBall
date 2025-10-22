@@ -31,8 +31,8 @@ router.put('/:id/status', async (req, res) => {
     const allowedTransitions = {
       cho_xac_nhan: ['dang_xu_ly', 'da_huy'],
       dang_xu_ly: ['dang_giao', 'da_huy'],
-      dang_giao: ['da_giao', 'giao_that_bai'],
-      da_giao: [],
+      dang_giao: ['da_nhan', 'giao_that_bai'],
+      da_nhan: [],
       da_huy: [],
       giao_that_bai: [],
     };
@@ -99,7 +99,7 @@ router.put('/:id/status', async (req, res) => {
     };
 
     // 5️⃣ Xác định logic trừ/hoàn kho
-    const stockDeductedStatuses = ['dang_xu_ly', 'dang_giao', 'da_giao'];
+    const stockDeductedStatuses = ['dang_xu_ly', 'dang_giao', 'da_nhan'];
     const oldDeducted = stockDeductedStatuses.includes(oldStatus);
     const newDeducted = stockDeductedStatuses.includes(newStatus);
 

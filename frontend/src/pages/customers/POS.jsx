@@ -9,6 +9,7 @@ export function POS() {
     // New customer & payment state
     const [customerName, setCustomerName] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
+    const [customerSex, setcustomerSex] = useState(''); // <-- Thêm state giới tính
     const [paymentMethod, setPaymentMethod] = useState('Tiền mặt');
 
     // Thêm state cho phân trang
@@ -111,6 +112,7 @@ export function POS() {
         setCart([]);
         setCustomerName('');
         setCustomerPhone('');
+        setcustomerSex(''); // <-- Reset giới tính
         setPaymentMethod('Tiền mặt');
     };
 
@@ -151,10 +153,11 @@ export function POS() {
                     items: itemsToSend, // Sử dụng mảng đã log
                     total,
                     paymentMethod: paymentMethod,
-                    status: 'da_giao',
+                    status: 'da_nhan',
                     customer: {
                         name: customerName,
-                        phone: customerPhone
+                        phone: customerPhone,
+                        sex: customerSex // <-- Gửi giới tính lên server
                     }
                 })
             });
@@ -286,13 +289,21 @@ export function POS() {
                     </div>
 
                     <form className="sale-form" onSubmit={(e) => { e.preventDefault(); handleCheckout(); }}>
-                        <label>Tên khách hàng *</label> {/* Đã sửa tiếng Việt */}
-                        <input type="text" placeholder="Nhập tên khách hàng" value={customerName} onChange={(e) => setCustomerName(e.target.value)} /> {/* Đã sửa tiếng Việt */}
+                        <label>Tên khách hàng *</label>
+                        <input type="text" placeholder="Nhập tên khách hàng" value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
 
-                        <label>Số điện thoại *</label> {/* Đã sửa tiếng Việt */}
-                        <input type="text" placeholder="Nhập số điện thoại" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} /> {/* Đã sửa tiếng Việt */}
+                        <label>Số điện thoại *</label>
+                        <input type="text" placeholder="Nhập số điện thoại" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} />
 
-                        <label>Phương thức thanh toán *</label> {/* Đã sửa tiếng Việt */}
+                        <label>Giới tính</label>
+                        <select value={customerSex} onChange={(e) => setcustomerSex(e.target.value)}>
+                            <option value="">Chọn giới tính</option>
+                            <option value="Nam">Nam</option>
+                            <option value="Nữ">Nữ</option>
+                            <option value="Khác">Khác</option>
+                        </select>
+
+                        <label>Phương thức thanh toán *</label>
                         <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
                             <option>Tiền mặt</option>
                             <option>Chuyển khoản</option>

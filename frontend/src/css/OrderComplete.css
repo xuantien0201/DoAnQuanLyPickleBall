@@ -36,6 +36,25 @@
   margin-bottom: 40px;
 }
 
+.order-items-preview.scrollable {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-height: 100px;
+  overflow-y: auto;
+  padding: 10px;
+  /* tránh thanh cuộn đè lên nội dung */
+}
+
+.order-items-preview.scrollable::-webkit-scrollbar {
+  width: 6px;
+}
+
+.order-items-preview.scrollable::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
 .item-preview {
   position: relative;
 }
@@ -224,3 +243,30 @@
     gap: 10px;
   }
 }
+
+.order-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+.btn {
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: 0.2s ease-in-out;
+}
+
+.btn-outline {
+  background-color: white;
+  color: #007bff;
+  border: 1px solid #007bff;
+}
+
+.btn-outline:hover {
+  background-color: #007bff;
+  color: white;
+} 

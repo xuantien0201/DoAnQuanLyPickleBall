@@ -19,6 +19,7 @@ import ProductDetail from './pages/customers/ProductDetail';
 import Cart from './pages/customers/Cart';
 import Checkout from './pages/customers/Checkout';
 import OrderComplete from './pages/customers/OrderComplete';
+import PurchaseHistory from './pages/customers/PurchaseHistory'; // Import component mới
 import AdminProducts from './pages/managers/AdminProducts';
 import AdminCategories from './pages/managers/AdminCategories';
 import AdminOrders from './pages/managers/AdminOrders';
@@ -26,7 +27,7 @@ import AdminOrders from './pages/managers/AdminOrders';
 
 function App() {
   const location = useLocation();
-  const noHeaderFooterRoutes = ['/xacnhansan','/dat-san','/xeve', '/categories', '/products', '/orders'];
+  const noHeaderFooterRoutes = ['/xacnhansan', '/dat-san', '/xeve', '/categories', '/products', '/orders'];
   const hideHeaderFooter = noHeaderFooterRoutes.includes(location.pathname);
   return (
     <div className="app">
@@ -47,6 +48,7 @@ function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/order-complete/:orderCode" element={<OrderComplete />} />
+          <Route path="/purchase-history" element={<PurchaseHistory />} /> {/* Thêm route này */}
           <Route path="/products" element={<AdminProducts />} />
           <Route path="/categories" element={<AdminCategories />} />
           <Route path="/orders" element={<AdminOrders />} />

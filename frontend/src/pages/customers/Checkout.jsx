@@ -7,14 +7,15 @@ import '../../css/Checkout.css';
 const Checkout = () => {
   const navigate = useNavigate();
   const { cartItems, getCartTotal, clearCart } = useCart();
-  const [paymentMethod, setPaymentMethod] = useState('cod'); // cod: cash on delivery, qr: qr code
+  const [paymentMethod, setPaymentMethod] = useState('cod'); // cod: cash on delivery
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     phone: '',
     address: '',
     city: '',
-    notes: ''
+    notes: '',
+    sex: '' // <-- Thêm state cho giới tính
   });
 
   const total = getCartTotal();
@@ -35,7 +36,7 @@ const Checkout = () => {
         ...formData,
         paymentMethod,
         items: cartItems.map(item => ({
-          product_id: item.product_id, // Đã sửa: Sử dụng item.product_id thay vì item.id
+          product_id: item.product_id, 
           name: item.name,
           price: item.price,
           quantity: item.quantity,
@@ -104,15 +105,23 @@ const Checkout = () => {
               </div>
               <div className="form-grid">
                 <div className="form-group">
-                  <label>EMAIL *</label>
+                  <label>EMAIL (KHÔNG BẮT BUỘC)</label>
                   <input
                     type="email"
                     name="email"
                     placeholder="Nhập email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    required
                   />
+                </div>
+                <div className="form-group">
+                  <label>GIỚI TÍNH</label>
+                  <select name="sex" value={formData.sex} onChange={handleInputChange}>
+                    <option value="">Chọn giới tính</option>
+                    <option value="Nam">Nam</option>
+                    <option value="Nữ">Nữ</option>
+                    <option value="Khác">Khác</option>
+                  </select>
                 </div>
                 <div className="form-group">
                   <label>SỐ ĐIỆN THOẠI *</label>
@@ -203,16 +212,6 @@ const Checkout = () => {
                     onChange={(e) => setPaymentMethod(e.target.value)}
                   />
                   <span>Thanh toán khi nhận hàng (COD)</span>
-                </label>
-                <label className="payment-option">
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="qr"
-                    checked={paymentMethod === 'qr'}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                  />
-                  <span>Chuyển khoản qua mã QR</span>
                 </label>
               </div>
             </div>

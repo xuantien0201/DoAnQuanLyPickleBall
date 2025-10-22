@@ -4,6 +4,25 @@ import { v4 as uuidv4 } from 'uuid';
 
 const router = express.Router();
 
+// Helper function to generate a new customer ID
+async function generateNewCustomerId() {
+    const [lastCustomer] = await db.query(
+        // Sắp xếp ID khách hàng bằng cách chuyển phần số sang dạng số để tìm ID lớn nhất
+        "SELECT id FROM tbl_khachhang ORDER BY CAST(SUBSTRING(id, 3) AS UNSIGNED) DESC LIMIT 1"
+    );
+
+    if (lastCustomer.length > 0) {
+        const lastId = lastCustomer[0].id;
+        // Lấy phần số từ ID cuối cùng (ví dụ: 'KH0022' -> 22)
+        const lastNumber = parseInt(lastId.substring(2), 10);
+        // Tạo ID mới bằng cách tăng số lên 1 và định dạng lại (ví dụ: 23 -> 'KH0023')
+        return 'KH' + String(lastNumber + 1).padStart(4, '0');
+    } else {
+        // Nếu chưa có khách hàng nào, bắt đầu từ KH0001
+        return 'KH0001';
+    }
+}
+
 // Create a new order
 router.post('/', async (req, res) => {
     try {
@@ -11,7 +30,7 @@ router.post('/', async (req, res) => {
 
         const {
             // Fields for regular checkout
-            fullName, email, phone, address, city,
+            fullName, email, phone, address, city, sex, 
             // Fields for POS
             customer,
             notes, paymentMethod, items, total, status
@@ -19,20 +38,34 @@ router.post('/', async (req, res) => {
 
         const orderCode = uuidv4().split('-')[0].toUpperCase();
         let orderData;
-        let customerPhone = phone;
+        let customerId; // ID từ bảng tbl_khachhang
         let initialStatus; // Để lưu trạng thái ban đầu được xác định
 
         // Phân biệt giữa đơn hàng POS và đơn hàng checkout thông thường
         if (customer && customer.name && customer.phone) {
             // Đây là đơn hàng POS
             if (!paymentMethod || !items || items.length === 0) {
-                await db.rollback(); // Rollback trước khi trả về
+                await db.rollback();
                 return res.status(400).json({ error: 'Dữ liệu đơn hàng POS không hợp lệ.' });
             }
-            customerPhone = customer.phone;
-            initialStatus = status || 'da_giao'; // Đơn hàng POS được hoàn thành ngay lập tức
+
+            // Tìm hoặc tạo khách hàng mới dựa trên SĐT
+            const [existingCustomers] = await db.query('SELECT id FROM tbl_khachhang WHERE SDT = ?', [customer.phone]);
+            if (existingCustomers.length > 0) {
+                customerId = existingCustomers[0].id;
+            } else {
+                const newCustomerId = await generateNewCustomerId();
+                await db.query(
+                    'INSERT INTO tbl_khachhang (id, TenKh, SDT, GioiTinh) VALUES (?, ?, ?, ?)', // <-- Thêm GioiTinh
+                    [newCustomerId, customer.name, customer.phone, customer.sex || null] // <-- Thêm customer.sex
+                );
+                customerId = newCustomerId;
+            }
+
+            initialStatus = status || 'da_nhan'; // Đơn hàng POS được hoàn thành ngay lập tức
             orderData = [
                 orderCode,
+                customerId,
                 customer.name,
                 null, // email
                 customer.phone,
@@ -45,13 +78,29 @@ router.post('/', async (req, res) => {
             ];
         } else {
             // Đây là đơn hàng checkout thông thường
-            if (!fullName || !email || !phone || !address || !city || !paymentMethod || !items || items.length === 0) {
+            if (!fullName || !phone || !address || !city || !paymentMethod || !items || items.length === 0) { // <-- Đã xóa !email
                 await db.rollback();
                 return res.status(400).json({ error: 'Vui lòng điền đầy đủ thông tin bắt buộc.' });
             }
+
+            // Tìm hoặc tạo khách hàng mới dựa trên SĐT
+            const [existingCustomers] = await db.query('SELECT id FROM tbl_khachhang WHERE SDT = ?', [phone]);
+            if (existingCustomers.length > 0) {
+                customerId = existingCustomers[0].id;
+            } else {
+                const newCustomerId = await generateNewCustomerId();
+                const fullAddress = `${address}, ${city}`;
+                await db.query(
+                    'INSERT INTO tbl_khachhang (id, TenKh, SDT, DiaChi, email, GioiTinh) VALUES (?, ?, ?, ?, ?, ?)', // <-- Thêm GioiTinh
+                    [newCustomerId, fullName, phone, fullAddress, email, sex || null] // <-- Thêm sex
+                );
+                customerId = newCustomerId;
+            }
+
             initialStatus = status || 'cho_xac_nhan'; // Đơn hàng thông thường ở trạng thái chờ xử lý
             orderData = [
                 orderCode,
+                customerId,
                 fullName,
                 email,
                 phone,
@@ -66,8 +115,8 @@ router.post('/', async (req, res) => {
 
         // Insert into orders table
         const [orderResult] = await db.query(
-            `INSERT INTO orders (order_code, customer_name, customer_email, customer_phone, shipping_address, shipping_city, notes, payment_method, total_amount, status)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO orders (order_code, customer_id, customer_name, customer_email, customer_phone, shipping_address, shipping_city, notes, payment_method, total_amount, status)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             orderData
         );
 
@@ -87,7 +136,7 @@ router.post('/', async (req, res) => {
                 throw new Error(`Thiếu product_id cho sản phẩm ${item.name || 'không tên'}.`);
             }
 
-            if (initialStatus === 'da_giao') {
+            if (initialStatus === 'da_nhan') {
                 const [[productStock]] = await db.query('SELECT stock FROM products WHERE id = ? FOR UPDATE', [productId]);
                 if (!productStock || productStock.stock < item.quantity) {
                     throw new Error(`Không đủ hàng tồn kho cho sản phẩm ${item.name}. Chỉ còn ${productStock ? productStock.stock : 0} sản phẩm.`);
@@ -111,7 +160,7 @@ router.post('/', async (req, res) => {
     } catch (error) {
         await db.rollback();
         console.error('Lỗi khi tạo đơn hàng:', error);
-        if (error.message.includes('Không đủ hàng tồn kho') || error.message.includes('Thiếu product_id')) {
+        if (error.message.includes('Không đủ hàng tồn kho') || error.message.includes('Thiếu product_id') || error.code === 'ER_DUP_ENTRY') {
             return res.status(400).json({ error: error.message });
         }
         res.status(500).json({ error: 'Không thể tạo đơn hàng' });
