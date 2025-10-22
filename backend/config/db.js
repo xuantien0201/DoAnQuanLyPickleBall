@@ -4,7 +4,7 @@ export const db = await mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "",
-  database: "pickleball2",
+  database: "pickleball",
 });
 
 // ✅ Kiểm tra kết nối

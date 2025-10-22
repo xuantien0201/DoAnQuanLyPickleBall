@@ -66,9 +66,9 @@ input[type="date"] {
   font-size: 18px;
 }
 
-input[type="text"] {
+/* input[type="text"] {
   max-width: 25%;
-}
+} */
 
 .btn {
   border: 1px solid #ccc;
