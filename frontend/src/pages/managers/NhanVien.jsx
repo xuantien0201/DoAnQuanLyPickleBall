@@ -1,130 +1,279 @@
-import '../../css/NhanVien.css'
-import { Link } from 'react-router';
-import { Sidebar } from '../../components/Sidebar';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import "../../css/NhanVienPage.css";
+import { Sidebar } from "../../components/Sidebar";
 
 export function NhanVien() {
-  return (
-    <>
-      <div className="app">
-        <Sidebar />
+  const [nhanVienList, setNhanVienList] = useState([]);
+  const [search, setSearch] = useState("");
+  const [form, setForm] = useState({
+    maNV: "",
+    tenNV: "",
+    ngaySinh: "",
+    gioiTinh: "Nam",
+    sdt: "",
+    email: "",
+    queQuan: "",
+    maTK: "",
+  });
+  const [showForm, setShowForm] = useState(false);
+  const [editing, setEditing] = useState(false);
 
-        <main className="main">
-          <div className="topbar">
-            <div className="hello">
-              Xin chào, Quản lý <span>👋🏼</span>
-            </div>
-            <div className="search">
-              <span>🔍</span>
-              <input placeholder="Tìm kiếm nhân viên..." />
-            </div>
+  useEffect(() => {
+    fetchNhanVien();
+  }, []);
+
+  const fetchNhanVien = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/api/nhanvien");
+      const formattedData = res.data.map((nv) => ({
+        ...nv,
+        ngaySinh: nv.ngaySinh ? nv.ngaySinh.split("T")[0] : "",
+      }));
+      setNhanVienList(formattedData);
+    } catch (err) {
+      console.error("❌ Lỗi khi tải danh sách nhân viên:", err);
+      alert("Không thể tải danh sách nhân viên! Vui lòng kiểm tra server.");
+    }
+  };
+
+  const handleSearch = async (e) => {
+    const q = e.target.value;
+    setSearch(q);
+    if (q.trim() === "") return fetchNhanVien();
+    try {
+      const res = await axios.get(`http://localhost:3000/api/nhanvien/search?q=${q}`);
+      setNhanVienList(res.data);
+    } catch (err) {
+      console.error("❌ Lỗi khi tìm kiếm:", err);
+      alert("Đã xảy ra lỗi khi tìm kiếm!");
+    }
+  };
+
+  const handleSave = async () => {
+    const required = ["maNV", "tenNV", "sdt", "email"];
+    for (let field of required) {
+      if (!form[field]) {
+        alert("Vui lòng nhập đầy đủ thông tin bắt buộc!");
+        return;
+      }
+    }
+
+    try {
+      if (editing) {
+        await axios.put("http://localhost:3000/api/nhanvien", form);
+        alert("✅ Cập nhật nhân viên thành công!");
+      } else {
+        await axios.post("http://localhost:3000/api/nhanvien", form);
+        alert("✅ Thêm nhân viên thành công!");
+      }
+      fetchNhanVien();
+      setShowForm(false);
+      setForm({
+        maNV: "",
+        tenNV: "",
+        ngaySinh: "",
+        gioiTinh: "Nam",
+        sdt: "",
+        email: "",
+        queQuan: "",
+        maTK: "",
+      });
+      setEditing(false);
+    } catch (err) {
+      console.error("❌ Lỗi khi lưu nhân viên:", err);
+      const errorMsg =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        err.message ||
+        "Đã xảy ra lỗi khi lưu nhân viên!";
+      alert("❌ " + errorMsg);
+    }
+  };
+
+  const handleEdit = (nv) => {
+    setForm(nv);
+    setEditing(true);
+    setShowForm(true);
+  };
+
+  const handleDelete = async (maNV) => {
+    if (!window.confirm("Bạn có chắc chắn muốn xóa nhân viên này không?")) return;
+    try {
+      await axios.delete(`http://localhost:3000/api/nhanvien/${maNV}`);
+      alert("✅ Xóa nhân viên thành công!");
+      fetchNhanVien();
+    } catch (err) {
+      console.error("❌ Lỗi khi xóa nhân viên:", err);
+      const errorMsg =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        err.message ||
+        "Đã xảy ra lỗi khi xóa nhân viên!";
+      alert("❌ " + errorMsg);
+    }
+  };
+
+  return (
+    <div className="nv-app">
+      <Sidebar />
+      <main className="nv-main">
+        <div className="nv-topbar">
+          <div className="nv-hello">Xin chào, Quản lý 👋🏼</div>
+          <div className="nv-search">
+            <span>🔍</span>
+            <input
+              placeholder="Tìm kiếm nhân viên..."
+              value={search}
+              onChange={handleSearch}
+            />
+          </div>
+        </div>
+
+        <section className="nv-section">
+          <div className="nv-actions">
+            <button
+              className="nv-btn-add"
+              onClick={() => {
+                setForm({
+                  maNV: "",
+                  tenNV: "",
+                  ngaySinh: "",
+                  gioiTinh: "Nam",
+                  sdt: "",
+                  email: "",
+                  queQuan: "",
+                  maTK: "",
+                });
+                setEditing(false);
+                setShowForm(true);
+              }}
+            >
+              ➕ Thêm nhân viên
+            </button>
           </div>
 
-          <section className="section">
-            <div className="hd">
-              <div>
-                <div className="title">Danh sách nhân viên</div>
-                <small style={{color: '#16a34a',fontWeight: 700}}>
-                  Tất cả nhân viên đang làm việc
-                </small>
-              </div>
-              <div className="tools">
-                <div className="input">
-                  <span>🔍</span>
-                  <input placeholder="Tìm theo tên hoặc chức vụ" />
-                </div>
-                <div className="sort">
-                  Sắp xếp theo: <strong>Mới nhất ▾</strong>
-                </div>
+          <div className="nv-bd">
+            <table>
+              <thead>
+                <tr>
+                  <th>Mã NV</th>
+                  <th>Tên NV</th>
+                  <th>Ngày sinh</th>
+                  <th>Giới tính</th>
+                  <th>SĐT</th>
+                  <th>Email</th>
+                  <th>Quê quán</th>
+                  <th>Mã TK</th>
+                  <th>Hành động</th>
+                </tr>
+              </thead>
+              <tbody>
+                {nhanVienList.map((nv) => (
+                  <tr key={nv.maNV}>
+                    <td>{nv.maNV}</td>
+                    <td>{nv.tenNV}</td>
+                    <td>{nv.ngaySinh}</td>
+                    <td>{nv.gioiTinh}</td>
+                    <td>{nv.sdt}</td>
+                    <td>{nv.email}</td>
+                    <td>{nv.queQuan}</td>
+                    <td>{nv.maTK}</td>
+                    <td>
+                      <button
+                        className="nv-btn-edit"
+                        onClick={() => handleEdit(nv)}
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        className="nv-btn-delete"
+                        onClick={() => handleDelete(nv.maNV)}
+                      >
+                        🗑️
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {showForm && (
+          <div className="nv-popup">
+            <div className="nv-popup-content">
+              <h3>{editing ? "Cập nhật nhân viên" : "Thêm nhân viên mới"}</h3>
+
+              <input
+                name="maNV"
+                placeholder="Mã nhân viên"
+                value={form.maNV}
+                onChange={(e) => setForm({ ...form, maNV: e.target.value })}
+                readOnly={editing}
+              />
+              <input
+                name="tenNV"
+                placeholder="Tên nhân viên"
+                value={form.tenNV}
+                onChange={(e) => setForm({ ...form, tenNV: e.target.value })}
+              />
+              <input
+                type="date"
+                name="ngaySinh"
+                value={form.ngaySinh}
+                onChange={(e) => setForm({ ...form, ngaySinh: e.target.value })}
+              />
+              <select
+                name="gioiTinh"
+                value={form.gioiTinh}
+                onChange={(e) => setForm({ ...form, gioiTinh: e.target.value })}
+              >
+                <option>Nam</option>
+                <option>Nữ</option>
+                <option>Khác</option>
+              </select>
+              <input
+                name="sdt"
+                placeholder="Số điện thoại"
+                value={form.sdt}
+                onChange={(e) => setForm({ ...form, sdt: e.target.value })}
+              />
+              <input
+                name="email"
+                placeholder="Email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+              />
+              <input
+                name="queQuan"
+                placeholder="Quê quán"
+                value={form.queQuan}
+                onChange={(e) => setForm({ ...form, queQuan: e.target.value })}
+              />
+              <input
+                name="maTK"
+                placeholder="Mã tài khoản"
+                value={form.maTK}
+                onChange={(e) => setForm({ ...form, maTK: e.target.value })}
+                readOnly={editing}
+              />
+
+              <div className="nv-popup-buttons">
+                <button className="nv-btn-save" onClick={handleSave}>
+                  {editing ? "Cập nhật" : "Lưu"}
+                </button>
+                <button
+                  className="nv-btn-cancel"
+                  onClick={() => setShowForm(false)}
+                >
+                  Hủy
+                </button>
               </div>
             </div>
-
-            <div className="bd">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Họ và tên</th>
-                    <th>Chức vụ</th>
-                    <th>Số điện thoại</th>
-                    <th>Email</th>
-                    <th>Địa chỉ</th>
-                    <th>Trạng thái</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Nguyễn Văn Minh</td>
-                    <td>Quản lý sân</td>
-                    <td>0902 345 678</td>
-                    <td>minh.nguyen@pickleball.vn</td>
-                    <td>45 Nguyễn Văn Cừ, P.Bồ Đề, Q.Long Biên, Hà Nội</td>
-                    <td>
-                      <span className="status active">Đang làm việc</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Trần Thị Hạnh</td>
-                    <td>Lễ tân</td>
-                    <td>0911 223 344</td>
-                    <td>hanh.tran@pickleball.vn</td>
-                    <td>22 Hoàng Như Tiếp, P.Bồ Đề, Q.Long Biên, Hà Nội</td>
-                    <td>
-                      <span className="status active">Đang làm việc</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Lê Quang Huy</td>
-                    <td>Nhân viên kỹ thuật</td>
-                    <td>0978 654 321</td>
-                    <td>huy.le@pickleball.vn</td>
-                    <td>18 Ngọc Lâm, P.Ngọc Lâm, Q.Long Biên, Hà Nội</td>
-                    <td>
-                      <span className="status inactive">Tạm nghỉ</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Phạm Thị Lan</td>
-                    <td>Kế toán</td>
-                    <td>0904 556 789</td>
-                    <td>lan.pham@pickleball.vn</td>
-                    <td>12 Lâm Hạ, P.Bồ Đề, Q.Long Biên, Hà Nội</td>
-                    <td>
-                      <span className="status active">Đang làm việc</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Đỗ Văn Tuấn</td>
-                    <td>Bảo vệ</td>
-                    <td>0983 223 456</td>
-                    <td>tuan.do@pickleball.vn</td>
-                    <td>89 Nguyễn Sơn, P.Gia Thụy, Q.Long Biên, Hà Nội</td>
-                    <td>
-                      <span className="status active">Đang làm việc</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Ngô Thị Mai</td>
-                    <td>Nhân viên dọn vệ sinh</td>
-                    <td>0918 888 234</td>
-                    <td>mai.ngo@pickleball.vn</td>
-                    <td>34 Ái Mộ, P.Bồ Đề, Q.Long Biên, Hà Nội</td>
-                    <td>
-                      <span className="status inactive">Tạm nghỉ</span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-
-              <div className="pagination">
-                <div className="page">‹</div>
-                <div className="page active">1</div>
-                <div className="page">2</div>
-                <div className="page">3</div>
-                <div className="page">›</div>
-              </div>
-            </div>
-          </section>
-        </main>
-      </div>
-    </>
+          </div>
+        )}
+      </main>
+    </div>
   );
 }

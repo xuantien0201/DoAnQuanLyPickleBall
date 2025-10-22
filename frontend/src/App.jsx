@@ -4,7 +4,6 @@ import { useLocation } from 'react-router-dom';
 
 
 import { NhapHang } from './pages/managers/NhapHang'
-import { NhanVien } from './pages/managers/NhanVien'
 import { DatSanNgay } from './pages/managers/DatSanNgay'
 import { DatSanThang } from './pages/managers/DatSanThang'
 import { XacNhanDatSan } from './pages/managers/XacNhanDatSan'
@@ -24,6 +23,13 @@ import PurchaseHistory from './pages/customers/PurchaseHistory'; // Import compo
 import AdminProducts from './pages/managers/AdminProducts';
 import AdminCategories from './pages/managers/AdminCategories';
 import AdminOrders from './pages/managers/AdminOrders';
+import CaLam from './pages/employees/CaLam'
+import QuanLyCaLam from './pages/managers/QuanLyCaLam'
+import QuanLyTaiKhoan from './pages/managers/QuanLyTaiKhoan'
+import Login from "./pages/login/Login";
+import Register from "./pages/login/Register";
+import ForgotPassword from "./pages/login/ForgotPassword";
+import { NhanVien } from './pages/managers/NhanVien'
 
 
 function App() {
@@ -39,7 +45,6 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="dat-san" element={<DatSanNgay />} />
           <Route path="santhang" element={<DatSanThang />} />
-          <Route path="nhanvien" element={<NhanVien />} />
           <Route path="nhaphang" element={<NhapHang />} />
           <Route path="xacnhansan" element={<XacNhanDatSan />} />
           <Route path="xeve" element={<QlyXeVe />} />
@@ -55,6 +60,14 @@ function App() {
           <Route path="/categories" element={<AdminCategories />} />
           <Route path="/orders" element={<AdminOrders />} />
           <Route path="/pos" element={<POS />} />
+          <Route path="nhanvien" element={<NhanVien />} /> 
+      <Route path="calam" element={<CaLam />} />
+      <Route path="quanlycalam" element={<QuanLyCaLam />} />
+      <Route path="quanlytaikhoan" element={<QuanLyTaiKhoan />} />
+      <Route path="login" element={<Login />} />
+      <Route path="register" element={<Register />} />
+      <Route path="forgot-password" element={<ForgotPassword />} />
+      
         </Routes>
       </main>
 
