@@ -29,13 +29,15 @@ router.put('/:id/status', async (req, res) => {
 
     // 2️⃣ Các luồng trạng thái hợp lệ
     const allowedTransitions = {
-      cho_xac_nhan: ['dang_xu_ly', 'da_huy'],
-      dang_xu_ly: ['dang_giao', 'da_huy'],
+      cho_xac_nhan: ['da_xac_nhan', 'da_huy'],
+      da_xac_nhan: ['dang_giao', 'huy_sau_xac_nhan'],
       dang_giao: ['da_nhan', 'giao_that_bai'],
       da_nhan: [],
       da_huy: [],
+      huy_sau_xac_nhan: [],
       giao_that_bai: [],
     };
+
 
     const allowedNext = allowedTransitions[oldStatus] || [];
     if (!allowedNext.includes(newStatus)) {
@@ -99,7 +101,7 @@ router.put('/:id/status', async (req, res) => {
     };
 
     // 5️⃣ Xác định logic trừ/hoàn kho
-    const stockDeductedStatuses = ['dang_xu_ly', 'dang_giao', 'da_nhan'];
+    const stockDeductedStatuses = ['da_xac_nhan', 'dang_giao', 'da_nhan'];
     const oldDeducted = stockDeductedStatuses.includes(oldStatus);
     const newDeducted = stockDeductedStatuses.includes(newStatus);
 

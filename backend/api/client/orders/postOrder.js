@@ -30,7 +30,7 @@ router.post('/', async (req, res) => {
 
         const {
             // Fields for regular checkout
-            fullName, email, phone, address, city, sex, 
+            fullName, email, phone, address, city, sex,
             // Fields for POS
             customer,
             notes, paymentMethod, items, total, status
@@ -40,6 +40,7 @@ router.post('/', async (req, res) => {
         let orderData;
         let customerId; // ID từ bảng tbl_khachhang
         let initialStatus; // Để lưu trạng thái ban đầu được xác định
+        let orderType; // Thêm biến để lưu kiểu bán hàng
 
         // Phân biệt giữa đơn hàng POS và đơn hàng checkout thông thường
         if (customer && customer.name && customer.phone) {
@@ -63,6 +64,7 @@ router.post('/', async (req, res) => {
             }
 
             initialStatus = status || 'da_nhan'; // Đơn hàng POS được hoàn thành ngay lập tức
+            orderType = 'pos'; // Đặt kiểu bán là 'pos'
             orderData = [
                 orderCode,
                 customerId,
@@ -74,7 +76,8 @@ router.post('/', async (req, res) => {
                 notes,
                 paymentMethod,
                 total,
-                initialStatus
+                initialStatus,
+                orderType // Thêm orderType vào đây
             ];
         } else {
             // Đây là đơn hàng checkout thông thường
@@ -98,6 +101,7 @@ router.post('/', async (req, res) => {
             }
 
             initialStatus = status || 'cho_xac_nhan'; // Đơn hàng thông thường ở trạng thái chờ xử lý
+            orderType = 'online'; // Đặt kiểu bán là 'online'
             orderData = [
                 orderCode,
                 customerId,
@@ -109,14 +113,16 @@ router.post('/', async (req, res) => {
                 notes,
                 paymentMethod,
                 total,
-                initialStatus
+                initialStatus,
+                orderType // Thêm orderType vào đây
             ];
         }
 
         // Insert into orders table
+        // Cập nhật câu lệnh INSERT để bao gồm cột order_type
         const [orderResult] = await db.query(
-            `INSERT INTO orders (order_code, customer_id, customer_name, customer_email, customer_phone, shipping_address, shipping_city, notes, payment_method, total_amount, status)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO orders (order_code, customer_id, customer_name, customer_email, customer_phone, shipping_address, shipping_city, notes, payment_method, total_amount, status, order_type)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             orderData
         );
 

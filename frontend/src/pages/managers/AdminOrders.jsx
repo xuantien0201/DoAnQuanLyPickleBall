@@ -8,25 +8,26 @@ const AdminOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [selectedOrders, setSelectedOrders] = useState([]);
+  const [bulkActionStatus, setBulkActionStatus] = useState('');
 
   // State cho tìm kiếm và phân trang
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [ordersPerPage] = useState(10);
+  const [ordersPerPage] = useState(5);
   const [totalOrders, setTotalOrders] = useState(0);
 
-  // NEW: State cho Dashboard Mini
+  // Cập nhật State cho Dashboard Mini để phản ánh dữ liệu đã lọc
   const [dashboardStats, setDashboardStats] = useState({
-    totalOrdersAllTime: 0,
-    totalRevenueAllTime: 0,
-    totalOrdersToday: 0,
-    totalRevenueToday: 0,
-    processingOrders: 0,
+    totalOrdersFiltered: 0,
+    totalRevenueFiltered: 0,
+    processingOrders: 0, // Giữ lại nếu muốn hiển thị riêng
     failedOrders: 0,
     successfulOrders: 0,
+    totalItemsSold: 0, // Thêm thống kê mới
+    topSellingProducts: [], // Thêm state cho top sản phẩm
   });
 
-  // NEW: State cho bộ lọc
+  // State cho bộ lọc
   const [filterStartDate, setFilterStartDate] = useState('');
   const [filterEndDate, setFilterEndDate] = useState('');
   const [filterSalesType, setFilterSalesType] = useState('all'); // 'all', 'online', 'pos'
@@ -48,7 +49,7 @@ const AdminOrders = () => {
       const response = await axios.get('/api/admin/orders', { params });
       setOrders(response.data.orders);
       setTotalOrders(response.data.totalCount);
-      setDashboardStats(response.data.dashboardStats); // Cập nhật dashboard stats
+      setDashboardStats(response.data.dashboardStats); // Cập nhật dashboard stats từ dữ liệu đã lọc
     } catch (error) {
       console.error('Lỗi khi tải đơn hàng:', error);
     }
@@ -107,14 +108,16 @@ const AdminOrders = () => {
   const getStatusInfo = (status) => {
     const statuses = {
       cho_xac_nhan: { color: 'warning', text: 'Chờ xác nhận' },
-      dang_xu_ly: { color: 'info', text: 'Đang xử lý' },
+      da_xac_nhan: { color: 'info', text: 'Đã xác nhận' },
       dang_giao: { color: 'primary', text: 'Đang giao hàng' },
       da_nhan: { color: 'success', text: 'Đã nhận hàng' },
-      da_huy: { color: 'danger', text: 'Đã hủy' },
+      da_huy: { color: 'danger', text: 'Đã hủy (trước xác nhận)' },
+      huy_sau_xac_nhan: { color: 'danger', text: 'Hủy sau xác nhận' },
       giao_that_bai: { color: 'danger', text: 'Giao thất bại' },
     };
     return statuses[status] || { color: 'secondary', text: status };
   };
+
 
 
   const formatDate = (d) => new Date(d).toLocaleString('vi-VN');
@@ -138,17 +141,18 @@ const AdminOrders = () => {
     }
   };
   const getNextStatusOptions = (current) => {
-    switch (current) {
-      case 'cho_xac_nhan':
-        return ['dang_xu_ly', 'da_huy'];
-      case 'dang_xu_ly':
-        return ['dang_giao', 'da_huy'];
-      case 'dang_giao':
-        return ['da_nhan', 'giao_that_bai'];
-      default:
-        return [];
-    }
+    const allowedTransitionsFrontend = {
+      cho_xac_nhan: ['da_xac_nhan', 'da_huy'],
+      da_xac_nhan: ['dang_giao', 'huy_sau_xac_nhan'],
+      dang_giao: ['da_nhan', 'giao_that_bai'],
+      da_nhan: [],
+      da_huy: [],
+      huy_sau_xac_nhan: [],
+      giao_that_bai: [],
+    };
+    return allowedTransitionsFrontend[current] || [];
   };
+
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
@@ -161,17 +165,22 @@ const AdminOrders = () => {
 
   const totalPages = Math.ceil(totalOrders / ordersPerPage);
 
-  const handleBulkStatusUpdate = async (newStatus, statusText) => {
-    if (selectedOrders.length === 0) return;
+  const handleBulkStatusUpdate = async () => {
+    if (selectedOrders.length === 0 || !bulkActionStatus) {
+      alert('Vui lòng chọn đơn hàng và trạng thái muốn cập nhật.');
+      return;
+    }
+
+    const statusText = getStatusInfo(bulkActionStatus).text;
 
     if (!window.confirm(`Bạn có chắc muốn chuyển ${selectedOrders.length} đơn hàng đã chọn sang trạng thái "${statusText}" không?`)) {
       return;
     }
 
     try {
-      const response = await axios.put(`/api/admin/orders/bulk/status`, {
+      const response = await axios.put(`/api/admin/orders/hangloat/status`, {
         orderIds: selectedOrders,
-        status: newStatus,
+        status: bulkActionStatus,
       });
 
       const { message, skippedCount, invalidOrders } = response.data;
@@ -179,13 +188,14 @@ const AdminOrders = () => {
 
       if (skippedCount > 0) {
         const skippedDetails = invalidOrders.map(order => `${order.order_code}: ${order.reason}`).join('\n');
-        alertMessage += `\n\n⚠️ Đã bỏ qua ${skippedCount} đơn hàng không hợp lệ:\n${skippedDetails}`;
+        alertMessage += `\n\n⚠️ Đã bỏ qua ${skippedDetails} đơn hàng không hợp lệ:\n${skippedDetails}`;
       }
 
       alert(alertMessage);
 
       fetchOrders();
       setSelectedOrders([]);
+      setBulkActionStatus('');
     } catch (error) {
       console.error('Lỗi khi cập nhật hàng loạt:', error);
       const errorData = error.response?.data;
@@ -201,41 +211,48 @@ const AdminOrders = () => {
   };
 
   const formatCurrency = (amount) => {
-  const num = Number(amount);
-  if (isNaN(num)) return '0₫';
-  return num.toLocaleString('vi-VN');
-};
+    const num = Number(amount);
+    if (isNaN(num)) return '0₫';
+    return num.toLocaleString('vi-VN');
+  };
 
+  // Hàm để xóa tất cả các bộ lọc
+  const handleClearFilters = () => {
+    setSearchTerm('');
+    setFilterStartDate('');
+    setFilterEndDate('');
+    setFilterSalesType('all');
+    setActiveTab('all');
+    setCurrentPage(1);
+  };
 
   return (
     <div className="admin-orders-page">
       <Sidebar />
       <div className="admin-content">
-        <div className="admin-orders-header">
-          <h2>Quản lý Đơn hàng</h2>
-        </div>
-
-        {/* NEW: Dashboard Mini */}
         <div className="dashboard-mini">
           <div className="stat-card">
-            <h4>Tổng đơn (All-time)</h4>
-            <p>{dashboardStats.totalOrdersAllTime}</p>
+            <h4>Tổng đơn (hiện tại)</h4>
+            <p>{dashboardStats.totalOrdersFiltered}</p>
           </div>
           <div className="stat-card">
-            <h4>Tổng doanh thu (All-time)</h4>
-            <p>{formatCurrency(dashboardStats.totalRevenueAllTime)}</p>
+            <h4>Tổng doanh thu (hiện tại)</h4>
+            <p>{formatCurrency(dashboardStats.totalRevenueFiltered)}</p>
           </div>
-          <div className="stat-card">
-            <h4>Đơn hôm nay</h4>
-            <p>{dashboardStats.totalOrdersToday}</p>
-          </div>
-          <div className="stat-card">
-            <h4>Doanh thu hôm nay</h4>
-            <p>{formatCurrency(dashboardStats.totalRevenueToday)}</p>
-          </div>
-          <div className="stat-card">
-            <h4>Đơn đang xử lý</h4>
-            <p>{dashboardStats.processingOrders}</p>
+          <div className="stat-card stat-card-top-products">
+            <h4>Top sản phẩm bán chạy</h4>
+            {dashboardStats.topSellingProducts && dashboardStats.topSellingProducts.length > 0 ? (
+              <ol className="top-products-list">
+                {dashboardStats.topSellingProducts.map((product, index) => (
+                  <li key={index}>
+                    <span className="product-name" title={product.product_name}>{product.product_name}</span>
+                    <span className="product-sold-count">{product.total_sold}</span>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <p className="no-data">Chưa có dữ liệu</p>
+            )}
           </div>
           <div className="stat-card">
             <h4>Đơn thất bại</h4>
@@ -249,27 +266,29 @@ const AdminOrders = () => {
 
         {/* NEW: Filters */}
         <div className="admin-filters-row">
-          <input
-            type="text"
-            placeholder="🔍 Tìm kiếm theo mã HĐ, tên, SĐT khách hàng..."
-            className="admin-search-bar"
-            value={searchTerm}
-            onChange={handleSearchChange}
-          />
-          
-        </div>
+          {/* Hàng chứa status + ô tìm kiếm bên phải */}
+          <div className="status-search-row">
+            <div className="status-tabs">
+              {['all', 'cho_xac_nhan', 'da_xac_nhan', 'dang_giao', 'da_nhan', 'da_huy', 'huy_sau_xac_nhan', 'giao_that_bai'].map(status => (
+                <button
+                  key={status}
+                  className={`status-tab-btn ${activeTab === status ? 'active' : ''}`}
+                  onClick={() => { setActiveTab(status); setCurrentPage(1); }}
+                >
+                  {status === 'all' ? 'Tất cả' : getStatusInfo(status).text}
+                </button>
+              ))}
+            </div>
 
-        {/* NEW: Status Tabs */}
-        <div className="status-tabs">
-          {['all', 'cho_xac_nhan', 'dang_xu_ly', 'dang_giao', 'da_nhan', 'da_huy', 'giao_that_bai'].map(status => (
-            <button
-              key={status}
-              className={`status-tab-btn ${activeTab === status ? 'active' : ''}`}
-              onClick={() => { setActiveTab(status); setCurrentPage(1); }}
-            >
-              {status === 'all' ? 'Tất cả' : getStatusInfo(status).text}
-            </button>
-          ))}
+            <input
+              type="text"
+              placeholder="Tìm kiếm theo mã HĐ, tên, SĐT..."
+              className="simple-search-input"
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+          </div>
+
           <div className="filter-group">
             <label htmlFor="startDate">Từ ngày:</label>
             <input
@@ -300,21 +319,36 @@ const AdminOrders = () => {
               <option value="pos">Tại quầy</option>
             </select>
           </div>
+          <button className="btn btn-secondary" onClick={handleClearFilters}>
+            Xóa bộ lọc
+          </button>
         </div>
 
 
         {selectedOrders.length > 0 && (
-          <div className="bulk-actions">
+          <div className="hangloat-actions">
             <span>Đã chọn {selectedOrders.length} đơn hàng</span>
-            <div className="bulk-buttons">
-              <button className="btn btn-info" onClick={() => handleBulkStatusUpdate('dang_xu_ly', 'Đang xử lý')}>
-                🔄 Chuyển sang đang xử lý
-              </button>
-              <button className="btn btn-primary" onClick={() => handleBulkStatusUpdate('dang_giao', 'Đang giao hàng')}>
-                🚚 Chuyển sang đang giao hàng
-              </button>
-              <button className="btn btn-danger" onClick={() => handleBulkStatusUpdate('da_huy', 'Đã hủy')}>
-                ❌ Hủy Hàng loạt
+            <div className="hangloat-buttons">
+              <select
+                value={bulkActionStatus}
+                onChange={(e) => setBulkActionStatus(e.target.value)}
+                className="bulk-status-select"
+              >
+                <option value="">Chọn trạng thái...</option>
+                <option value="da_xac_nhan">✅ Xác nhận đơn</option>
+                <option value="dang_giao">🚚 Đang giao hàng</option>
+                <option value="da_nhan">🎉 Đã nhận hàng</option>
+                <option value="da_huy">❌ Hủy (trước xác nhận)</option>
+                <option value="huy_sau_xac_nhan">♻️ Hủy sau xác nhận (hoàn kho)</option>
+                <option value="giao_that_bai">⚠️ Giao thất bại (hoàn kho)</option>
+              </select>
+
+              <button
+                className="btn btn-primary"
+                onClick={handleBulkStatusUpdate}
+                disabled={!bulkActionStatus}
+              >
+                Cập nhật hàng loạt
               </button>
             </div>
           </div>
@@ -391,7 +425,6 @@ const AdminOrders = () => {
           </table>
           {orders.length === 0 && <div className="no-orders"><p>Không có đơn hàng nào.</p></div>}
         </div>
-
         {totalPages > 1 && (
           <div className="pagination">
             {[...Array(totalPages)].map((_, index) => (

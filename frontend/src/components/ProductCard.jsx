@@ -57,7 +57,7 @@ const ProductCard = ({ product }) => {
         </div>
         <div className="product-stock">
           {product.stock > 0 ? (
-            <span className="in-stock">Còn hàng: {product.stock}</span>
+            <span className="in-stock">Còn: {product.stock}</span>
           ) : (
             <span className="out-of-stock">Hết hàng</span>
           )}

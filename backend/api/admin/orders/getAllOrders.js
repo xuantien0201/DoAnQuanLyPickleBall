@@ -5,48 +5,42 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
     try {
-        const { page = 1, limit = 10, search = '', startDate, endDate, salesType, statusFilter } = req.query;
+        const { page = 1, limit = 5, search = '', startDate, endDate, salesType, statusFilter } = req.query;
         const offset = (parseInt(page) - 1) * parseInt(limit);
         const searchPattern = `%${search}%`;
 
         let whereClause = 'WHERE 1=1';
-        const queryParams = [];
-        const countParams = [];
+        const queryParams = []; // Dùng cho cả orders, totalCount và dashboardStats
 
         if (search) {
             whereClause += ' AND (o.order_code LIKE ? OR kh.TenKh LIKE ? OR kh.SDT LIKE ?)';
             queryParams.push(searchPattern, searchPattern, searchPattern);
-            countParams.push(searchPattern, searchPattern, searchPattern);
         }
 
         if (startDate) {
             whereClause += ' AND o.created_at >= ?';
             queryParams.push(startDate);
-            countParams.push(startDate);
         }
         if (endDate) {
             whereClause += ' AND o.created_at <= ?';
             queryParams.push(endDate + ' 23:59:59'); // Bao gồm cả ngày kết thúc
-            countParams.push(endDate + ' 23:59:59');
         }
         if (salesType && salesType !== 'all') {
             whereClause += ' AND o.order_type = ?';
             queryParams.push(salesType);
-            countParams.push(salesType);
         }
         if (statusFilter && statusFilter !== 'all') {
             whereClause += ' AND o.status = ?';
             queryParams.push(statusFilter);
-            countParams.push(statusFilter);
         }
 
-        // 1. Lấy tổng số đơn hàng
+        // 1. Lấy tổng số đơn hàng (áp dụng bộ lọc)
         const [totalCountResult] = await db.query(
             `SELECT COUNT(o.id) AS totalCount
              FROM orders o
              LEFT JOIN tbl_khachhang kh ON o.customer_id = kh.id
              ${whereClause}`,
-            countParams
+            queryParams
         );
         const totalCount = totalCountResult[0].totalCount;
 
@@ -61,41 +55,55 @@ router.get('/', async (req, res) => {
             [...queryParams, parseInt(limit), offset]
         );
 
-        // 3. Lấy dữ liệu cho Dashboard Mini
-        const [allTimeStats] = await db.query(`
+        // 3. Lấy dữ liệu cho Dashboard Mini (áp dụng cùng bộ lọc)
+        const [dashboardStatsResult] = await db.query(`
             SELECT
-                COUNT(id) AS totalOrdersAllTime,
-                SUM(CASE WHEN status = 'da_nhan' THEN total_amount ELSE 0 END) AS totalRevenueAllTime
-            FROM orders
-        `);
+                COUNT(o.id) AS totalOrdersFiltered,
+                SUM(CASE WHEN o.status = 'da_nhan' THEN o.total_amount ELSE 0 END) AS totalRevenueFiltered,
+                SUM(CASE WHEN o.status = 'dang_xu_ly' THEN 1 ELSE 0 END) AS processingOrders,
+                SUM(CASE WHEN o.status IN ('da_huy', 'giao_that_bai', 'huy_sau_xac_nhan') THEN 1 ELSE 0 END) AS failedOrders,
+                SUM(CASE WHEN o.status = 'da_nhan' THEN 1 ELSE 0 END) AS successfulOrders
+            FROM orders o
+            LEFT JOIN tbl_khachhang kh ON o.customer_id = kh.id
+            ${whereClause}
+        `, queryParams);
 
-        const [todayStats] = await db.query(`
-            SELECT
-                COUNT(id) AS totalOrdersToday,
-                SUM(CASE WHEN status = 'da_nhan' THEN total_amount ELSE 0 END) AS totalRevenueToday
-            FROM orders
-            WHERE DATE(created_at) = CURDATE()
-        `);
+        // Lấy tổng số lượng sản phẩm đã bán và top sản phẩm (chỉ từ đơn hàng thành công)
+        const successfulOrdersWhereClause = whereClause + " AND o.status = 'da_nhan'";
 
-        const [statusCounts] = await db.query(`
-            SELECT
-                SUM(CASE WHEN status = 'dang_xu_ly' THEN 1 ELSE 0 END) AS processingOrders,
-                SUM(CASE WHEN status = 'giao_that_bai' THEN 1 ELSE 0 END) AS failedOrders,
-                SUM(CASE WHEN status = 'da_nhan' THEN 1 ELSE 0 END) AS successfulOrders
-            FROM orders
-        `);
+        const [totalItemsSoldResult] = await db.query(`
+            SELECT SUM(oi.quantity) AS totalItemsSold
+            FROM orders o
+            LEFT JOIN tbl_khachhang kh ON o.customer_id = kh.id
+            JOIN order_items oi ON o.id = oi.order_id
+            ${successfulOrdersWhereClause}
+        `, queryParams);
+
+        const [topSellingProducts] = await db.query(`
+            SELECT oi.product_name, SUM(oi.quantity) as total_sold
+            FROM orders o
+            LEFT JOIN tbl_khachhang kh ON o.customer_id = kh.id
+            JOIN order_items oi ON o.id = oi.order_id
+            ${successfulOrdersWhereClause}
+            GROUP BY oi.product_name
+            ORDER BY total_sold DESC
+            LIMIT 3
+        `, queryParams);
+
+        const stats = dashboardStatsResult[0];
+        const totalItemsSold = totalItemsSoldResult[0].totalItemsSold || 0;
 
         res.json({
             orders,
             totalCount,
             dashboardStats: {
-                totalOrdersAllTime: allTimeStats[0].totalOrdersAllTime || 0,
-                totalRevenueAllTime: allTimeStats[0].totalRevenueAllTime || 0,
-                totalOrdersToday: todayStats[0].totalOrdersToday || 0,
-                totalRevenueToday: todayStats[0].totalRevenueToday || 0,
-                processingOrders: statusCounts[0].processingOrders || 0,
-                failedOrders: statusCounts[0].failedOrders || 0,
-                successfulOrders: statusCounts[0].successfulOrders || 0,
+                totalOrdersFiltered: stats.totalOrdersFiltered || 0,
+                totalRevenueFiltered: stats.totalRevenueFiltered || 0,
+                processingOrders: stats.processingOrders || 0,
+                failedOrders: stats.failedOrders || 0,
+                successfulOrders: stats.successfulOrders || 0,
+                totalItemsSold: totalItemsSold,
+                topSellingProducts: topSellingProducts || [],
             }
         });
 

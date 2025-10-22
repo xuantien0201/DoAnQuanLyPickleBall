@@ -3,7 +3,7 @@ import { db } from '../../../config/db.js';
 
 const router = express.Router();
 
-router.put('/bulk/status', async (req, res) => {
+router.put('/hangloat/status', async (req, res) => {
     const { orderIds, status: newStatus } = req.body;
 
     if (!Array.isArray(orderIds) || orderIds.length === 0)
@@ -18,13 +18,15 @@ router.put('/bulk/status', async (req, res) => {
 
     try {
         const allowedTransitions = {
-            cho_xac_nhan: ['dang_xu_ly', 'da_huy'],
-            dang_xu_ly: ['dang_giao', 'da_huy'],
+            cho_xac_nhan: ['da_xac_nhan', 'da_huy'],
+            da_xac_nhan: ['dang_giao', 'huy_sau_xac_nhan'],
             dang_giao: ['da_nhan', 'giao_that_bai'],
             da_nhan: [],
             da_huy: [],
+            huy_sau_xac_nhan: [],
             giao_that_bai: [],
         };
+
 
         // 1. Lấy tất cả các đơn hàng được chọn để kiểm tra
         // Sử dụng 'db.query' thay vì 'connection.query'
@@ -126,7 +128,7 @@ router.put('/bulk/status', async (req, res) => {
 
     } catch (error) {
         await db.rollback();
-        console.error('Lỗi khi cập nhật bulk status:', error);
+        console.error('Lỗi khi cập nhật hangloat status:', error);
         res.status(400).json({ error: error.message });
     }
     // Không cần 'finally' và 'connection.release()' nữa
