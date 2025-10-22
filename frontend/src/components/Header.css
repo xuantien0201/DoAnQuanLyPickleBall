@@ -222,3 +222,21 @@
     margin-bottom: 10px;
   }
 }
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* khoảng cách giữa các nút */
+}
+
+.login-button {
+  display: flex;
+  align-items: center;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.login-button:hover {
+  color: #ffcc00;
+}
