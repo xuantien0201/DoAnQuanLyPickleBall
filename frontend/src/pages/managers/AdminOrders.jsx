@@ -16,15 +16,14 @@ const AdminOrders = () => {
   const [ordersPerPage] = useState(5);
   const [totalOrders, setTotalOrders] = useState(0);
 
-  // Cập nhật State cho Dashboard Mini để phản ánh dữ liệu đã lọc
   const [dashboardStats, setDashboardStats] = useState({
     totalOrdersFiltered: 0,
     totalRevenueFiltered: 0,
-    processingOrders: 0, // Giữ lại nếu muốn hiển thị riêng
+    processingOrders: 0, 
     failedOrders: 0,
     successfulOrders: 0,
-    totalItemsSold: 0, // Thêm thống kê mới
-    topSellingProducts: [], // Thêm state cho top sản phẩm
+    totalItemsSold: 0, 
+    topSellingProducts: [], 
   });
 
   // State cho bộ lọc
@@ -412,7 +411,7 @@ const AdminOrders = () => {
                     </select>
                   </td>
                   <td>
-                    <div className="action-buttons">
+                    <div className="action-buttons-orders">
                       <button className="btn-view" onClick={() => viewOrderDetails(order.order_code)}>
                         Xem chi tiết
                       </button>

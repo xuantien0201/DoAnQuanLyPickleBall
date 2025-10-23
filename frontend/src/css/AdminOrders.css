@@ -54,11 +54,11 @@
 }
 
 /* Thêm vào AdminOrders.css */
-.action-buttons {
+.action-buttons-orders {
   display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 8px;
-  /* 👈 Thay thế cho style={{ marginLeft: '10px' }} */
+  height: 100%;
 }
 
 .page-item:hover {
@@ -129,6 +129,7 @@
   border-bottom: 1px solid var(--border-color);
   vertical-align: middle;
 }
+
 
 .orders-table tbody tr:hover {
   background: var(--bg-light);
