@@ -93,14 +93,19 @@ export const updateCustomerProfile = async (req, res) => {
   if (!id) return res.status(400).json({ success: false, message: "Thiếu id khách hàng" });
 
   try {
-    // Câu lệnh cập nhật
-    const sql = `UPDATE tbl_khachhang 
-                 SET TenKh=?, SDT=?, email=?, DiaChi=?, GioiTinh=? 
-                 WHERE id=?`;
-    
-    await db.execute(sql, [TenKh, SDT, email, DiaChi, GioiTinh, id]);
+    // 🔹 Cập nhật tbl_khachhang
+    const sqlKh = `UPDATE tbl_khachhang 
+                   SET TenKh=?, SDT=?, email=?, DiaChi=?, GioiTinh=? 
+                   WHERE id=?`;
+    await db.execute(sqlKh, [TenKh, SDT, email, DiaChi, GioiTinh, id]);
 
-    res.json({ success: true, message: "Cập nhật thông tin thành công" });
+    // 🔹 Cập nhật TenKh, SDT, email trong tbl_taikhoankhachhang
+    const sqlTK = `UPDATE tbl_taikhoankhachhang 
+                   SET TenKh=?, SDT=?, email=? 
+                   WHERE id=?`;
+    await db.execute(sqlTK, [TenKh, SDT, email, id]);
+
+    res.json({ success: true, message: "Cập nhật thông tin khách hàng thành công" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Lỗi server" });

@@ -1,13 +1,28 @@
 import { db } from "../../config/db.js";
 
-// Hàm sinh ID ngẫu nhiên
-function generateRandomId(length = 3) {
+// Hàm sinh ID ngẫu nhiên (KH + 3 số)
+function generateRandomId(prefix = "KH", length = 3) {
   const chars = "0123456789";
-  let result = "KH";
+  let result = prefix;
   for (let i = 0; i < length; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
   return result;
+}
+
+// Sinh ID đảm bảo không trùng trong bảng tbl_taikhoankhachhang
+async function getUniqueId() {
+  let isUnique = false;
+  let newId;
+  while (!isUnique) {
+    newId = generateRandomId();
+    const [rows] = await db.execute(
+      "SELECT id FROM tbl_taikhoankhachhang WHERE id = ?",
+      [newId]
+    );
+    if (rows.length === 0) isUnique = true;
+  }
+  return newId;
 }
 
 export async function registerKhachHang(req, res) {
@@ -37,25 +52,16 @@ export async function registerKhachHang(req, res) {
       });
     }
 
-    // Sinh ID ngẫu nhiên và đảm bảo không trùng
-    let accId;
-    let isUniqueAcc = false;
-    while (!isUniqueAcc) {
-      accId = generateRandomId(3); // KH + 3 ký tự số
-      const [rows] = await db.execute(
-        "SELECT id FROM tbl_taikhoankhachhang WHERE id = ?",
-        [accId]
-      );
-      if (rows.length === 0) isUniqueAcc = true;
-    }
+    // Sinh ID duy nhất
+    const accId = await getUniqueId();
 
     // Thêm vào tbl_taikhoankhachhang
     await db.execute(
-      "INSERT INTO tbl_taikhoankhachhang (id, userName, passWord, email, SDT) VALUES (?, ?, ?, ?, ?)",
-      [accId, userName, passWord, email, sdt]
+      "INSERT INTO tbl_taikhoankhachhang (id, userName, passWord, email, SDT, TenKh) VALUES (?, ?, ?, ?, ?, ?)",
+      [accId, userName, passWord, email, sdt, tenKh]
     );
 
-    // Thêm vào tbl_khachhang với TenKh
+    // Thêm vào tbl_khachhang cùng ID
     await db.execute(
       "INSERT INTO tbl_khachhang (id, TenKh, SDT, email) VALUES (?, ?, ?, ?)",
       [accId, tenKh, sdt, email]
