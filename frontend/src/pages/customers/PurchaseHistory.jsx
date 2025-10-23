@@ -9,22 +9,54 @@ const PurchaseHistory = () => {
     const [loading, setLoading] = useState(true);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [showModal, setShowModal] = useState(false);
+    const [error, setError] = useState(null); // Thêm state để quản lý lỗi
 
     useEffect(() => {
         const fetchOrders = async () => {
+            setLoading(true);
+            setError(null); // Xóa lỗi trước đó
+
+            const userString = localStorage.getItem('user');
+            let customerId = null;
+
+            if (userString) {
+                try {
+                    const user = JSON.parse(userString);
+                    // Đảm bảo đây là tài khoản khách hàng, không phải admin/nhân viên
+                    if (user.id && !user.role) {
+                        customerId = user.id;
+                    } else {
+                        setError("Bạn đã đăng nhập, nhưng không phải là tài khoản khách hàng.");
+                        setLoading(false);
+                        return;
+                    }
+                } catch (e) {
+                    setError("Lỗi dữ liệu người dùng trong bộ nhớ cục bộ. Vui lòng đăng nhập lại.");
+                    setLoading(false);
+                    return;
+                }
+            }
+
+            if (!customerId) {
+                setError("Bạn chưa đăng nhập. Vui lòng đăng nhập để xem lịch sử mua hàng.");
+                setLoading(false);
+                return;
+            }
+
             try {
                 // Gọi API mới để lấy lịch sử đơn hàng của người dùng
-                const response = await axios.get('/api/client/orders/history');
+                // Truyền customerId làm query parameter
+                const response = await axios.get(`/api/client/orders/history?customerId=${customerId}`);
                 setOrders(response.data);
             } catch (error) {
                 console.error('Lỗi khi tải lịch sử mua hàng:', error);
-                // Xử lý trường hợp chưa đăng nhập hoặc lỗi khác
+                setError(error.response?.data?.error || 'Không thể tải lịch sử mua hàng.');
             } finally {
                 setLoading(false);
             }
         };
         fetchOrders();
-    }, []);
+    }, []); // Dependency array rỗng để chỉ chạy một lần khi component mount
 
     const viewOrderDetails = async (orderCode) => {
         try {
@@ -44,10 +76,11 @@ const PurchaseHistory = () => {
     const getStatusInfo = (status) => {
         const statuses = {
             cho_xac_nhan: { color: 'warning', text: 'Chờ xác nhận' },
-            dang_xu_ly: { color: 'info', text: 'Đang xử lý' },
+            da_xac_nhan: { color: 'info', text: 'Đã xác nhận' },
             dang_giao: { color: 'primary', text: 'Đang giao hàng' },
             da_nhan: { color: 'success', text: 'Đã nhận hàng' },
-            da_huy: { color: 'danger', text: 'Đã hủy' },
+            da_huy: { color: 'danger', text: 'Đã hủy (trước xác nhận)' },
+            huy_sau_xac_nhan: { color: 'danger', text: 'Hủy sau xác nhận' },
             giao_that_bai: { color: 'danger', text: 'Giao thất bại' },
         };
         return statuses[status] || { color: 'secondary', text: status };
@@ -57,6 +90,22 @@ const PurchaseHistory = () => {
 
     if (loading) {
         return <div className="loading">Đang tải lịch sử mua hàng...</div>;
+    }
+
+    if (error) {
+        return (
+            <div className="purchase-history-page">
+                <div className="container">
+                    <h1 className="page-title">Lịch sử mua hàng</h1>
+                    <div className="error-message">
+                        <p>{error}</p>
+                        {!localStorage.getItem('user') && ( 
+                            <Link to="/login" className="btn btn-primary">Đăng nhập ngay</Link>
+                        )}
+                    </div>
+                </div>
+            </div>
+        );
     }
 
     return (

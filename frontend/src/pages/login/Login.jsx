@@ -19,7 +19,7 @@ export default function Login() {
         if (res.data.success) {
           alert("✅ Đăng nhập nhân viên thành công!");
           localStorage.setItem("user", JSON.stringify(res.data.user));
-          window.location.href = "/trangchu";
+          window.location.href = "/";
         } else alert("❌ Sai tài khoản hoặc mật khẩu!");
       } else if (role === "Quản lý") {
         res = await axios.post("http://localhost:3000/api/taikhoan/login", {
@@ -30,7 +30,7 @@ export default function Login() {
         if (res.data.success) {
           alert("✅ Đăng nhập quản lý thành công!");
           localStorage.setItem("user", JSON.stringify(res.data.user));
-          window.location.href = "/trangchu";
+          window.location.href = "/";
         } else alert("❌ Sai tài khoản hoặc mật khẩu!");
       } else {
         res = await axios.post("http://localhost:3000/api/taikhoan/loginKhachHang", {
@@ -41,7 +41,7 @@ export default function Login() {
           alert("✅ Đăng nhập khách hàng thành công!");
           // Sau khi backend cập nhật, res.data.user sẽ có TenKH
           localStorage.setItem("user", JSON.stringify(res.data.user)); 
-          window.location.href = "/trangchu";
+          window.location.href = "/";
         } else alert("❌ " + res.data.message);
       }
     } catch (err) {

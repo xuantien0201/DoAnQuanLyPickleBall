@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import PurchaseHistory from '../pages/customers/PurchaseHistory'; // Import PurchaseHistory
 import './ProfilePage.css';
 
 const ProfilePage = () => {
@@ -138,6 +139,7 @@ const ProfilePage = () => {
           ))}
         </div>
 
+   
         <div className="profile-actions">
           {editing ? (
             <>
@@ -149,8 +151,15 @@ const ProfilePage = () => {
           )}
         </div>
       </div>
+         {/* Thêm phần lịch sử mua hàng */}
+      <div className="purchase-history-section">
+        <PurchaseHistory />
+      </div>
     </div>
+    
   );
+  
 };
+
 
 export default ProfilePage;

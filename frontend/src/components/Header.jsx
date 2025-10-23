@@ -88,9 +88,8 @@ const Header = () => {
                 </Link>
               )}
 
-              <Link to="/cart" className="cart-icon-wrapper">
+             <Link to="/cart" className="cart-icon-wrapper">
                 <div className="cart-icon">
-                  {getCartCount() > 0 && <span className="cart-badge">{getCartCount()}</span>}
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                     <circle cx="9" cy="21" r="1" />
                     <circle cx="20" cy="21" r="1" />
