@@ -193,21 +193,25 @@ export default function QuanLyCaLam() {
     <div className="cl-app">
       <Sidebar />
       <main className="cl-main">
-        <div className="cl-topbar">
-          <div className="cl-hello">Xin chào, Quản lý 👋🏼</div>
-          <div className="cl-week-picker">
-            <label>Chọn tuần:</label>
-            <input
-              type="date"
-              value={weekStart}
-              onChange={(e) => {
-                const parts = e.target.value.split("-");
-                const localDate = new Date(parts[0], parts[1] - 1, parts[2]);
-                setWeekStart(getMonday(localDate));
-              }}
-            />
-          </div>
-        </div>
+    <div className="cl-topbar">
+  <div className="cl-page-title">Quản lý ca làm của nhân viên</div>
+  <div className="cl-right">
+    <span className="cl-hello">Xin chào, Quản lý 👋🏼</span>
+    <div className="cl-week-picker">
+      <label>Chọn tuần:</label>
+      <input
+        type="date"
+        value={weekStart}
+        onChange={(e) => {
+          const parts = e.target.value.split("-");
+          const localDate = new Date(parts[0], parts[1] - 1, parts[2]);
+          setWeekStart(getMonday(localDate));
+        }}
+      />
+    </div>
+  </div>
+</div>
+
 
         <section className="cl-section">
           <table className="cl-table">

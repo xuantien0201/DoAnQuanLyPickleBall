@@ -9,11 +9,12 @@ export default function Register() {
   const [passWord, setPassWord] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [sdt, setSDT] = useState("");
+const [tenKh, setTenKh] = useState("");
 
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    if (!userName || !email || !passWord || !confirmPassword || !sdt) {
+    if (!userName || !email || !passWord || !confirmPassword || !sdt || !tenKh) {
       alert("Vui lòng nhập đầy đủ thông tin!");
       return;
     }
@@ -31,11 +32,12 @@ export default function Register() {
 
     try {
       const res = await axios.post("http://localhost:3000/api/taikhoan/registerKhachHang", {
-        userName,
-        passWord,
-        email,
-        sdt
-      });
+  userName,
+  passWord,
+  email,
+  sdt,
+  tenKh
+});
 
       alert(res.data.message);
       if (res.data.success) window.location.href = "/login";
@@ -56,6 +58,12 @@ export default function Register() {
             value={userName}
             onChange={(e) => setUserName(e.target.value)}
           />
+          <input
+  type="text"
+  placeholder="Họ và tên"
+  value={tenKh}
+  onChange={(e) => setTenKh(e.target.value)}
+/>
           <input
             type="email"
             placeholder="Email"

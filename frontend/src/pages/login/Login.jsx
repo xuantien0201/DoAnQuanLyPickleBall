@@ -19,7 +19,7 @@ export default function Login() {
         if (res.data.success) {
           alert("✅ Đăng nhập nhân viên thành công!");
           localStorage.setItem("user", JSON.stringify(res.data.user));
-          window.location.href = "/calam";
+          window.location.href = "/trangchu";
         } else alert("❌ Sai tài khoản hoặc mật khẩu!");
       } else if (role === "Quản lý") {
         res = await axios.post("http://localhost:3000/api/taikhoan/login", {
@@ -30,7 +30,7 @@ export default function Login() {
         if (res.data.success) {
           alert("✅ Đăng nhập quản lý thành công!");
           localStorage.setItem("user", JSON.stringify(res.data.user));
-          window.location.href = "/nhanvien";
+          window.location.href = "/trangchu";
         } else alert("❌ Sai tài khoản hoặc mật khẩu!");
       } else {
         res = await axios.post("http://localhost:3000/api/taikhoan/loginKhachHang", {

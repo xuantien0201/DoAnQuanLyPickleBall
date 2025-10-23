@@ -12,13 +12,10 @@ function generateRandomId(length = 3) {
 
 export async function registerKhachHang(req, res) {
   try {
-    const { userName, passWord, email, sdt } = req.body;
+    const { userName, passWord, email, sdt, tenKh } = req.body;
 
-    if (!userName || !passWord || !email || !sdt) {
-      return res.json({
-        success: false,
-        message: "Vui lòng nhập đầy đủ thông tin!",
-      });
+    if (!userName || !passWord || !email || !sdt || !tenKh) {
+      return res.json({ success: false, message: "Vui lòng nhập đầy đủ thông tin!" });
     }
 
     // Kiểm tra trùng trong tbl_taikhoankhachhang
@@ -40,11 +37,11 @@ export async function registerKhachHang(req, res) {
       });
     }
 
-    // Sinh ID ngẫu nhiên và đảm bảo không trùng cho tbl_taikhoankhachhang
+    // Sinh ID ngẫu nhiên và đảm bảo không trùng
     let accId;
     let isUniqueAcc = false;
     while (!isUniqueAcc) {
-      accId = generateRandomId(3); // KH + 5 ký tự
+      accId = generateRandomId(3); // KH + 3 ký tự số
       const [rows] = await db.execute(
         "SELECT id FROM tbl_taikhoankhachhang WHERE id = ?",
         [accId]
@@ -58,21 +55,15 @@ export async function registerKhachHang(req, res) {
       [accId, userName, passWord, email, sdt]
     );
 
-    // Thêm vào tbl_khachhang chỉ với id, SDT, email (các trường khác để trống)
+    // Thêm vào tbl_khachhang với TenKh
     await db.execute(
-      "INSERT INTO tbl_khachhang (id, SDT, email) VALUES (?, ?, ?)",
-      [accId, sdt, email]
+      "INSERT INTO tbl_khachhang (id, TenKh, SDT, email) VALUES (?, ?, ?, ?)",
+      [accId, tenKh, sdt, email]
     );
 
-    res.json({
-      success: true,
-      message: "Đăng ký khách hàng thành công",
-    });
+    res.json({ success: true, message: "Đăng ký khách hàng thành công" });
   } catch (err) {
     console.error("❌ Lỗi khi đăng ký khách hàng:", err);
-    res.status(500).json({
-      success: false,
-      message: "Lỗi server",
-    });
+    res.status(500).json({ success: false, message: "Lỗi server" });
   }
 }

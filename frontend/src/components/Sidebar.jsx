@@ -95,13 +95,13 @@ export function Sidebar() {
           </Link>
         </nav>
 
-        <div className="user">
+        {/* <div className="user">
           <div className="avatar"></div>
           <div>
             <div style={{ fontWeight: 700 }}>Nguyễn Văn A</div>
             <small>Quản lý cơ sở</small>
           </div>
-        </div>
+        </div> */}
       </aside>
     </>
   );
