@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 22, 2025 lúc 07:43 PM
+-- Thời gian đã tạo: Th10 23, 2025 lúc 03:33 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
--- Phiên bản PHP: 8.2.12
+-- Phiên bản PHP: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Cơ sở dữ liệu: `pickleball-check`
+-- Cơ sở dữ liệu: `pickleball`
 --
 
 -- --------------------------------------------------------
@@ -36,6 +36,13 @@ CREATE TABLE `cart_items` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `cart_items`
+--
+
+INSERT INTO `cart_items` (`id`, `session_id`, `product_id`, `quantity`, `color`, `created_at`, `updated_at`) VALUES
+(72, 'session_1760853385557_rhhi6zzlm', 44, 1, 'Yellow', '2025-10-22 17:17:26', '2025-10-22 17:17:26');
 
 -- --------------------------------------------------------
 
@@ -93,9 +100,9 @@ CREATE TABLE `nhacungcap` (
 --
 
 INSERT INTO `nhacungcap` (`id`, `ten`, `created_at`) VALUES
-(1, 'Công ty Thể thao XYZ', '2025-10-21 02:04:46'),
-(2, 'Nhà cung cấp ABC', '2025-10-21 02:04:46'),
-(3, 'Pickleball Việt Nam', '2025-10-21 02:04:46');
+(1, 'Công ty Thể thao XYZ', '2025-10-20 19:04:46'),
+(2, 'Nhà cung cấp ABC', '2025-10-20 19:04:46'),
+(3, 'Pickleball Việt Nam', '2025-10-20 19:04:46');
 
 -- --------------------------------------------------------
 
@@ -144,7 +151,9 @@ INSERT INTO `orders` (`id`, `order_code`, `customer_id`, `customer_name`, `custo
 (70, '4814630D', 'KH886406', 'Trần Trung Quân', NULL, '091283848', NULL, NULL, NULL, 'Tiền mặt', 9850000, 'da_nhan', '2025-10-22 15:27:13', 'pos'),
 (71, '1BC09A2C', 'KH886407', 'Quân Trần', NULL, '091283842', NULL, NULL, NULL, 'Tiền mặt', 4850000, 'da_nhan', '2025-10-22 15:42:44', 'pos'),
 (72, '9AA8C7DE', 'KH886405', 'Trần Trung Tiến', '', '0984747222', '1231', 'HaNoi', '', 'cod', 19995000, 'da_nhan', '2025-10-22 15:55:24', 'online'),
-(73, '9F337609', 'KH886405', 'Trần Trung Tiến', '', '0984747222', '1231', 'HaNoi', '', 'cod', 24000000, 'da_nhan', '2025-10-22 15:56:40', 'online');
+(73, '9F337609', 'KH886405', 'Trần Trung Tiến', '', '0984747222', '1231', 'HaNoi', '', 'cod', 24000000, 'da_nhan', '2025-10-22 15:56:40', 'online'),
+(74, 'B292B0A6', 'KH886405', 'Trần Trung Tiến', '', '0984747222', '1231', 'HaNoi', '', 'cod', 270000, 'da_nhan', '2025-10-22 16:52:18', 'online'),
+(75, '507CE052', 'KH886405', 'Trần Trung Tiến', '', '0984747222', '1231', 'HaNoi', '', 'cod', 9600000, 'da_nhan', '2025-10-22 16:57:42', 'online');
 
 -- --------------------------------------------------------
 
@@ -198,7 +207,10 @@ INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `product_name`, `quan
 (86, 71, 39, 'Tyson Mcguffin Magnus 3 14mm', 1, 4850000, NULL),
 (87, 72, 43, 'Heleus Pickleball Pools', 20, 250000, 'Yellow'),
 (88, 72, 75, 'Giày Nike Zoom Gp Challenge 1 Premium', 5, 2999000, 'White'),
-(89, 73, 28, 'Anna Bright Scorpeus 3 14mm', 5, 4800000, 'Black');
+(89, 73, 28, 'Anna Bright Scorpeus 3 14mm', 5, 4800000, 'Black'),
+(90, 74, 51, 'Cuon Can Chinh Hang Joola', 1, 150000, 'Gray'),
+(91, 74, 52, 'Edge Tape 24mm', 1, 120000, 'Black'),
+(92, 75, 28, 'Anna Bright Scorpeus 3 14mm', 2, 4800000, 'Black');
 
 -- --------------------------------------------------------
 
@@ -245,7 +257,7 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `name`, `description`, `price`, `original_price`, `category`, `image_url`, `colors`, `rating`, `reviews_count`, `stock`, `is_new`, `discount_percent`, `created_at`, `updated_at`) VALUES
-(28, 'Anna Bright Scorpeus 3 14mm', 'Vợt nhẹ với khả năng kiểm soát tuyệt vời, dòng signature của Anna Bright.', 4800000, NULL, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760925530248.webp', '[\"Black\"]', 0.0, 0, 35, 0, NULL, '2025-10-20 01:43:44', '2025-10-22 15:56:47'),
+(28, 'Anna Bright Scorpeus 3 14mm', 'Vợt nhẹ với khả năng kiểm soát tuyệt vời, dòng signature của Anna Bright.', 4800000, NULL, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760925530248.webp', '[\"Black\"]', 0.0, 0, 33, 0, NULL, '2025-10-20 01:43:44', '2025-10-22 16:57:50'),
 (29, 'Ben Johns Blue Lightning Set', 'Bộ vợt và phụ kiện Ben Johns phiên bản Blue Lightning.', 5200000, NULL, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760925520526.webp', '[\"Blue\"]', 0.0, 0, 30, 0, NULL, '2025-10-20 01:43:44', '2025-10-22 08:55:16'),
 (30, 'Ben Johns Hyperion 3 14mm', 'Vợt Ben Johns Hyperion thế hệ 3, dày 14mm.', 4950000, 5500000, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760925515107.webp', '[\"Black\"]', 0.0, 0, 59, 0, 10, '2025-10-20 01:43:44', '2025-10-22 15:27:13'),
 (31, 'Ben Johns Perseus 3 14mm', 'Vợt Ben Johns Perseus thế hệ 3, dày 14mm, tối ưu sức mạnh.', 4900000, NULL, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760925509481.webp', '[\"Black\",\"Red\"]', 0.0, 0, 54, 0, 10, '2025-10-20 01:43:44', '2025-10-22 15:27:13'),
@@ -268,8 +280,8 @@ INSERT INTO `products` (`id`, `name`, `description`, `price`, `original_price`, 
 (48, 'Bong Pickleball Joola Primo 4 Qua', 'Bóng Joola Primo, hộp 4 quả.', 300000, 350000, 'Bóng Pickleball', 'http://localhost:3000/uploads/products/product-1760925301614.webp', '[\"Yellow\"]', 0.0, 0, 178, 0, 14, '2025-10-20 01:43:44', '2025-10-22 14:47:35'),
 (49, 'Balo Joola Agassi Vision II', 'Balo đựng vợt Joola Agassi Vision II.', 1800000, NULL, 'Phụ kiện', 'http://localhost:3000/uploads/products/product-1760925293815.webp', '[\"Black\",\"Silver\"]', 0.0, 0, 60, 0, NULL, '2025-10-20 01:43:44', '2025-10-22 08:55:16'),
 (50, 'Balo Six Zero Pro Tour', 'Balo chuyên nghiệp Six Zero Pro Tour màu đen hồng.', 2200000, 2500000, 'Phụ kiện', 'http://localhost:3000/uploads/products/product-1760925286020.webp', '[\"Black\",\"Pink\"]', 0.0, 0, 40, 0, 12, '2025-10-20 01:43:44', '2025-10-22 08:55:16'),
-(51, 'Cuon Can Chinh Hang Joola', 'Cuốn cán vợt chính hãng Joola.', 150000, NULL, 'Phụ kiện', 'http://localhost:3000/uploads/products/product-1760925279059.webp', '[\"Gray\",\"White\",\"Black\"]', 0.0, 0, 500, 0, NULL, '2025-10-20 01:43:44', '2025-10-22 08:55:16'),
-(52, 'Edge Tape 24mm', 'Băng dán cạnh vợt 24mm.', 120000, NULL, 'Phụ kiện', 'http://localhost:3000/uploads/products/product-1760925272524.webp', '[\"Black\",\"Red\",\"Blue\"]', 0.0, 0, 800, 0, NULL, '2025-10-20 01:43:44', '2025-10-22 08:55:16'),
+(51, 'Cuon Can Chinh Hang Joola', 'Cuốn cán vợt chính hãng Joola.', 150000, NULL, 'Phụ kiện', 'http://localhost:3000/uploads/products/product-1760925279059.webp', '[\"Gray\",\"White\",\"Black\"]', 0.0, 0, 499, 0, NULL, '2025-10-20 01:43:44', '2025-10-22 16:52:44'),
+(52, 'Edge Tape 24mm', 'Băng dán cạnh vợt 24mm.', 120000, NULL, 'Phụ kiện', 'http://localhost:3000/uploads/products/product-1760925272524.webp', '[\"Black\",\"Red\",\"Blue\"]', 0.0, 0, 799, 0, NULL, '2025-10-20 01:43:44', '2025-10-22 16:52:44'),
 (53, 'Joola Trinity Wristband White', 'Băng đeo cổ tay Joola Trinity màu trắng.', 250000, NULL, 'Phụ kiện', 'http://localhost:3000/uploads/products/product-1760925252984.webp', '[\"White\"]', 0.0, 0, 200, 0, NULL, '2025-10-20 01:43:44', '2025-10-22 08:55:16'),
 (54, 'Joola Vision II Backpack', 'Balo Joola Vision II.', 1750000, NULL, 'Phụ kiện', 'http://localhost:3000/uploads/products/product-1760925263499.webp', '[\"Black\"]', 0.0, 0, 70, 0, NULL, '2025-10-20 01:43:44', '2025-10-22 08:55:16'),
 (55, 'Joola Vision II Backpack Petrol Teal', 'Balo Joola Vision II màu xanh xăng.', 1850000, NULL, 'Phụ kiện', 'http://localhost:3000/uploads/products/product-1760925245444.webp', '[\"Teal\",\"Petrol\"]', 0.0, 0, 55, 0, NULL, '2025-10-20 01:43:44', '2025-10-22 08:55:16'),
@@ -878,7 +890,7 @@ ALTER TABLE `tbl_xeve_sukien`
 -- AUTO_INCREMENT cho bảng `cart_items`
 --
 ALTER TABLE `cart_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
 
 --
 -- AUTO_INCREMENT cho bảng `categories`
@@ -902,13 +914,13 @@ ALTER TABLE `nhacungcap`
 -- AUTO_INCREMENT cho bảng `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
 
 --
 -- AUTO_INCREMENT cho bảng `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=90;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=93;
 
 --
 -- AUTO_INCREMENT cho bảng `phieunhap`
