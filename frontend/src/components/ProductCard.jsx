@@ -25,7 +25,7 @@ const ProductCard = ({ product }) => {
 
   return (
     <Link to={`/product/${product.id}`} className="product-card">
-      <div className="product-image">
+      <div className="product-image-card">
         <img src={product.image_url || '/images/placeholder.jpg'} alt={product.name} />
         {product.is_new && <span className="badge badge-new">NEW</span>}
         {product.discount_percent > 0 && (
@@ -39,7 +39,7 @@ const ProductCard = ({ product }) => {
           Thêm vào giỏ hàng
         </button>
       </div>
-      <div className="product-info">
+      <div className="product-info-card">
         <h3 className="product-name">{product.name}</h3>
         <div className="product-rating">
           <div className="stars">{renderStars(Math.round(product.rating))}</div>

@@ -11,21 +11,21 @@
   transform: translateY(-5px);
 }
 
-.product-image {
+.product-image-card {
   position: relative;
   overflow: hidden;
   aspect-ratio: 1;
   background: var(--bg-light);
 }
 
-.product-image img {
+.product-image-card img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s ease;
 }
 
-.product-card:hover .product-image img {
+.product-card:hover .product-image-card img {
   transform: scale(1.05);
 }
 
@@ -76,7 +76,7 @@
   background: #333;
 }
 
-.product-info {
+.product-info-card {
   padding: 15px;
 }
 
