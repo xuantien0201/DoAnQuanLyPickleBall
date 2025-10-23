@@ -58,7 +58,7 @@ export function QlyXeVe() {
 
   useEffect(() => {
     fetchXeVe();
-  }, []);
+  }, [keyword, from]);
 
   const handleToggleStatus = async (item) => {
     const current = item.TrangThai?.trim();
@@ -146,9 +146,39 @@ export function QlyXeVe() {
   return (
     <div className="qlyxeve-container">
       <Sidebar />
-      
+
       <div className="qlyxeve-content">
         <h3>Danh sách sự kiện xé vé</h3>
+        <div className="top-bar">
+          <div className="filter-left">
+            <input
+              type="text"
+              placeholder="Tìm kiếm tên sự kiện..."
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              className="xeve-input search-input"
+            />
+            <input
+              type="date"
+              value={from}
+              onChange={(e) => {
+                const selectedDate = e.target.value; // ngày người dùng chọn
+                const today = new Date().toISOString().split("T")[0]; // yyyy-mm-dd hiện tại
+                // Nếu ngày chọn nhỏ hơn hôm nay, mặc định lấy hôm nay
+                setFrom(selectedDate >= today ? selectedDate : today);
+              }}
+              className="xeve-input date-input"
+              title="Từ ngày"
+            />
+          </div>
+
+          <div className="add-right">
+            <button className="btn btn-add" onClick={() => setShowModal(true)}>
+              Thêm sự kiện
+            </button>
+          </div>
+        </div>
+
         <table>
           <thead>
             <tr>
@@ -178,7 +208,9 @@ export function QlyXeVe() {
                     <td>{item.ThoiGianBatDau?.slice(0, 5)}</td>
                     <td>{item.ThoiGianKetThuc?.slice(0, 5)}</td>
                     <td>{item.DanhSachSan}</td>
-                    <td>{item.DaDat}/{item.SoLuongToiDa}</td>
+                    <td>
+                      {item.DaDat}/{item.SoLuongToiDa}
+                    </td>
 
                     <td>
                       <button

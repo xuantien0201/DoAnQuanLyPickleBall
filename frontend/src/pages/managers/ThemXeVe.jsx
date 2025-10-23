@@ -49,7 +49,7 @@ export function ThemXeVe({ onClose, onAdded }) {
     try {
       setIsLoading(true);
 
-      const res = await fetch("http://localhost:3000/api/xeve", {
+      const res = await fetch("http://localhost:3000/api/xeve/sukien/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

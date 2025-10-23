@@ -26,35 +26,35 @@ export function DatSanNgay() {
   const closingHour = 24;
   const slotMinutes = 60;
 
-useEffect(() => {
-  const currentUser =
-    JSON.parse(localStorage.getItem("user")) ||
-    JSON.parse(localStorage.getItem("khach"));
+  useEffect(() => {
+    const currentUser =
+      JSON.parse(localStorage.getItem("user")) ||
+      JSON.parse(localStorage.getItem("khach"));
 
-  if (!currentUser) return;
+    if (!currentUser) return;
 
-  let role = "";
-  let maNguoiDung = "";
+    let role = "";
+    let maNguoiDung = "";
 
-  if (currentUser?.role === "Nhân viên" || currentUser?.role === "Quản lý") {
-    role = "nhanvien";
-    maNguoiDung = currentUser.maNV;
-    console.log("🔹 Đang đăng nhập với vai trò:", currentUser.role);
-    console.log("Mã nhân viên:", maNguoiDung);
-  } else if (currentUser?.MaKH) {  // ✅ sửa từ currentUser.id => currentUser.MaKH
-    role = "khachhang";
-    maNguoiDung = currentUser.MaKH;  // ✅ sửa từ currentUser.id => currentUser.MaKH
-    console.log("🔹 Khách hàng đăng nhập:");
-    console.log("Mã KH:", maNguoiDung);
-    console.log("Tên KH:", currentUser.TenKh);
-    console.log("SĐT:", currentUser.SDT);
-  }
+    if (currentUser?.role === "Nhân viên" || currentUser?.role === "Quản lý") {
+      role = "nhanvien";
+      maNguoiDung = currentUser.maNV;
+      console.log("🔹 Đang đăng nhập với vai trò:", currentUser.role);
+      console.log("Mã nhân viên:", maNguoiDung);
+    } else if (currentUser?.MaKH) {
+      // ✅ sửa từ currentUser.id => currentUser.MaKH
+      role = "khachhang";
+      maNguoiDung = currentUser.MaKH; // ✅ sửa từ currentUser.id => currentUser.MaKH
+      console.log("🔹 Khách hàng đăng nhập:");
+      console.log("Mã KH:", maNguoiDung);
+      console.log("Tên KH:", currentUser.TenKh);
+      console.log("SĐT:", currentUser.SDT);
+    }
 
-  setUser(currentUser);
-  setRole(role);
-  setMaNguoiDung(maNguoiDung);
-}, []);
-
+    setUser(currentUser);
+    setRole(role);
+    setMaNguoiDung(maNguoiDung);
+  }, []);
 
   const [courts, setCourts] = useState([]);
   const [bookedSlots, setBookedSlots] = useState({});
@@ -330,6 +330,10 @@ useEffect(() => {
 
   // 🔹 Vẽ lưới hiển thị sân (gộp booked theo khách + sự kiện)
   const buildGrid = () => {
+    const now = new Date();
+    const currentDate = now.toISOString().split("T")[0]; // yyyy-mm-dd hiện tại
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
     const gridEl = document.getElementById("grid");
     if (!gridEl) return;
     gridEl.innerHTML = "";
@@ -456,14 +460,41 @@ useEffect(() => {
 
         // Ô trống để chọn
         const cell = document.createElement("div");
-        cell.className = "cell slot avail";
         cell.dataset.court = ci;
         cell.dataset.slot = i;
-        cell.addEventListener("click", () => handleSlotClick(ci, i));
-        if (selectedSlots.includes(key)) {
-          cell.style.backgroundColor = "#f9e07aff"; // vàng khi chọn
-          cell.style.border = "1px solid black"; // vàng khi chọn
+
+        // Kiểm tra slot quá hạn
+        const slotStartMinutes = openingHour * 60 + i * slotMinutes;
+        const now = new Date();
+        const currentDate = now.toISOString().split("T")[0];
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+        const selected = new Date(selectedDate);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // reset giờ phút giây
+        selected.setHours(0, 0, 0, 0);
+
+        if (selected < today) {
+          // Ngày đã qua, tất cả slot là past
+          cell.className = "cell slot past";
+          cell.style.backgroundColor = "#cccccc";
+        } else if (
+          selected.getTime() === today.getTime() &&
+          slotStartMinutes <= currentMinutes
+        ) {
+          // Hôm nay, slot trôi qua
+          cell.className = "cell slot past";
+          cell.style.backgroundColor = "#cccccc";
+        } else {
+          // Slot còn chọn được
+          cell.className = "cell slot avail";
+          cell.addEventListener("click", () => handleSlotClick(ci, i));
+          if (selectedSlots.includes(key)) {
+            cell.style.backgroundColor = "#f9e07aff";
+            cell.style.border = "1px solid black";
+          }
         }
+
         row.appendChild(cell);
       }
 

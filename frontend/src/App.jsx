@@ -64,9 +64,23 @@ function App() {
 // }
 
 
+// 🧩 Lấy thông tin đăng nhập
+const currentUser =
+  JSON.parse(localStorage.getItem("user")) ||
+  JSON.parse(localStorage.getItem("khach")) || {};
+
+let role = ""; // nhanvien / khachhang
+
+if (currentUser?.role === "Nhân viên" || currentUser?.role === "Quản lý") {
+  role = "nhanvien";
+} else if (currentUser?.MaKH) {
+  role = "khachhang";
+}
+
   const location = useLocation();
 
-  const noHeaderFooterRoutes = ['/xacnhansan', '/dat-san', '/xeve', '/categories', '/products', '/orders', '/santhang',
+
+  const noHeaderFooterRoutes = ['/xacnhansan', '/xeve', '/categories', '/products', '/orders',
     '/nhaphang', '/nhacungcap', '/taophieunhap', '/lichsunhap','/calam', '/quanlycalam', '/quanlytaikhoan', '/nhanvien',
      '/register', '/forgot-password','/login'
   ];

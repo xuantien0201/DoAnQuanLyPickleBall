@@ -250,3 +250,76 @@ tr:hover {
 input[type="number"] {
   width: 100px;
 }
+
+.top-bar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.btn-add {
+  background-color: #2799db;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-add:hover {
+  background-color: #4583a0;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  gap: 10px;
+  flex-wrap: wrap; /* responsive khi màn hình nhỏ */
+}
+
+.filter-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1; /* chiếm phần còn lại */
+  min-width: 0; /* tránh tràn */
+}
+
+.add-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.xeve-input {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  flex: 1; /* input co giãn */
+  min-width: 120px; /* giới hạn nhỏ nhất */
+}
+
+.search-input {
+  max-width: 200px;
+}
+
+.date-input {
+  max-width: 150px;
+}
+
+.btn-search {
+  padding: 6px 12px;
+  background-color: #3498db;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-search:hover {
+  background-color: #2980b9;
+}
+
