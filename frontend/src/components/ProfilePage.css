@@ -4,6 +4,34 @@
     min-height: 100vh;
 }
 
+.no-orders-message {
+    display: flex;
+    flex-direction: column; 
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #6c757d;
+    font-size: 18px;
+    font-weight: 500;
+    gap: 15px; 
+}
+
+.no-orders-message button {
+    background-color: #212529;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.no-orders-message button:hover {
+    background-color: #000;
+}
+
+
 .profile-container {
     max-width: 800px;
     margin: 0 auto;
@@ -15,7 +43,8 @@
 
 .profile-title {
     text-align: center;
-    color: #387038; /* Màu xanh lá cây của logo */
+    color: #387038;
+    /* Màu xanh lá cây của logo */
     margin-bottom: 30px;
     font-size: 28px;
     font-weight: 600;
@@ -49,7 +78,8 @@
 }
 
 .full-width {
-    grid-column: 1 / -1; /* Chiếm toàn bộ chiều rộng */
+    grid-column: 1 / -1;
+    /* Chiếm toàn bộ chiều rộng */
 }
 
 .profile-actions {

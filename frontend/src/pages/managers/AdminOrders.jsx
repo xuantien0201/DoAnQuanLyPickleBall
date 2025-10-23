@@ -348,12 +348,12 @@ const AdminOrders = () => {
                 className="bulk-status-select"
               >
                 <option value="">Chọn trạng thái...</option>
-                <option value="da_xac_nhan">✅ Xác nhận đơn</option>
+                <option value="da_xac_nhan">✅ Xác nhận đơn (trừ kho) </option>
                 <option value="dang_giao">🚚 Đang giao hàng</option>
                 <option value="da_nhan">🎉 Đã nhận hàng</option>
-                <option value="doi_hang">🔄 Đổi hàng</option> {/* Thêm trạng thái mới */}
-                <option value="tra_hang">↩️ Trả hàng</option> {/* Thêm trạng thái mới */}
-                <option value="hoan_tien">💲 Hoàn tiền</option> {/* Thêm trạng thái mới */}
+                <option value="doi_hang">🔄 Đổi hàng</option> 
+                <option value="tra_hang">↩️ Trả hàng (hoàn kho chờ hoàn tiền)</option> 
+                <option value="hoan_tien">💲 Hoàn tiền</option>
                 <option value="da_huy">❌ Hủy (trước xác nhận)</option>
                 <option value="huy_sau_xac_nhan">♻️ Hủy sau xác nhận (hoàn kho)</option>
                 <option value="giao_that_bai">⚠️ Giao thất bại (hoàn kho)</option>
