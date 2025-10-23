@@ -15,7 +15,7 @@ export function Sidebar() {
         </div>
 
         <nav className="snav" aria-label="Chính">
-          <Link className="slink" to="/trangchu">
+          <Link className="slink" to="/">
             <span className="ic">🗓️</span>
             <span>Trang chủ</span>
           </Link>
@@ -43,18 +43,10 @@ export function Sidebar() {
             <span className="ic">🧾</span>
             <span>Hóa đơn</span>
           </Link>
-          <Link className="slink" to="/shop">
-            <span className="ic">🏠</span>
-            <span>Xem trang bán hàng</span>
-          </Link>
           
           <Link className="slink" to="/pos">
             <span className="ic">💵</span>
             <span>Bán hàng tại quầy</span>
-          </Link>
-          <Link className="slink" to="/">
-            <span className="ic">🗓️</span>
-            <span>Trở về Trang chủ</span>
           </Link>
           <Link className="slink active" to="/nhanvien">
             <span className="ic">👥</span>
@@ -73,14 +65,6 @@ export function Sidebar() {
         <div className="divider"></div>
 
         <nav className="bottom" aria-label="Hỗ trợ">
-          <Link className="slink" to="#">
-            <span className="ic">⚙️</span>
-            <span>Cài đặt</span>
-          </Link>
-          <Link className="slink" to="#">
-            <span className="ic">❓</span>
-            <span>Trung tâm trợ giúp</span>
-          </Link>
         </nav>
 
         <div className="user">
