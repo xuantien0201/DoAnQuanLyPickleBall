@@ -6,35 +6,37 @@ export async function loginKhachHang(req, res) {
 
     // 1️⃣ Kiểm tra tài khoản trong bảng tbl_taikhoankhachhang
     const [accountRows] = await db.execute(
-      "SELECT * FROM tbl_taikhoankhachhang WHERE userName = ? AND passWord = ?",
+      "SELECT id, userName, email, SDT FROM tbl_taikhoankhachhang WHERE userName = ? AND passWord = ?",
       [userName, passWord]
     );
 
     if (accountRows.length === 0) {
-      return res.json({
-        success: false,
-        message: "Sai tài khoản hoặc mật khẩu",
-      });
+      return res.json({ success: false, message: "Tên đăng nhập hoặc mật khẩu không đúng." });
     }
 
     const account = accountRows[0];
     const customerId = account.id; // Lấy id từ tbl_taikhoankhachhang
 
-    // 2️⃣ Lấy thông tin khách hàng từ tbl_khachhang dựa trên id
+    // 2️⃣ Lấy tất cả thông tin khách hàng từ tbl_khachhang dựa trên id
     const [customerRows] = await db.execute(
-      "SELECT TenKh FROM tbl_khachhang WHERE id = ?",
+      "SELECT TenKh, SDT, email, DiaChi, GioiTinh FROM tbl_khachhang WHERE id = ?",
       [customerId]
     );
 
-    const customerName = customerRows.length > 0 ? customerRows[0].TenKh : userName;
+    const customerInfo = customerRows.length > 0 ? customerRows[0] : {};
 
-    // 3️⃣ Trả về thông tin khách hàng (bao gồm tên)
+    // 3️⃣ Trả về thông tin khách hàng đầy đủ
     res.json({
       success: true,
       message: "Đăng nhập khách hàng thành công",
       user: {
-        ...account,   // thông tin tài khoản
-        TenKh: customerName, // thêm tên khách hàng
+        id: account.id,
+        userName: account.userName,
+        email: account.email,
+        SDT: account.SDT,
+        TenKh: customerInfo.TenKh || account.userName, // Sử dụng TenKh từ tbl_khachhang, fallback về userName
+        DiaChi: customerInfo.DiaChi || null,
+        GioiTinh: customerInfo.GioiTinh || null,
       },
     });
   } catch (err) {
@@ -44,48 +46,49 @@ export async function loginKhachHang(req, res) {
       message: "Lỗi server",
     });
   }
-  
 }
+
 export async function getKhachHangProfile(req, res) {
-  try {
-    // Nhận id từ query params. Đây là ID từ tbl_taikhoankhachhang, 
+  try {
+    // Nhận id từ query params. Đây là ID từ tbl_taikhoankhachhang, 
     // và bạn dùng nó làm khóa ngoại trong tbl_khachhang.
-    const { id } = req.query;
+    const { id } = req.query;
 
-    if (!id) {
-      return res.status(400).json({
-        success: false,
-        // SỬA: Thông báo lỗi phải phản ánh biến đang được sử dụng
-        message: "Thiếu ID tài khoản khách hàng.", 
-      });
-    }
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        // SỬA: Thông báo lỗi phải phản ánh biến đang được sử dụng
+        message: "Thiếu ID tài khoản khách hàng.",
+      });
+    }
 
-    // Lấy tất cả thông tin từ tbl_khachhang
-    const [rows] = await db.execute(
-      // SỬA: Thay MaKH bằng id
-      "SELECT * FROM tbl_khachhang WHERE id = ?",
-      [id] // SỬA: Truyền biến id vào đây
-    );
+    // Lấy tất cả thông tin từ tbl_khachhang
+    const [rows] = await db.execute(
+      // SỬA: Thay MaKH bằng id
+      "SELECT * FROM tbl_khachhang WHERE id = ?",
+      [id] // SỬA: Truyền biến id vào đây
+    );
 
-    if (rows.length > 0) {
-      res.json({
-        success: true,
-        customer: rows[0], // Trả về toàn bộ thông tin khách hàng
-      });
-    } else {
-      res.status(404).json({
-        success: false,
-        message: "Không tìm thấy thông tin khách hàng tương ứng.",
-      });
-    }
-  } catch (err) {
-    console.error("❌ Lỗi khi lấy thông tin khách hàng:", err);
-    res.status(500).json({
-      success: false,
-      message: "Lỗi server",
-    });
-  }
+    if (rows.length > 0) {
+      res.json({
+        success: true,
+        customer: rows[0], // Trả về toàn bộ thông tin khách hàng
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "Không tìm thấy thông tin khách hàng tương ứng.",
+      });
+    }
+  } catch (err) {
+    console.error("❌ Lỗi khi lấy thông tin khách hàng:", err);
+    res.status(500).json({
+      success: false,
+      message: "Lỗi server",
+    });
+  }
 }
+
 export const updateCustomerProfile = async (req, res) => {
   const { id } = req.query; // id khách hàng
   const { TenKh, SDT, email, DiaChi, GioiTinh } = req.body;
@@ -97,7 +100,7 @@ export const updateCustomerProfile = async (req, res) => {
     const sql = `UPDATE tbl_khachhang 
                  SET TenKh=?, SDT=?, email=?, DiaChi=?, GioiTinh=? 
                  WHERE id=?`;
-    
+
     await db.execute(sql, [TenKh, SDT, email, DiaChi, GioiTinh, id]);
 
     res.json({ success: true, message: "Cập nhật thông tin thành công" });

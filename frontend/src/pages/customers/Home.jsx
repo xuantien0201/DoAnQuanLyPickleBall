@@ -55,13 +55,11 @@ const Home = () => {
             <p>
               Khám phá bộ sưu tập vợt pickleball cao cấp được thiết kế dành cho mọi cấp độ người chơi —
               từ người mới bắt đầu đến vận động viên chuyên nghiệp.
-              Chất lượng vượt trội, hiệu suất đỉnh cao cho từng cú đánh.
             </p>
-            <Link to="/shop" className="btn hero-btn">
-              Mua Ngay
-            </Link>
+            <Link to="/shop" className="btn hero-btn">Mua Ngay</Link>
           </div>
         </div>
+
         <div className="hero-image">
           <img
             src="http://localhost:3000/uploads/categories/Huong-dan-cach-chon-vot-Pickleball-phu-hop-va-chuan-nhat-Hoc-Vien-VNTA-8.webp"
@@ -69,7 +67,6 @@ const Home = () => {
           />
         </div>
       </section>
-
 
       {/* Phần danh mục sản phẩm */}
       <section className="categories-section">

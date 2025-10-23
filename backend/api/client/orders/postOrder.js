@@ -29,97 +29,56 @@ router.post('/', async (req, res) => {
         await db.beginTransaction();
 
         const {
-            // Fields for regular checkout
             fullName, email, phone, address, city, sex,
-            // Fields for POS
-            customer,
+            customer, 
             notes, paymentMethod, items, total, status
         } = req.body;
 
         const orderCode = uuidv4().split('-')[0].toUpperCase();
         let orderData;
-        let customerId; // ID từ bảng tbl_khachhang
-        let initialStatus; // Để lưu trạng thái ban đầu được xác định
-        let orderType; // Thêm biến để lưu kiểu bán hàng
+        let customerId; 
+        let initialStatus; 
+        let orderType; 
 
-        // Phân biệt giữa đơn hàng POS và đơn hàng checkout thông thường
-        if (customer && customer.name && customer.phone) {
-            // Đây là đơn hàng POS
-            if (!paymentMethod || !items || items.length === 0) {
-                await db.rollback();
-                return res.status(400).json({ error: 'Dữ liệu đơn hàng POS không hợp lệ.' });
-            }
-
-            // Tìm hoặc tạo khách hàng mới dựa trên SĐT
-            const [existingCustomers] = await db.query('SELECT id FROM tbl_khachhang WHERE SDT = ?', [customer.phone]);
-            if (existingCustomers.length > 0) {
-                customerId = existingCustomers[0].id;
-            } else {
-                const newCustomerId = await generateNewCustomerId();
-                await db.query(
-                    'INSERT INTO tbl_khachhang (id, TenKh, SDT, GioiTinh) VALUES (?, ?, ?, ?)', // <-- Thêm GioiTinh
-                    [newCustomerId, customer.name, customer.phone, customer.sex || null] // <-- Thêm customer.sex
-                );
-                customerId = newCustomerId;
-            }
-
-            initialStatus = status || 'da_nhan'; // Đơn hàng POS được hoàn thành ngay lập tức
-            orderType = 'pos'; // Đặt kiểu bán là 'pos'
-            orderData = [
-                orderCode,
-                customerId,
-                customer.name,
-                null, // email
-                customer.phone,
-                null, // address
-                null, // city
-                notes,
-                paymentMethod,
-                total,
-                initialStatus,
-                orderType // Thêm orderType vào đây
-            ];
+        if (customer && customer.id) { 
+            customerId = customer.id;
+            orderType = 'online'; 
+            await db.query(
+                `UPDATE tbl_khachhang SET TenKh = ?, SDT = ?, email = ?, DiaChi = ?, GioiTinh = ? WHERE id = ?`,
+                [fullName, phone, email, address, sex, customerId]
+            );
         } else {
-            // Đây là đơn hàng checkout thông thường
-            if (!fullName || !phone || !address || !city || !paymentMethod || !items || items.length === 0) { // <-- Đã xóa !email
-                await db.rollback();
-                return res.status(400).json({ error: 'Vui lòng điền đầy đủ thông tin bắt buộc.' });
-            }
+            orderType = 'online';
+            const [existingCustomers] = await db.query(
+                "SELECT id FROM tbl_khachhang WHERE email = ? OR SDT = ?",
+                [email, phone]
+            );
 
-            // Tìm hoặc tạo khách hàng mới dựa trên SĐT
-            const [existingCustomers] = await db.query('SELECT id FROM tbl_khachhang WHERE SDT = ?', [phone]);
             if (existingCustomers.length > 0) {
                 customerId = existingCustomers[0].id;
-            } else {
-                const newCustomerId = await generateNewCustomerId();
-                const fullAddress = `${address}, ${city}`;
                 await db.query(
-                    'INSERT INTO tbl_khachhang (id, TenKh, SDT, DiaChi, email, GioiTinh) VALUES (?, ?, ?, ?, ?, ?)', // <-- Thêm GioiTinh
-                    [newCustomerId, fullName, phone, fullAddress, email, sex || null] // <-- Thêm sex
+                    `UPDATE tbl_khachhang SET TenKh = ?, SDT = ?, email = ?, DiaChi = ?, GioiTinh = ? WHERE id = ?`,
+                    [fullName, phone, email, address, sex, customerId]
                 );
-                customerId = newCustomerId;
+            } else {
+                // Tạo khách hàng mới trong tbl_khachhang
+                customerId = await generateNewCustomerId(); // Hàm này tạo ID dạng KHxxxx
+                await db.query(
+                    `INSERT INTO tbl_khachhang (id, TenKh, SDT, email, DiaChi, GioiTinh) VALUES (?, ?, ?, ?, ?, ?)`,
+                    [customerId, fullName, phone, email, address, sex]
+                );
             }
-
-            initialStatus = status || 'cho_xac_nhan'; // Đơn hàng thông thường ở trạng thái chờ xử lý
-            orderType = 'online'; // Đặt kiểu bán là 'online'
-            orderData = [
-                orderCode,
-                customerId,
-                fullName,
-                email,
-                phone,
-                address,
-                city,
-                notes,
-                paymentMethod,
-                total,
-                initialStatus,
-                orderType // Thêm orderType vào đây
-            ];
         }
 
+        // Xác định trạng thái ban đầu
+        initialStatus = 'cho_xac_nhan'; // Mặc định cho đơn hàng mới
+
+        orderData = [
+            orderCode, customerId, fullName, email, phone, address, city,
+            notes, paymentMethod, total, initialStatus, orderType
+        ];
+
         // Insert into orders table
-        // Cập nhật câu lệnh INSERT để bao gồm cột order_type
         const [orderResult] = await db.query(
             `INSERT INTO orders (order_code, customer_id, customer_name, customer_email, customer_phone, shipping_address, shipping_city, notes, payment_method, total_amount, status, order_type)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -128,48 +87,29 @@ router.post('/', async (req, res) => {
 
         const orderId = orderResult.insertId;
 
-        // Insert into order_items table and potentially reduce stock
-        const itemPromises = items.map(async (item) => {
-            let productId;
-
-            if (customer && customer.name && customer.phone) {
-                productId = item.id; // Đây là đơn hàng POS, item.id chính là product_id
-            } else {
-                productId = item.product_id;
+        // Insert order items
+        for (const item of items) {
+            // Thêm kiểm tra để đảm bảo product_id không phải là NULL
+            if (!item.product_id) {
+                await db.rollback(); // Rollback giao dịch nếu có lỗi
+                console.error('Lỗi: product_id bị thiếu cho sản phẩm:', item.name);
+                return res.status(400).json({ error: `Thiếu ID sản phẩm cho '${item.name}'. Vui lòng kiểm tra lại giỏ hàng.` });
             }
 
-            if (!productId) {
-                throw new Error(`Thiếu product_id cho sản phẩm ${item.name || 'không tên'}.`);
-            }
-
-            if (initialStatus === 'da_nhan') {
-                const [[productStock]] = await db.query('SELECT stock FROM products WHERE id = ? FOR UPDATE', [productId]);
-                if (!productStock || productStock.stock < item.quantity) {
-                    throw new Error(`Không đủ hàng tồn kho cho sản phẩm ${item.name}. Chỉ còn ${productStock ? productStock.stock : 0} sản phẩm.`);
-                }
-                await db.query('UPDATE products SET stock = stock - ? WHERE id = ?', [item.quantity, productId]);
-            }
-
-            return db.query(
-                `INSERT INTO order_items (order_id, product_id, product_name, quantity, price, color)
+            await db.query(
+                `INSERT INTO order_items (order_id, product_id, quantity, price, color, product_name)
                  VALUES (?, ?, ?, ?, ?, ?)`,
-                [orderId, productId, item.name, item.quantity, item.price, item.color || null]
+                [orderId, item.product_id, item.quantity, item.price, item.color, item.name]
             );
-        });
-
-        await Promise.all(itemPromises);
+        }
 
         await db.commit();
-
-        res.status(201).json({ message: 'Tạo đơn hàng thành công', orderCode: orderCode });
+        res.status(201).json({ success: true, message: 'Đặt hàng thành công!', orderCode: orderCode });
 
     } catch (error) {
         await db.rollback();
         console.error('Lỗi khi tạo đơn hàng:', error);
-        if (error.message.includes('Không đủ hàng tồn kho') || error.message.includes('Thiếu product_id') || error.code === 'ER_DUP_ENTRY') {
-            return res.status(400).json({ error: error.message });
-        }
-        res.status(500).json({ error: 'Không thể tạo đơn hàng' });
+        res.status(500).json({ error: 'Không thể tạo đơn hàng.' });
     }
 });
 

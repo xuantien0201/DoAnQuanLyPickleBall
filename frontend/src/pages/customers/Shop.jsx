@@ -238,7 +238,7 @@ const Shop = () => {
                 <div className="sort-controls">
                   <label>Lọc theo:</label>
                   <select value={sortBy} onChange={handleSortChange}>
-                    <option value="newest">Mới nhất</option>
+                    <option value="newest">Mặc định</option>
                     <option value="best_selling">Sản phẩm bán chạy</option>
                     <option value="price_asc">Giá: Từ Thấp đến Cao</option>
                     <option value="price_desc">Giá: Từ Cao đến Thấp</option>

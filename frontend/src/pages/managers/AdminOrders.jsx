@@ -19,11 +19,11 @@ const AdminOrders = () => {
   const [dashboardStats, setDashboardStats] = useState({
     totalOrdersFiltered: 0,
     totalRevenueFiltered: 0,
-    processingOrders: 0, 
+    processingOrders: 0,
     failedOrders: 0,
     successfulOrders: 0,
-    totalItemsSold: 0, 
-    topSellingProducts: [], 
+    totalItemsSold: 0,
+    topSellingProducts: [],
   });
 
   // State cho bộ lọc
@@ -395,7 +395,16 @@ const AdminOrders = () => {
                   <td>{formatDate(order.created_at)}</td>
                   <td><strong>{order.total_amount.toLocaleString('vi-VN')}₫</strong></td>
                   <td><span className="payment-method">{renderPaymentMethod(order.payment_method)}</span></td>
-                  <td><span className={`order-type-badge order-type-${order.order_type}`}>{order.order_type === 'pos' ? 'Tại quầy' : 'Online'}</span></td>
+                  <td>
+                    {/* Thêm console.log để kiểm tra giá trị order.order_type */}
+                    {console.log('Order in AdminOrders:', order)}
+                    <span className={`order-type-badge order-type-${order.order_type || 'unknown'}`}>
+                      {/* Điều chỉnh logic hiển thị cho Kiểu bán */}
+                      {order.order_type === 'pos' ? 'Tại quầy' :
+                       order.order_type === 'online' ? 'Online' : // Kiểm tra trực tiếp 'online'
+                       'Không xác định'}
+                    </span>
+                  </td>
                   <td>
                     <select
                       className={`status-select status-${getStatusInfo(order.status).color}`}
