@@ -55,16 +55,21 @@ const Header = () => {
             <nav className="nav">
               {/* <Link to="/">Trang chủ</Link>  */}
               {/* <Link to="/shop">Shop</Link> */}
-              {role !== "Nhân viên" && <Link to="/shop">Shop</Link> && <Link to="/">Trang chủ</Link>}
+              {role !== "Nhân viên" && (
+                <>
+                  <Link to="/">Trang chủ</Link>
+                  <Link to="/shop">Shop</Link>
+                </>
+              )}
 
               {/* Chỉ hiện menu Quản lý/Bán hàng cho Nhân viên hoặc Quản lý */}
               {(role === "Nhân viên") && (
                 <>
                   <Link to="/pos">Bán hàng tại quầy</Link>
-                <Link to="/calam">Đăng ký ca làm</Link>
+                  <Link to="/calam">Đăng ký ca làm</Link>
                 </>
               )}
-               {( role === "Quản lý") && (
+              {(role === "Quản lý") && (
                 <>
                   <Link to="/dat-san">Quản lý</Link>
                   <Link to="/pos">Bán hàng tại quầy</Link>
