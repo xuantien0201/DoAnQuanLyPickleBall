@@ -4,7 +4,6 @@ export async function login(req, res) {
   try {
     const { userName, passWord, role } = req.body;
 
-    // Truy vấn tài khoản
     const [accounts] = await db.execute(
       "SELECT * FROM tbl_taikhoan WHERE userName = ? AND passWord = ? AND role = ?",
       [userName, passWord, role]
@@ -19,8 +18,7 @@ export async function login(req, res) {
 
     const account = accounts[0];
 
-    // 🔹 Nếu là nhân viên hoặc quản lý, lấy thông tin từ tbl_nhanvien
-    if (role === "Nhân viên" || role === "Quản lý") {
+    if (role === "Nhân viên") {
       const [nvRows] = await db.execute(
         "SELECT maNV, tenNV FROM tbl_nhanvien WHERE maTK = ?",
         [account.maTK]
@@ -28,7 +26,8 @@ export async function login(req, res) {
 
       if (nvRows.length > 0) {
         account.maNV = nvRows[0].maNV;
-        account.tenNV = nvRows[0].tenNV;
+        account.userName = nvRows[0].tenNV; // 🔹 Gán tenNV cho userName
+        account.tenNV = nvRows[0].tenNV; // tùy chọn, nếu muốn giữ riêng
       }
     }
 

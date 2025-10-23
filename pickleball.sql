@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 23, 2025 lúc 10:36 AM
+-- Thời gian đã tạo: Th10 23, 2025 lúc 11:23 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.0.30
 
@@ -549,15 +549,17 @@ INSERT INTO `tbl_khachhang` (`id`, `TenKh`, `GioiTinh`, `SDT`, `DiaChi`, `email`
 ('KH209', '', NULL, '0987654321', '', 'nam@gmail.com'),
 ('KH230370', 'nguyen trung nguyen day', '', '0345137846', '', NULL),
 ('KH266662', 'hải lý', NULL, '0912314134', '', NULL),
-('KH439', 'Nguyễn Đức Phương', 'Nam', '0984323412', 'Bắc Giang  ', 'phuongn@gmail.com'),
+('KH439', 'Nguyễn Đức Phương', 'Nam', '0984323412', 'Bắc Giang  ', 'phuongngc@gmail.com'),
+('KH510', 'Nguyễn Duy Khanh', NULL, '0358932172', NULL, 'khanh2@gmail.com'),
 ('KH573815', 'a', NULL, '0909090909', '', NULL),
 ('KH610', 'Trần Quang Trung', NULL, '0984735342', '', 'trung2@gmail.com'),
 ('KH697865', 'abc', '', '0354553546', '', NULL),
 ('KH700714', 'nguyen van thanh tung', '', '0976313548', '', NULL),
 ('KH731893', 'nguyen van thanh', '', '0354553589', '', NULL),
-('KH809', 'Trần Xuân Tiến', 'Nam', '0854894838', '', 'xtien@gmail.com'),
+('KH809', 'Trần Xuân Tiến', 'Nam', '0854894838', 'Thanh Trì ', 'xtien@gmail.com'),
+('KH836', 'Nguyễn Duy Khanh', NULL, '0357456963', NULL, 'khanh@gmail.com'),
 ('KH886389', 'hey hey', '', '0654664684', '', NULL),
-('KH991', 'Nguyễn Trung Nguyên', NULL, '0357125964', NULL, 'nguyentn@gmail.com');
+('KH991', 'Nguyễn Trung Nguyên', 'Nam', '0357125964', 'Long Biên ', 'nguyentn@gmail.com');
 
 -- --------------------------------------------------------
 
@@ -672,9 +674,10 @@ CREATE TABLE `tbl_taikhoankhachhang` (
 
 INSERT INTO `tbl_taikhoankhachhang` (`id`, `userName`, `passWord`, `TenKh`, `SDT`, `email`) VALUES
 ('KH133', 'viet', '1', 'Nguyễn Minh Việt', '0389752695', 'viet@gmail.com'),
-('KH439', 'phuong', '1', 'Nguyễn Đức Phương', '0984323412', 'phuongn@gmail.com'),
-('KH809', 'tientran', '123', '', '0854894838', 'xtien@gmail.com'),
-('KH991', 'nguyen', '123', '', '0357125964', 'nguyentn@gmail.com');
+('KH439', 'phuong', '1', 'Nguyễn Đức Phương', '0984323412', 'phuongngc@gmail.com'),
+('KH510', 'khanh1', '123', 'Nguyễn Duy Khanh', '0358932172', 'khanh2@gmail.com'),
+('KH809', 'tientran', '123', 'Trần Xuân Tiến', '0854894838', 'xtien@gmail.com'),
+('KH991', 'nguyen', '123', 'Nguyễn Trung Nguyên', '0357125964', 'nguyentn@gmail.com');
 
 -- --------------------------------------------------------
 
