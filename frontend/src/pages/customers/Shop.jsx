@@ -239,6 +239,7 @@ const Shop = () => {
                   <label>Lọc theo:</label>
                   <select value={sortBy} onChange={handleSortChange}>
                     <option value="newest">Mới nhất</option>
+                    <option value="best_selling">Sản phẩm bán chạy</option>
                     <option value="price_asc">Giá: Từ Thấp đến Cao</option>
                     <option value="price_desc">Giá: Từ Cao đến Thấp</option>
                     <option value="name_asc">Tên: A to Z</option>

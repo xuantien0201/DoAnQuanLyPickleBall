@@ -9,46 +9,46 @@ const Footer = () => {
           <div className="footer-grid">
             <div className="footer-column">
               <h3>Pickleball Bồ đề</h3>
-              <p className="footer-tagline">Premium Pickleball Equipment & Accessories</p>
               <p className="footer-description">
                 Đại lý ủy quyền pickleball số 1 Việt Nam. Uy tín tạo niềm tin.
               </p>
             </div>
 
             <div className="footer-column">
-              <h4>Quick Links</h4>
+              <h4>Đường dẫn</h4>
               <ul>
-                <li><Link to="/">Home</Link></li>
+                <li><Link to="/">Trang chủ</Link></li>
                 <li><Link to="/shop">Shop</Link></li>
-                <li><Link to="/shop?category=Paddles">Paddles</Link></li>
-                <li><Link to="/shop?category=Balls">Balls</Link></li>
+                <li><Link to="/shop?category=vot-pickleball">Paddles</Link></li>
+                <li><Link to="/shop?category=bong-pickleball">Bóng Pickleball</Link></li>
               </ul>
             </div>
 
             <div className="footer-column">
-              <h4>Customer Service</h4>
+              <h4>Dịch vụ có sẵn</h4>
               <ul>
-                <li><a href="#">Privacy Policy</a></li>
-                <li><a href="#">Terms of Use</a></li>
-                <li><a href="#">Shipping Info</a></li>
-                <li><a href="#">Returns</a></li>
+                <li>Có mái che</li>
+                <li>Có chỗ để xe</li>
+                <li>Hệ thống chiếu sáng LED chống chói hiện đại</li>
+                <li>Sân có cho thuê vợt, bóng Pickleball với giá cả hợp lý</li>
               </ul>
             </div>
 
             <div className="footer-column">
-              <h4>Contact Us</h4>
-              <ul>
-                <li>Email: info@pickleballstore.com</li>
-                <li>Phone: (555) 123-4567</li>
-                <li>Hours: Mon-Fri 9AM-6PM</li>
+              <h4>Liên hệ chúng tôi</h4>
+              <ul class="no-list-style">
+                <li><span> Địa chỉ :</span> 237 Phú Viên, Phường Bồ Đề, Quận Long Biên, Thành phố Hà Nội</li>
+                <li><span> Phone :</span> <a href="tel:079 668 2288">079 668 2288</a></li>
+                <li><span> Chủ sân :</span> <a href="#">Pickleball Bồ Đề</a></li>
+
               </ul>
-             
+
             </div>
           </div>
         </div>
       </div>
 
-      
+
     </footer>
   );
 };

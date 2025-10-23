@@ -25,7 +25,7 @@ const ProductCard = ({ product }) => {
 
   return (
     <Link to={`/product/${product.id}`} className="product-card">
-      <div className="product-image">
+      <div className="product-image-card">
         <img src={product.image_url || '/images/placeholder.jpg'} alt={product.name} />
         {product.is_new && <span className="badge badge-new">NEW</span>}
         {product.discount_percent > 0 && (
@@ -39,7 +39,7 @@ const ProductCard = ({ product }) => {
           Thêm vào giỏ hàng
         </button>
       </div>
-      <div className="product-info">
+      <div className="product-info-card">
         <h3 className="product-name">{product.name}</h3>
         <div className="product-rating">
           <div className="stars">{renderStars(Math.round(product.rating))}</div>
@@ -57,10 +57,11 @@ const ProductCard = ({ product }) => {
         </div>
         <div className="product-stock">
           {product.stock > 0 ? (
-            <span className="in-stock">Còn hàng: {product.stock}</span>
+            <span className="in-stock">Còn: {product.stock}</span>
           ) : (
             <span className="out-of-stock">Hết hàng</span>
           )}
+          <span className="sold-count">Đã bán: {product.total_sold || 0}</span>
         </div>
       </div>
     </Link>

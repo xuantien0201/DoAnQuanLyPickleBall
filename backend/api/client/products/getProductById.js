@@ -1,27 +1,30 @@
 import express from 'express';
-import { db } from '../../../config/db.js'; // Adjusted path
+import { db } from '../../../config/db.js';
 
 const router = express.Router();
 
-// Get single product by ID
+// Get a single product by ID, including total sold count
 router.get('/:id', async (req, res) => {
     try {
-        const [products] = await db.query('SELECT * FROM products WHERE id = ?', [req.params.id]);
+        const [products] = await db.query(`
+            SELECT 
+                p.*, 
+                COALESCE(SUM(oi.quantity), 0) AS total_sold
+            FROM products p
+            LEFT JOIN order_items oi ON p.id = oi.product_id
+            LEFT JOIN orders o ON oi.order_id = o.id AND o.status = 'da_nhan'
+            WHERE p.id = ?
+            GROUP BY p.id
+        `, [req.params.id]);
 
         if (products.length === 0) {
-            return res.status(404).json({ error: 'Product not found' });
+            return res.status(404).json({ message: 'Không tìm thấy sản phẩm' });
         }
 
-        // Get reviews for the product
-        const [reviews] = await db.query('SELECT * FROM reviews WHERE product_id = ? ORDER BY created_at DESC', [req.params.id]);
-
-        const product = products[0];
-        product.reviews = reviews;
-
-        res.json(product);
+        res.json(products[0]);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Failed to fetch product' });
+        console.error('Lỗi khi lấy chi tiết sản phẩm:', error);
+        res.status(500).json({ error: 'Không thể lấy thông tin sản phẩm' });
     }
 });
 

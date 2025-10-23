@@ -15,7 +15,7 @@ const Checkout = () => {
     address: '',
     city: '',
     notes: '',
-    sex: '' // <-- Thêm state cho giới tính
+    sex: ''
   });
 
   const total = getCartTotal();
@@ -31,12 +31,17 @@ const Checkout = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Kiểm tra định dạng số điện thoại (tùy chọn, ví dụ: 10 chữ số)
+    if (!/^\d{10,11}$/.test(formData.phone.trim())) {
+      alert('Số điện thoại không hợp lệ. Vui lòng nhập 10 hoặc 11 chữ số.');
+      return;
+    }
     try {
       const orderData = {
         ...formData,
         paymentMethod,
         items: cartItems.map(item => ({
-          product_id: item.product_id, 
+          product_id: item.product_id,
           name: item.name,
           price: item.price,
           quantity: item.quantity,
@@ -53,7 +58,7 @@ const Checkout = () => {
       }
     } catch (error) {
       console.error('Error creating order:', error);
-      alert('Không thể tạo đơn hàng. Vui lòng thử lại.');
+      alert(error.response?.data?.error || 'Không thể tạo đơn hàng. Vui lòng thử lại.');
     }
   };
 
@@ -194,11 +199,11 @@ const Checkout = () => {
                 </div>
               ))}
             </div>
-
+{/* 
             <div className="coupon-input">
               <input type="text" placeholder="Mã khuyến mãi" />
               <button type="button" className="btn btn-outline">Áp dụng</button>
-            </div>
+            </div> */}
 
             <div className="form-section">
               <h2>Phương thức thanh toán</h2>

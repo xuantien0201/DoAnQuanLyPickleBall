@@ -134,43 +134,41 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Phần tiện ích nổi bật */}
       <section className="features-section">
         <div className="container">
           <div className="features-grid">
+
             <div className="feature">
               <div className="feature-icon">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M20 7h-9M14 17H5M20 17h-3M10 7H5M14 12H5M20 12h-4" />
-                  <circle cx="17" cy="7" r="2" />
-                  <circle cx="17" cy="17" r="2" />
-                  <circle cx="17" cy="12" r="2" />
+                  <path d="M12 2l4 4-4 4-4-4z" />
+                  <path d="M4 13h16v8H4z" />
                 </svg>
               </div>
-              <h3>Miễn phí vận chuyển</h3>
-              <p>Cho đơn hàng trên 2.000.000₫</p>
+              <h3>Sản phẩm chính hãng</h3>
+              <p>Cam kết chất lượng, nguồn gốc rõ ràng</p>
             </div>
 
             <div className="feature">
               <div className="feature-icon">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20z" />
                   <path d="M12 6v6l4 2" />
                 </svg>
               </div>
-              <h3>Hoàn tiền dễ dàng</h3>
-              <p>Bảo đảm hoàn tiền trong 30 ngày</p>
+              <h3>Giao hàng nhanh chóng</h3>
+              <p>Nhận hàng tận nơi, uy tín và đúng hẹn</p>
             </div>
 
             <div className="feature">
               <div className="feature-icon">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  <path d="M4 4h16v16H4z" />
+                  <path d="M9 9h6v6H9z" />
                 </svg>
               </div>
-              <h3>Thanh toán an toàn</h3>
-              <p>Bảo mật bởi Stripe</p>
+              <h3>Thanh toán khi nhận hàng</h3>
+              <p>COD toàn quốc, an tâm mua sắm</p>
             </div>
 
             <div className="feature">
@@ -179,12 +177,14 @@ const Home = () => {
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                 </svg>
               </div>
-              <h3>Hỗ trợ 24/7</h3>
-              <p>Tư vấn qua điện thoại & email</p>
+              <h3>Hỗ trợ nhanh chóng</h3>
+              <p>Liên hệ qua hotline hoặc fanpage 24/7</p>
             </div>
+
           </div>
         </div>
       </section>
+
     </div>
   );
 };

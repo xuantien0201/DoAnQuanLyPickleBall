@@ -16,7 +16,7 @@
 }
 
 .footer-column h3 {
-  font-size: 40px;
+  font-size: 50px;
   margin-bottom: 15px;
   color: var(--secondary-color);
 }
@@ -35,7 +35,7 @@
 
 .footer-description {
   color: rgba(255, 255, 255, 0.7);
-  font-size: 0.9rem;
+  font-size: 20px;
   line-height: 1.6;
 }
 
@@ -46,7 +46,7 @@
 }
 
 .footer-column ul li {
-  font-size: 0.9rem;
+  font-size: 18px;
   color: rgba(255, 255, 255, 0.8);
 }
 

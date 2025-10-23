@@ -19,6 +19,7 @@
   display: flex;
   justify-content: center;
 }
+
 .admin-orders-header h2 {
   font-size: 3rem;
   font-weight: 600;
@@ -26,12 +27,12 @@
 }
 
 .admin-search-bar {
-  width: 300px;
-  padding: 10px 15px;
-  border-radius: 6px;
-  border: 1px solid #ddd;
-  font-size: 1rem;
-  margin-bottom: 0; /* bỏ margin cũ */
+  flex: 0 0 300px; /* hoặc auto nếu muốn co giãn */
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
 }
 
 .pagination {
@@ -53,11 +54,11 @@
 }
 
 /* Thêm vào AdminOrders.css */
-.action-buttons {
+.action-buttons-orders {
   display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 8px;
-  /* 👈 Thay thế cho style={{ marginLeft: '10px' }} */
+  height: 100%;
 }
 
 .page-item:hover {
@@ -128,6 +129,7 @@
   border-bottom: 1px solid var(--border-color);
   vertical-align: middle;
 }
+
 
 .orders-table tbody tr:hover {
   background: var(--bg-light);
@@ -360,12 +362,64 @@
   color: var(--text-dark);
 }
 
+/* Styles for Top Products Card */
+.stat-card-top-products {
+  text-align: left;
+  /* Cho phép card cao hơn để chứa danh sách */
+  align-self: start;
+}
+
+.top-products-list {
+  list-style-type: decimal;
+  padding-left: 20px;
+  margin-top: 10px;
+  font-size: 0.9rem;
+}
+
+.top-products-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.top-products-list li:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.top-products-list .product-name {
+  color: var(--text-dark);
+  max-width: 70%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.top-products-list .product-sold-count {
+  font-weight: 600;
+  color: var(--primary-color, #007bff);
+  background-color: #e7f3ff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.stat-card .no-data {
+  margin-top: 15px;
+  color: #888;
+  font-style: italic;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
 .admin-filters-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
-  margin-bottom: 20px;
   align-items: center;
+  gap: 10px;
 }
 
 .admin-filters-row .admin-search-bar {
@@ -395,13 +449,19 @@
   background-color: white;
 }
 
-/* Status Tabs */
+.status-search-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+
 .status-tabs {
   display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .status-tab-btn {

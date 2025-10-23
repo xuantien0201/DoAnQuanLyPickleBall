@@ -60,7 +60,7 @@ const Header = () => {
             <nav className="nav">
               <Link to="/">Trang chủ</Link>
               <Link to="/shop">Shop</Link>
-              <Link to="/products">Quản lý</Link>
+              <Link to="/dat-san">Quản lý</Link>
               <Link to="/pos">Bán hàng tại quầy</Link>
             </nav>
 
@@ -104,6 +104,7 @@ const Header = () => {
               )}
               
               {/* Giỏ hàng (giữ nguyên) */}
+
               <Link to="/cart" className="cart-icon-wrapper">
                 <div className="cart-icon">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">

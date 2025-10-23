@@ -15,7 +15,7 @@ export function Sidebar() {
         </div>
 
         <nav className="snav" aria-label="Chính">
-          <Link className="slink" to="/trangchu">
+          <Link className="slink" to="/">
             <span className="ic">🗓️</span>
             <span>Trang chủ</span>
           </Link>
@@ -43,10 +43,6 @@ export function Sidebar() {
             <span className="ic">🧾</span>
             <span>Hóa đơn</span>
           </Link>
-          <Link className="slink" to="/shop">
-            <span className="ic">🏠</span>
-            <span>Xem trang bán hàng</span>
-          </Link>
           
           <Link className="slink" to="/pos">
             <span className="ic">💵</span>
@@ -60,7 +56,7 @@ export function Sidebar() {
             <span className="ic">👥</span>
             <span>Nhân viên</span>
           </Link>
-           <Link className="slink" to="/calam">
+          <Link className="slink" to="/calam">
             <span className="ic">📅</span>
             <span>Đăng kí ca làm</span>
           </Link>
@@ -72,13 +68,13 @@ export function Sidebar() {
             <span className="ic">🔑</span>
             <span>Quản lí tài khoản</span>
           </Link>
-          <Link className="slink" to="#">
+          <Link className="slink" to="/nhacungcap">
             <span className="ic">📇</span>
-            <span>Khách hàng</span>
+            <span>Nhà cung cấp</span>
           </Link>
-          <Link className="slink" to="#">
+          <Link className="slink" to="/nhaphang">
             <span className="ic">🎟️</span>
-            <span>Khuyến mãi</span>
+            <span>Nhập hàng</span>
           </Link>
         </nav>
 
@@ -89,7 +85,7 @@ export function Sidebar() {
             <span className="ic">⚙️</span>
             <span>Cài đặt</span>
           </Link>
-           <Link className="slink" to="/trangchu">
+          <Link className="slink" to="/trangchu">
             <span className="ic">🗓️</span>
             <span>Đăng xuất</span>
           </Link>
@@ -97,7 +93,6 @@ export function Sidebar() {
             <span className="ic">❓</span>
             <span>Trung tâm trợ giúp</span>
           </Link>
-          
         </nav>
 
         <div className="user">

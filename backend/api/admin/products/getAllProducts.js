@@ -5,9 +5,20 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
     try {
-        const { page = 1, limit = 10, search = '' } = req.query;
-        const offset = (parseInt(page) - 1) * parseInt(limit);
+        const { page, limit, search = '' } = req.query; // Không đặt giá trị mặc định cho 'page' và 'limit' ở đây
         const searchPattern = `%${search}%`;
+
+        // Xác định xem có nên áp dụng phân trang hay không
+        const applyPagination = limit !== undefined;
+
+        let offset = 0;
+        let parsedLimit = 0;
+
+        if (applyPagination) {
+            parsedLimit = parseInt(limit) || 10; 
+            const parsedPage = parseInt(page) || 1;
+            offset = (parsedPage - 1) * parsedLimit;
+        }
 
         const countParams = [];
         let countQuery = 'SELECT COUNT(*) as totalCount FROM products WHERE 1=1';
@@ -25,8 +36,12 @@ router.get('/', async (req, res) => {
             query += ' AND (name LIKE ? OR description LIKE ?)';
             params.push(searchPattern, searchPattern);
         }
-        query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
-        params.push(parseInt(limit), offset);
+        query += ' ORDER BY created_at DESC';
+
+        if (applyPagination) {
+            query += ' LIMIT ? OFFSET ?';
+            params.push(parsedLimit, offset);
+        }
 
         const [products] = await db.query(query, params);
         res.json({ products, totalCount });
