@@ -1,11 +1,11 @@
 import express from "express";
 import { getAllSan } from "./getAllSan.js";
-import { postDatSan } from "./postDatSan.js";
+import { postDatSan, uploadPaymentScreenshot } from "./postDatSan.js";
 
 const router = express.Router();
 
-// API: GET /api/san
 router.get("/", getAllSan);
-router.post("/book", postDatSan);
+// Thêm upload.single("PaymentScreenshot") giống TTXeVe
+router.post("/book", uploadPaymentScreenshot.single("PaymentScreenshot"), postDatSan);
 
 export default router;

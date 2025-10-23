@@ -41,6 +41,7 @@ body {
   flex-direction: column;
   padding: 20px;
   overflow-y: auto;
+  height: fit-content;
 }
 
 /* HEADER */
@@ -56,7 +57,6 @@ body {
   border-radius: 16px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
 }
-
 .datsan-header .left,
 .datsan-header .right {
   display: flex;
@@ -264,7 +264,7 @@ body {
   font-size: 14px;
   font-weight: 700;
   margin-bottom: 8px;
-  /* color: var(--primary); */
+  color: var(--primary);
 }
 .ghost {
   opacity: 0.75;

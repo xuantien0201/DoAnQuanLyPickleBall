@@ -2,8 +2,12 @@ import { useState, useEffect, useRef } from "react";
 import { Sidebar } from "../../components/Sidebar";
 import "../../css/XacNhanDatSan.css";
 import mbBank from "../../images/mb-bank.jpg";
+import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import axios from "axios"; // đảm bảo có import axios
 
 export function XacNhanDatSan() {
+  const navigate = useNavigate();
   const [danhSachSan, setDanhSachSan] = useState([]);
   const [tenKhach, setTenKhach] = useState("");
   const [sdt, setSdt] = useState("");
@@ -14,11 +18,60 @@ export function XacNhanDatSan() {
   const [dichVuList, setDichVuList] = useState([]);
   const [khachHangData, setKhachHangData] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
+  const location = useLocation();
+  const [paymentScreenshot, setPaymentScreenshot] = useState(null);
+
+  useEffect(() => {
+    if (location.state?.services) {
+      const updatedList = location.state.services.map((s) => ({
+        ten: s.name, // tên dịch vụ
+        gia: s.price, // giá dịch vụ
+        qty: s.qty || 1,
+      }));
+      setDichVuList(updatedList);
+    } else {
+      // Nếu mở trực tiếp /xacnhansan từ đầu
+      const tmp = JSON.parse(localStorage.getItem("bookingServiceTmp"));
+      if (tmp?.dichVuList) setDichVuList(tmp.dichVuList);
+    }
+  }, [location.state]);
 
   // 🆕 cho đặt sân tháng
   const [isDatSanThang, setIsDatSanThang] = useState(false);
   const [thongTinThang, setThongTinThang] = useState({});
   const [loaiThanhToan, setLoaiThanhToan] = useState("100%");
+
+  useEffect(() => {
+    const data = localStorage.getItem("bookingData");
+    if (!data) return;
+    const payload = JSON.parse(data);
+
+    // Nếu payload có MaKH và role là "khachhang" → gọi API
+    if (payload.MaKH && payload.Role === "khachhang") {
+      axios
+        .get(`/api/khachhang/idsearch?MaKH=${payload.MaKH}`)
+        .then((res) => {
+          const kh = res.data;
+          // Cập nhật lại thông tin hiển thị
+          setThongTinThang((prev) => ({
+            ...prev,
+            TenKH: kh.TenKh || kh.TenKH || kh.ten || kh.HoTen || "Không rõ",
+            SDT: kh.SDT || kh.sdt || kh.SoDienThoai || "Không rõ",
+            MaKH: payload.MaKH,
+            ...payload,
+          }));
+        })
+        .catch((err) => {
+          console.error("❌ Lỗi lấy thông tin khách hàng:", err);
+        });
+    } else {
+      // Nếu không có khách hàng (NV đặt hộ)
+      setThongTinThang((prev) => ({
+        ...prev,
+        ...payload,
+      }));
+    }
+  }, []);
 
   // const [tongTienSan, setTongTienSan] = useState(0);
 
@@ -27,8 +80,57 @@ export function XacNhanDatSan() {
   const [tongTienThuc, setTongTienThuc] = useState(0);
   const [soTienThanhToan, setSoTienThanhToan] = useState(0);
 
+  // 🆕 Lấy thông tin đăng nhập
+
+  const storedUser =
+    JSON.parse(localStorage.getItem("user")) ||
+    JSON.parse(localStorage.getItem("khach")) ||
+    {};
+
+  const currentUser = {
+    id: storedUser.id || storedUser.MaKH || null,
+    maNV: storedUser.maNV || null,
+    TenKh: storedUser.TenKh || storedUser.TenKH || storedUser.HoTen || "",
+    SDT: storedUser.SDT || storedUser.sdt || storedUser.SoDienThoai || "",
+    role: (
+      storedUser.role ||
+      storedUser.Role ||
+      storedUser.RoleName ||
+      "khachhang"
+    ).toLowerCase(),
+  };
+
+  const userRole = currentUser.role; // luôn là 'khachhang' hoặc 'nhanvien'
+  const userId = currentUser?.maNV || currentUser?.id || null;
+
+  useEffect(() => {
+    console.log("🔎 Người dùng hiện tại:", currentUser);
+  }, []);
+
+  console.log("userRole:", userRole, "maNguoiDung:", userId);
+
   const API_BASE = "http://localhost:3000/api/khachhang";
   const typingTimeout = useRef(null);
+
+  useEffect(() => {
+    if (userRole === "khachhang" && currentUser?.id) {
+      // ✅ Lấy thông tin khách hàng trực tiếp từ localStorage (đã có sẵn)
+      setTenKhach(currentUser.TenKh);
+      setSdt(currentUser.SDT);
+      setSelectedKhachHangId(currentUser.id);
+      console.log("👤 Thông tin khách hàng đăng nhập:", currentUser);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!location.state?.services) {
+      // Nếu không có dịch vụ từ location.state, reset
+      setDichVuList([]);
+    } else {
+      // Nếu có dịch vụ truyền từ /dichvu, dùng luôn
+      setDichVuList(location.state.services);
+    }
+  }, [location.state]);
 
   const openingHour = 5;
   const courts = [
@@ -94,15 +196,6 @@ export function XacNhanDatSan() {
     console.log("💵 Cần thanh toán:", soTienThanhToan);
   }, [thongTinThang, loaiThanhToan]);
 
-  // // 🆕 Tính tổng tiền thực khi đặt sân tháng
-  // useEffect(() => {
-  //   if (!isDatSanThang) return;
-  //   let total = thongTinThang?.TongTien || 0;
-  //   if (loaiThanhToan === "50%") total = total * 0.5;
-  //   else if (loaiThanhToan === "100%") total = total * 0.9; // chiết khấu 10%
-  //   setTongTienThuc(total);
-  //   console.log("💰 Tổng tiền thực tính:", total);
-  // }, [loaiThanhToan, thongTinThang, isDatSanThang]);
   // ===================== HÀM TÍNH GIÁ =====================
 
   const getSlotPriceByHour = (courtName, hour) => {
@@ -122,6 +215,33 @@ export function XacNhanDatSan() {
       currentH += 1;
     }
     return total;
+  };
+
+  useEffect(() => {
+    const data = localStorage.getItem("bookingData");
+    if (data) {
+      const parsed = JSON.parse(data);
+      setDanhSachSan(parsed.MaSan || []);
+      setTenKhach("");
+      setSdt("");
+      setSelectedKhachHangId(parsed.MaKH || null);
+
+      // 🔹 Nếu có mã khách hàng => gọi API để lấy thông tin chi tiết
+      if (parsed.MaKH) {
+        fetchKhachHangInfo(parsed.MaKH);
+      }
+    }
+  }, []);
+
+  const fetchKhachHangInfo = async (maKH) => {
+    try {
+      const res = await axios.get(`/api/khachhang/idsearch?MaKH=${maKH}`);
+      const kh = res.data;
+      setTenKhach(kh.TenKh || kh.ten || kh.HoTen || "");
+      setSdt(kh.SDT || kh.sdt || kh.SoDienThoai || "");
+    } catch (err) {
+      console.error("❌ Lỗi lấy thông tin khách hàng:", err);
+    }
   };
 
   // 🧩 Load dữ liệu đặt sân
@@ -259,6 +379,15 @@ export function XacNhanDatSan() {
     typingTimeout.current = setTimeout(() => timKiemKhachHang(sdt, "sdt"), 400);
   }, [sdt]);
 
+  const readFileAsDataURL = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (err) => reject(err);
+      reader.readAsDataURL(file);
+    });
+  };
+
   const chonKhach = (ten, sdt, id) => {
     setTenKhach(ten);
     setSdt(sdt);
@@ -284,29 +413,49 @@ export function XacNhanDatSan() {
       alert("Vui lòng nhập đầy đủ họ tên và số điện thoại!");
       return;
     }
+
     if (!/^\d{10}$/.test(sdt)) {
       alert("Số điện thoại không hợp lệ (10 số)!");
       return;
     }
+
     try {
+      // 🔹 Tạo mã KH ngẫu nhiên (giống bên server)
       const randomNum = Math.floor(Math.random() * 900000 + 100000);
-      const idKh = `KH${randomNum}`;
+      const maKh = `KH${randomNum}`;
+
+      // 🔹 Gọi API thêm khách hàng
       const res = await fetch(`${API_BASE}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          id: idKh,
+          MaKH: maKh,
           TenKh: tenKhach,
-          GioiTinh: "",
           SDT: sdt,
           DiaChi: "",
         }),
       });
+
       const result = await res.json();
       if (!res.ok) throw new Error(result.message || "Lỗi thêm khách hàng!");
+
+      // ✅ Thành công → cập nhật state, truyền lại mã KH mới
       alert("✅ Thêm khách hàng thành công!");
-      setSelectedKhachHangId(result.id);
-      console.log("✅ Đã thêm KH mới:", result);
+
+      // Lưu mã KH mới vừa tạo để dùng cho các bước sau
+      setSelectedKhachHangId(result.insertedId || maKh);
+
+      // Nếu muốn cập nhật lại danh sách gợi ý (tuỳ bạn)
+      setSearchTen((prev) => [
+        ...prev,
+        { TenKh: tenKhach, SDT: sdt, id: result.insertedId || maKh },
+      ]);
+      setSearchSdt((prev) => [
+        ...prev,
+        { TenKh: tenKhach, SDT: sdt, id: result.insertedId || maKh },
+      ]);
+
+      console.log("✅ Đã thêm KH mới:", result.insertedId || maKh);
     } catch (err) {
       console.error(err);
       alert(err.message || "❌ Lỗi khi thêm khách hàng!");
@@ -328,11 +477,25 @@ export function XacNhanDatSan() {
     // 🌟 Xử lý đặt sân tháng (CÓ ĐỦ DỮ LIỆU TIỀN)
     // ===============================
     if (loaiDat === "thang") {
-      const tenKHThang = parsed.TenKH;
-      const sdtThang = parsed.SDT;
+      // 🔍 Ưu tiên lấy thông tin khách hàng từ 3 nguồn: parsed → thongTinThang → state
+      const tenKHThang =
+        parsed.TenKH ||
+        parsed.TenKh ||
+        thongTinThang?.TenKH ||
+        thongTinThang?.TenKh ||
+        tenKhach ||
+        "";
+      const sdtThang = parsed.SDT || thongTinThang?.SDT || sdt || "";
 
+      // ✅ Nếu vẫn thiếu thì báo lỗi
       if (!tenKHThang?.trim() || !sdtThang?.trim()) {
         alert("Vui lòng nhập đầy đủ họ tên và SĐT cho sân tháng!");
+        return;
+      }
+
+      // ✅ Kiểm tra ảnh thanh toán nếu là khách
+      if (userRole === "khachhang" && !paymentScreenshot) {
+        alert("⚠️ Vui lòng nộp ảnh thanh toán trước khi xác nhận!");
         return;
       }
 
@@ -359,8 +522,8 @@ export function XacNhanDatSan() {
         // 🧩 Tạo dữ liệu gửi API
         const reqBody = {
           MaSan: parsed.MaSan,
-          MaKH: parsed.MaKH,
-          MaNV: parsed.MaNV || "NV001",
+          MaNV: currentUser?.maNV || null,
+          MaKH: currentUser?.id || parsed.MaKH || null,
           Thang: parsed.Thang,
           Nam: parsed.Nam,
           TongTien: tongTien, // Tổng gốc
@@ -404,8 +567,57 @@ export function XacNhanDatSan() {
     // ===============================
     else {
       try {
-        if (!tenKhach?.trim() || !sdt?.trim()) {
-          alert("Vui lòng nhập đầy đủ họ tên và SĐT cho sân ngày!");
+        // ✅ Lấy lại thông tin đăng nhập
+        const storedUser =
+          JSON.parse(localStorage.getItem("user")) ||
+          JSON.parse(localStorage.getItem("khach")) ||
+          {};
+
+        const currentUser = {
+          id: storedUser.id || storedUser.MaKH || null,
+          maNV: storedUser.maNV || null,
+          TenKh: storedUser.TenKh || storedUser.TenKH || storedUser.HoTen || "",
+          SDT: storedUser.SDT || storedUser.sdt || storedUser.SoDienThoai || "",
+          role: (
+            storedUser.role ||
+            storedUser.Role ||
+            storedUser.RoleName ||
+            "khachhang"
+          ).toLowerCase(),
+        };
+
+        const userRole = currentUser.role; // luôn là 'khachhang' hoặc 'nhanvien'
+        let maNhanVienThucTe = currentUser?.maNV || null;
+        let maKhachHangThucTe = currentUser?.id || null;
+        const maNguoiDung = currentUser?.id || currentUser?.MaKH || null;
+
+        // ⚡ Nếu là khách hàng đăng nhập
+        if (userRole === "khachhang") {
+          if (!maNguoiDung) {
+            alert("Không xác định được mã khách hàng!");
+            return;
+          }
+          maKhachHangThucTe = currentUser?.id; // Lấy từ tài khoản khách hàng
+          console.log("👤 Khách hàng tự đặt, Mã KH:", maKhachHangThucTe);
+        }
+        // ⚡ Nếu là nhân viên / quản lý
+        else {
+          if (!tenKhach?.trim() || !sdt?.trim()) {
+            alert("Vui lòng nhập đầy đủ họ tên và SĐT cho sân ngày!");
+            return;
+          }
+          if (!selectedKhachHangId) {
+            alert("Vui lòng chọn hoặc thêm khách hàng trước khi đặt sân!");
+            return;
+          }
+          maNhanVienThucTe = currentUser?.maNV; // Lấy từ tài khoản nhân viên hoặc quản lý
+          maKhachHangThucTe = selectedKhachHangId;
+          console.log("🧑‍💼 Đặt giúp khách, Mã NV:", maNhanVienThucTe);
+        }
+
+        // ✅ Kiểm tra ảnh thanh toán nếu là khách
+        if (userRole === "khachhang" && !paymentScreenshot) {
+          alert("⚠️ Vui lòng nộp ảnh thanh toán trước khi xác nhận!");
           return;
         }
 
@@ -438,20 +650,44 @@ export function XacNhanDatSan() {
                   gioVaoStr,
                   gioRaStr
                 );
+                // Tính tổng tiền dịch vụ
+                const TienDichVu = dichVuList.reduce(
+                  (sum, dv) =>
+                    sum +
+                    (dv.qty || dv.soLuong || 1) * (dv.price || dv.gia || 0),
+                  0
+                );
+
+                // Chuyển danh sách dịch vụ thành JSON string để gửi API
+                const DanhSachDichVu = dichVuList.map((dv) => ({
+                  name: dv.name || dv.ten,
+                  qty: dv.qty || dv.soLuong || 1,
+                  price: dv.price || dv.gia || 0,
+                }));
+
+                let PaymentScreenshotData = null;
+                if (paymentScreenshot) {
+                  PaymentScreenshotData = readFileAsDataURL(paymentScreenshot);
+                }
+
                 requests.push({
                   MaSan: `S${courts.indexOf(courtName) + 1}`,
-                  MaKH: selectedKhachHangId,
-                  MaNV: "NV001",
-                  GioVao: `${gioVaoStr}:00`,
-                  GioRa: `${gioRaStr}:00`,
+                  MaKH: maKhachHangThucTe,
+                  MaNV: maNhanVienThucTe,
+                  GioVao: gioVaoStr,
+                  GioRa: gioRaStr,
                   TongGio: soGio,
                   TongTien: tongTienSan,
                   GiamGia: 0,
-                  TongTienThuc: tongTienSan,
+                  TongTienThuc: tongTienSan + TienDichVu,
                   GhiChu: "",
                   LoaiDat: "Đặt sân ngày",
                   NgayLap: date,
+                  TienDichVu, // ✅ tổng tiền dịch vụ
+                  DanhSachDichVu: JSON.stringify(DanhSachDichVu), // ✅ JSON string
+                  PaymentScreenshot: paymentScreenshot || null, // ✅ ảnh thanh toán
                 });
+
                 start = hours[i];
                 end = hours[i];
               }
@@ -462,10 +698,31 @@ export function XacNhanDatSan() {
         console.log("🧾 Danh sách yêu cầu gửi đặt sân ngày:", requests);
 
         for (let reqBody of requests) {
+          const formData = new FormData();
+          formData.append("MaSan", reqBody.MaSan);
+          formData.append("MaKH", reqBody.MaKH);
+          formData.append("MaNV", reqBody.MaNV || "");
+          formData.append("GioVao", reqBody.GioVao);
+          formData.append("GioRa", reqBody.GioRa);
+          formData.append("TongGio", reqBody.TongGio);
+          formData.append("TongTien", reqBody.TongTien);
+          formData.append("GiamGia", reqBody.GiamGia);
+          formData.append("TongTienThuc", reqBody.TongTienThuc);
+          formData.append("GhiChu", reqBody.GhiChu || "");
+          formData.append("LoaiDat", reqBody.LoaiDat);
+          formData.append("NgayLap", reqBody.NgayLap);
+          formData.append("TienDichVu", reqBody.TienDichVu || 0);
+          formData.append(
+            "DanhSachDichVu",
+            JSON.stringify(reqBody.DanhSachDichVu || [])
+          );
+          if (reqBody.PaymentScreenshot) {
+            formData.append("PaymentScreenshot", reqBody.PaymentScreenshot);
+          }
+
           const res = await fetch("http://localhost:3000/api/san/book", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(reqBody),
+            body: formData,
           });
           const result = await res.json();
           if (!res.ok) throw new Error(result.message || "Lỗi khi đặt sân!");
@@ -491,22 +748,42 @@ export function XacNhanDatSan() {
         {/* Nếu là đặt sân tháng */}
         {isDatSanThang ? (
           <div className="info-group">
-            {/* Thông tin khách hàng và đặt sân tháng */}
-            <div className="info-grid">
-              {/* Cột 1 + 2: Thông tin khách hàng */}
+            <div className="tt-info-grid">
+              {/* 🟢 Cột 1 + 2: Thông tin khách hàng */}
               <div className="info-col info-customer">
-                <div className="grid-row">
-                  <div className="grid-label">Họ và tên:</div>
-                  <div className="grid-value" title="Click để chỉnh sửa">
-                    {thongTinThang.TenKH || tenKhach}
-                  </div>
-                </div>
-                <div className="grid-row">
-                  <div className="grid-label">SĐT:</div>
-                  <div className="grid-value" title="Click để chỉnh sửa">
-                    {thongTinThang.SDT || sdt}
-                  </div>
-                </div>
+                {userRole === "khachhang" ? (
+                  <>
+                    <div className="grid-row">
+                      <div className="grid-label">Họ và tên:</div>
+                      <div className="grid-value">
+                        {currentUser.TenKh || thongTinThang.TenKH || "Không rõ"}
+                      </div>
+                    </div>
+                    <div className="grid-row">
+                      <div className="grid-label">SĐT:</div>
+                      <div className="grid-value">
+                        {currentUser.SDT || thongTinThang.SDT || "Không rõ"}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="grid-row">
+                      <div className="grid-label">Họ và tên:</div>
+                      <div className="grid-value" title="Click để chỉnh sửa">
+                        {thongTinThang.TenKH || tenKhach}
+                      </div>
+                    </div>
+                    <div className="grid-row">
+                      <div className="grid-label">SĐT:</div>
+                      <div className="grid-value" title="Click để chỉnh sửa">
+                        {thongTinThang.SDT || sdt}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* Các thông tin tháng/sân */}
                 <div className="grid-row">
                   <div className="grid-label">Tháng:</div>
                   <div className="grid-value">
@@ -520,14 +797,16 @@ export function XacNhanDatSan() {
                   </div>
                 </div>
               </div>
+            </div>
 
-              {/* Cột 3: Mã QR */}
+            <div className="tt-payment-div">
+              {/* 🟢 Cột 3: Mã QR */}
               <div className="info-col info-qr">
                 <img src={mbBank} alt="QR Thanh toán" className="qr-image" />
                 <p className="qr-note">Quét mã QR để thanh toán</p>
               </div>
 
-              {/* Cột 4: Thông tin tài khoản */}
+              {/* 🟢 Cột 4: Thông tin tài khoản */}
               <div className="info-col info-bank">
                 <h3>Thông tin chuyển khoản</h3>
                 <p>
@@ -540,8 +819,53 @@ export function XacNhanDatSan() {
                   <b>Ngân hàng:</b> MB Bank
                 </p>
               </div>
+
+              {userRole === "khachhang" && (
+                <div className="customer-payment-upload">
+                  <h4>💳 Nộp ảnh chụp màn hình chuyển khoản</h4>
+                  {/* Khung hiển thị ảnh */}
+                  <div
+                    className="payment-preview"
+                    onClick={() =>
+                      document.getElementById("payment-input").click()
+                    }
+                  >
+                    {paymentScreenshot ? (
+                      <img
+                        src={URL.createObjectURL(paymentScreenshot)}
+                        alt="Ảnh đã chọn"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    ) : (
+                      <span style={{ color: "#999" }}>
+                        Click vào đây để chọn ảnh
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Input file ẩn */}
+                  <input
+                    id="payment-input"
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={(e) => setPaymentScreenshot(e.target.files[0])}
+                  />
+
+                  {paymentScreenshot && (
+                    <p style={{ marginTop: "5px", color: "#333" }}>
+                      Ảnh đã chọn thành công!
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
 
+            {/* Bảng thông tin sân tháng */}
             <table className="table-san-thang">
               <thead>
                 <tr>
@@ -567,18 +891,11 @@ export function XacNhanDatSan() {
                       "Sáu",
                       "Bảy",
                     ][date.getDay()];
-
                     const gioVao = thongTinThang.GioVao;
                     const gioRa = thongTinThang.GioRa;
-
-                    // ✅ Chuẩn hóa tên sân TT
                     const courtName =
                       maSan === "TT" || maSan === "STT" ? "Sân TT" : maSan;
-
-                    // ✅ Tính tổng tiền thực tế theo giờ
                     const tong = tinhTienTheoGio(courtName, gioVao, gioRa);
-
-                    // ✅ Tính giá trung bình / giờ để hiển thị (tuỳ ý)
                     const soGio =
                       parseInt(gioRa.split(":")[0]) -
                       parseInt(gioVao.split(":")[0]);
@@ -600,7 +917,7 @@ export function XacNhanDatSan() {
               </tbody>
             </table>
 
-            {/* ✅ Khu vực tính tổng tiền & loại thanh toán */}
+            {/* ✅ Tổng tiền & loại thanh toán */}
             <div className="total-summary">
               <label>Loại thanh toán:</label>
               <select
@@ -656,7 +973,7 @@ export function XacNhanDatSan() {
             </div>
           </div>
         ) : (
-          // Giữ nguyên phần giao diện sân lẻ
+          // 🟢 Giao diện đặt sân NGÀY
           <>
             <div className="info-group">
               <h2>Danh sách sân khách đặt</h2>
@@ -675,7 +992,7 @@ export function XacNhanDatSan() {
                 <tbody>
                   {danhSachSan.map((san, index) => {
                     const gio = tinhSoGio(san.batDau, san.ketThuc);
-                    const tong = san.gia; // đã tính tổng sẵn trong danhSachSan
+                    const tong = san.gia;
                     return (
                       <tr key={index}>
                         <td>{san.ten}</td>
@@ -702,184 +1019,304 @@ export function XacNhanDatSan() {
               </div>
             </div>
 
-            {/* Thông tin khách */}
-            <div className="info-group">
-              <h2>Thông tin khách hàng</h2>
-              <div className="flex-row">
-                <div className="flex-col" style={{ position: "relative" }}>
-                  <label>Họ và tên:</label>
-                  <input
-                    type="text"
-                    value={tenKhach}
-                    onChange={(e) => setTenKhach(e.target.value)}
-                    placeholder="Nhập họ tên..."
-                    autoComplete="off"
-                  />
-                  {searchTen.length > 0 && (
-                    <div
-                      className="search-results-table"
-                      style={{ position: "relative" }}
-                    >
-                      <table className="suggest-table">
-                        <thead>
-                          <tr>
-                            <th>Họ & tên</th>
-                            <th>SĐT</th>
-                            <th>Mã</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {searchTen
-                            .filter((kh) =>
-                              kh?.TenKh?.toLowerCase().includes(
-                                tenKhach.toLowerCase()
-                              )
-                            )
-                            .slice(0, 5)
-                            .map((kh, i) => (
-                              <tr
-                                key={i}
-                                onClick={() =>
-                                  chonKhach(kh.TenKh, kh.SDT, kh.id ?? kh.ID)
-                                }
-                                style={{ cursor: "pointer" }}
-                              >
-                                <td>{kh.TenKh}</td>
-                                <td>{kh.SDT}</td>
-                                <td>{kh.id ?? kh.ID ?? ""}</td>
-                              </tr>
-                            ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex-col" style={{ position: "relative" }}>
-                  <label>Số điện thoại:</label>
-                  <input
-                    type="tel"
-                    value={sdt}
-                    onChange={handlePhoneChange}
-                    placeholder="Nhập SĐT..."
-                    maxLength={10}
-                    autoComplete="off"
-                  />
-                  {errorMsg && <p className="error-text">{errorMsg}</p>}
-                  {searchSdt.length > 0 && (
-                    <div
-                      className="search-results-table"
-                      style={{ position: "relative" }}
-                    >
-                      <table className="suggest-table">
-                        <thead>
-                          <tr>
-                            <th>SĐT</th>
-                            <th>Họ & tên</th>
-                            <th>Mã</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {searchSdt
-                            .filter((kh) => String(kh?.SDT || "").includes(sdt))
-                            .slice(0, 5)
-                            .map((kh, i) => (
-                              <tr
-                                key={i}
-                                onClick={() =>
-                                  chonKhach(kh.TenKh, kh.SDT, kh.id ?? kh.ID)
-                                }
-                                style={{ cursor: "pointer" }}
-                              >
-                                <td>{kh.SDT}</td>
-                                <td>{kh.TenKh}</td>
-                                <td>{kh.id ?? kh.ID ?? ""}</td>
-                              </tr>
-                            ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="actions-customer">
-                <button className="btn-add-customer" onClick={themKhachHang}>
-                  + Thêm khách hàng mới
-                </button>
-                {hienThiMaGiamGia && (
-                  <div>
-                    <label htmlFor="maGiamGia">Mã giảm giá:</label>
-                    <select id="maGiamGia">
-                      <option value="">-- Chọn mã giảm giá --</option>
-                      <option value="KM10">Giảm 10%</option>
-                      <option value="KM50">Giảm 50.000đ</option>
-                    </select>
-                  </div>
-                )}
-              </div>
-
-              {/* Dịch vụ thêm */}
+            {/* 🟡 Ẩn phần nhập khách hàng nếu là khách hàng đăng nhập */}
+            {userRole !== "khachhang" && (
               <div className="info-group">
-                <h2>Dịch vụ thêm</h2>
-                <button
-                  className="btn-add-service"
-                  onClick={() =>
-                    setDichVuList([...dichVuList, { ten: "", gia: "" }])
-                  }
-                >
-                  + Thêm dịch vụ
-                </button>
-                <div className="dichvu-list">
-                  {dichVuList.map((dv, index) => (
-                    <div key={index} className="dich-vu-item">
-                      <input
-                        type="text"
-                        className="input-ten-dv"
-                        placeholder="Tên dịch vụ"
-                        value={dv.ten}
-                        onChange={(e) => {
-                          const updated = [...dichVuList];
-                          updated[index].ten = e.target.value;
-                          setDichVuList(updated);
-                        }}
-                      />
-                      <input
-                        type="number"
-                        className="input-gia-dv"
-                        placeholder="Giá (đ)"
-                        value={dv.gia}
-                        onChange={(e) => {
-                          const updated = [...dichVuList];
-                          updated[index].gia = e.target.value;
-                          setDichVuList(updated);
-                        }}
-                      />
+                <h2 className="section-title">Thông tin khách hàng</h2>
+
+                <div className="flex-row">
+                  {/* Họ và tên */}
+                  <div className="flex-col" style={{ position: "relative" }}>
+                    <label>Họ và tên:</label>
+                    <input
+                      type="text"
+                      value={tenKhach}
+                      onChange={(e) => setTenKhach(e.target.value)}
+                      placeholder="Nhập họ tên..."
+                      autoComplete="off"
+                    />
+                    {searchTen.length > 0 && (
+                      <div
+                        className="search-results-table"
+                        style={{ position: "relative" }}
+                      >
+                        <table className="suggest-table">
+                          <thead>
+                            <tr>
+                              <th>Họ & tên</th>
+                              <th>SĐT</th>
+                              <th>Mã</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {searchTen
+                              .filter((kh) =>
+                                kh?.TenKh?.toLowerCase().includes(
+                                  tenKhach.toLowerCase()
+                                )
+                              )
+                              .slice(0, 5)
+                              .map((kh, i) => (
+                                <tr
+                                  key={i}
+                                  onClick={() =>
+                                    chonKhach(kh.TenKh, kh.SDT, kh.id ?? kh.ID)
+                                  }
+                                  style={{ cursor: "pointer" }}
+                                >
+                                  <td>{kh.TenKh}</td>
+                                  <td>{kh.SDT}</td>
+                                  <td>{kh.id ?? kh.ID ?? ""}</td>
+                                </tr>
+                              ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Số điện thoại */}
+                  <div className="flex-col" style={{ position: "relative" }}>
+                    <label>Số điện thoại:</label>
+                    <input
+                      type="tel"
+                      value={sdt}
+                      onChange={handlePhoneChange}
+                      placeholder="Nhập SĐT..."
+                      maxLength={10}
+                      autoComplete="off"
+                    />
+                    {errorMsg && <p className="error-text">{errorMsg}</p>}
+                    {searchSdt.length > 0 && (
+                      <div
+                        className="search-results-table"
+                        style={{ position: "relative" }}
+                      >
+                        <table className="suggest-table">
+                          <thead>
+                            <tr>
+                              <th>SĐT</th>
+                              <th>Họ & tên</th>
+                              <th>Mã</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {searchSdt
+                              .filter((kh) =>
+                                String(kh?.SDT || "").includes(sdt)
+                              )
+                              .slice(0, 5)
+                              .map((kh, i) => (
+                                <tr
+                                  key={i}
+                                  onClick={() =>
+                                    chonKhach(kh.TenKh, kh.SDT, kh.id ?? kh.ID)
+                                  }
+                                  style={{ cursor: "pointer" }}
+                                >
+                                  <td>{kh.SDT}</td>
+                                  <td>{kh.TenKh}</td>
+                                  <td>{kh.id ?? kh.ID ?? ""}</td>
+                                </tr>
+                              ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Hành động thêm khách và mã giảm giá */}
+                <div className="actions-customer">
+                  <button className="btn-add-customer" onClick={themKhachHang}>
+                    + Thêm khách hàng mới
+                  </button>
+                  {hienThiMaGiamGia && (
+                    <div>
+                      <label htmlFor="maGiamGia">Mã giảm giá:</label>
+                      <select id="maGiamGia">
+                        <option value="">-- Chọn mã giảm giá --</option>
+                        <option value="KM10">Giảm 10%</option>
+                        <option value="KM50">Giảm 50.000đ</option>
+                      </select>
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
+            )}
 
-              <div className="confirm-buttons">
-                <button className="btn-back" onClick={() => history.back()}>
-                  Quay lại
-                </button>
-                {/* <button className="btn-confirm" onClick={xacNhanDatSan}>
-                  {isDatSanThang
-                    ? "Xác nhận đặt sân tháng"
-                    : "Xác nhận đặt sân"}
-                </button> */}
-                <button
-                  className="btn-confirm"
-                  onClick={() =>
-                    xacNhanDatSan(isDatSanThang ? "thang" : "ngay")
-                  }
-                >
-                  {isDatSanThang
-                    ? "✅ Xác nhận đặt sân tháng"
-                    : "✅ Xác nhận đặt sân"}
-                </button>
+            {/* Dịch vụ thêm */}
+            <div className="info-group">
+              <h2>Dịch vụ thêm</h2>
+
+              <button
+                className="btn-add-service"
+                onClick={() => {
+                  // Lưu state hiện tại vào localStorage
+                  const tmpData = {
+                    danhSachSan,
+                    tenKhach,
+                    sdt,
+                    selectedKhachHangId,
+                    dichVuList,
+                    tongTienSan,
+                    giamGia,
+                    tongTienThuc,
+                    soTienThanhToan,
+                  };
+                  localStorage.setItem(
+                    "bookingServiceTmp",
+                    JSON.stringify(tmpData)
+                  );
+
+                  // Chuyển tới trang chọn dịch vụ
+                  navigate("/dichvu", {
+                    state: {
+                      event: {
+                        danhSachSan,
+                        tenKhach,
+                        sdt,
+                        selectedKhachHangId,
+                      },
+                      services: dichVuList || [],
+                      returnPath: "/xacnhansan", // trang cần quay về sau khi thêm dịch vụ
+                    },
+                  });
+                }}
+              >
+                + Thêm dịch vụ
+              </button>
+
+              <div className="dichvu-list">
+                <table className="dichvu-table">
+                  <thead>
+                    <tr>
+                      <th>Tên dịch vụ</th>
+                      <th>Số lượng</th>
+                      <th>Giá (đ)</th>
+                      <th>Tổng (đ)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {dichVuList.map((dv, index) => (
+                      <tr key={index}>
+                        <td>{dv.name || dv.ten}</td>
+                        <td>{dv.qty || dv.soLuong || 1}</td>
+                        <td>{(dv.price || dv.gia || 0).toLocaleString()}</td>
+                        <td>
+                          {(
+                            (dv.qty || dv.soLuong || 1) *
+                            (dv.price || dv.gia || 0)
+                          ).toLocaleString()}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  {dichVuList.length > 0 && (
+                    <tfoot>
+                      <tr>
+                        <td
+                          colSpan={3}
+                          style={{ textAlign: "right", fontWeight: "bold" }}
+                        >
+                          Tổng dịch vụ:
+                        </td>
+                        <td style={{ fontWeight: "bold" }}>
+                          {dichVuList
+                            .reduce(
+                              (sum, dv) =>
+                                sum +
+                                (dv.qty || dv.soLuong || 1) *
+                                  (dv.price || dv.gia || 0),
+                              0
+                            )
+                            .toLocaleString()}
+                        </td>
+                      </tr>
+                    </tfoot>
+                  )}
+                </table>
               </div>
+            </div>
+
+            <div className="tt-payment-div">
+              {/* 🟢 Cột 3: Mã QR */}
+              <div className="info-col info-qr">
+                <img src={mbBank} alt="QR Thanh toán" className="qr-image" />
+                <p className="qr-note">Quét mã QR để thanh toán</p>
+              </div>
+
+              {/* 🟢 Cột 4: Thông tin tài khoản */}
+              <div className="info-col info-bank">
+                <h3>Thông tin chuyển khoản</h3>
+                <p>
+                  <b>Tên tài khoản:</b> Nguyen Trung Nguyen
+                </p>
+                <p>
+                  <b>Số tài khoản:</b> 0345137842
+                </p>
+                <p>
+                  <b>Ngân hàng:</b> MB Bank
+                </p>
+              </div>
+
+              {userRole === "khachhang" && (
+                <div className="customer-payment-upload">
+                  <h4>💳 Nộp ảnh chụp màn hình chuyển khoản</h4>
+                  {/* Khung hiển thị ảnh */}
+                  <div
+                    className="payment-preview"
+                    onClick={() =>
+                      document.getElementById("payment-input").click()
+                    }
+                  >
+                    {paymentScreenshot ? (
+                      <img
+                        src={URL.createObjectURL(paymentScreenshot)}
+                        alt="Ảnh đã chọn"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    ) : (
+                      <span style={{ color: "#999" }}>
+                        Click vào đây để chọn ảnh
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Input file ẩn */}
+                  <input
+                    id="payment-input"
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={(e) => setPaymentScreenshot(e.target.files[0])}
+                  />
+
+                  {paymentScreenshot && (
+                    <p style={{ marginTop: "5px", color: "#333" }}>
+                      Ảnh đã chọn thành công!
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="confirm-buttons">
+              <button className="btn-back" onClick={() => history.back()}>
+                Quay lại
+              </button>
+              <button
+                className="btn-confirm"
+                onClick={() => xacNhanDatSan(isDatSanThang ? "thang" : "ngay")}
+              >
+                {isDatSanThang
+                  ? "✅ Xác nhận đặt sân tháng"
+                  : "✅ Xác nhận đặt sân"}
+              </button>
             </div>
           </>
         )}

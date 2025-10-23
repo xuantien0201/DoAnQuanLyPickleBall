@@ -5,13 +5,22 @@ export async function loginKhachHang(req, res) {
     const { userName, passWord } = req.body;
 
     // 1️⃣ Kiểm tra tài khoản trong bảng tbl_taikhoankhachhang
+    // const [accountRows] = await db.execute(
+    //   "SELECT id, userName, email, SDT FROM tbl_taikhoankhachhang WHERE userName = ? AND passWord = ?",
+    //   [userName, passWord]
+    // );
+
     const [accountRows] = await db.execute(
-      "SELECT id, userName, email, SDT FROM tbl_taikhoankhachhang WHERE userName = ? AND passWord = ?",
-      [userName, passWord]
-    );
+  "SELECT id, userName, passWord, email, SDT FROM tbl_taikhoankhachhang WHERE userName = ? AND passWord = ?",
+  [userName, passWord]
+);
+
 
     if (accountRows.length === 0) {
-      return res.json({ success: false, message: "Tên đăng nhập hoặc mật khẩu không đúng." });
+      return res.json({
+        success: false,
+        message: "Tên đăng nhập hoặc mật khẩu không đúng.",
+      });
     }
 
     const account = accountRows[0];
@@ -19,24 +28,25 @@ export async function loginKhachHang(req, res) {
 
     // 2️⃣ Lấy tất cả thông tin khách hàng từ tbl_khachhang dựa trên id
     const [customerRows] = await db.execute(
-      "SELECT TenKh, SDT, email, DiaChi, GioiTinh FROM tbl_khachhang WHERE id = ?",
+      "SELECT * FROM tbl_khachhang WHERE id = ?",
       [customerId]
     );
 
-    const customerInfo = customerRows.length > 0 ? customerRows[0] : {};
+    const customerName =
+      customerRows.length > 0 ? customerRows[0].TenKh : userName;
+    const customerPhone = customerRows.length > 0 ? customerRows[0].SDT : null;
 
     // 3️⃣ Trả về thông tin khách hàng đầy đủ
     res.json({
       success: true,
       message: "Đăng nhập khách hàng thành công",
       user: {
-        id: account.id,
+        role: "khachhang", // ✅ Thêm role để đồng bộ
+        MaKH: customerId, // ✅ ID khách hàng
         userName: account.userName,
-        email: account.email,
-        SDT: account.SDT,
-        TenKh: customerInfo.TenKh || account.userName, // Sử dụng TenKh từ tbl_khachhang, fallback về userName
-        DiaChi: customerInfo.DiaChi || null,
-        GioiTinh: customerInfo.GioiTinh || null,
+        passWord: account.passWord,
+        TenKh: customerName, // ✅ Tên khách
+        SDT: customerPhone, // ✅ SĐT khách hàng
       },
     });
   } catch (err) {
@@ -50,19 +60,18 @@ export async function loginKhachHang(req, res) {
 
 export async function getKhachHangProfile(req, res) {
   try {
-    // Nhận id từ query params. Đây là ID từ tbl_taikhoankhachhang, 
+    // Nhận id từ query params. Đây là ID từ tbl_taikhoankhachhang,
+    // Nhận id từ query params. Đây là ID từ tbl_taikhoankhachhang,
     // và bạn dùng nó làm khóa ngoại trong tbl_khachhang.
     const { id } = req.query;
 
     if (!id) {
       return res.status(400).json({
-        success: false,
-        // SỬA: Thông báo lỗi phải phản ánh biến đang được sử dụng
+        success: false, // SỬA: Thông báo lỗi phải phản ánh biến đang được sử dụng
         message: "Thiếu ID tài khoản khách hàng.",
       });
-    }
+    } // Lấy tất cả thông tin từ tbl_khachhang
 
-    // Lấy tất cả thông tin từ tbl_khachhang
     const [rows] = await db.execute(
       // SỬA: Thay MaKH bằng id
       "SELECT * FROM tbl_khachhang WHERE id = ?",
@@ -93,7 +102,10 @@ export const updateCustomerProfile = async (req, res) => {
   const { id } = req.query; // id khách hàng
   const { TenKh, SDT, email, DiaChi, GioiTinh } = req.body;
 
-  if (!id) return res.status(400).json({ success: false, message: "Thiếu id khách hàng" });
+  if (!id)
+    return res
+      .status(400)
+      .json({ success: false, message: "Thiếu id khách hàng" });
 
   try {
     // 🔹 Cập nhật tbl_khachhang
@@ -101,7 +113,6 @@ export const updateCustomerProfile = async (req, res) => {
                    SET TenKh=?, SDT=?, email=?, DiaChi=?, GioiTinh=? 
                    WHERE id=?`;
     await db.execute(sqlKh, [TenKh, SDT, email, DiaChi, GioiTinh, id]);
-    
 
     // 🔹 Cập nhật TenKh, SDT, email trong tbl_taikhoankhachhang
     const sqlTK = `UPDATE tbl_taikhoankhachhang 
@@ -109,7 +120,10 @@ export const updateCustomerProfile = async (req, res) => {
                    WHERE id=?`;
     await db.execute(sqlTK, [TenKh, SDT, email, id]);
 
-    res.json({ success: true, message: "Cập nhật thông tin khách hàng thành công" });
+    res.json({
+      success: true,
+      message: "Cập nhật thông tin khách hàng thành công",
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Lỗi server" });

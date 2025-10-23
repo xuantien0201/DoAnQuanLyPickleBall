@@ -47,7 +47,7 @@ export async function postDatSanThang(req, res) {
     } = req.body;
 
     // 🧩 Kiểm tra dữ liệu bắt buộc
-    if (!MaSan.length || !MaKH || !MaNV || !GioVao || !GioRa || !Thang || !Nam) {
+    if (!MaSan.length || !MaKH || !GioVao || !GioRa || !Thang || !Nam) {
       return res.status(400).json({ message: "Thiếu thông tin bắt buộc!" });
     }
 

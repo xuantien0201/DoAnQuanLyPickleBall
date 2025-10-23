@@ -69,7 +69,7 @@ export function QlyXeVe() {
 
     try {
       const res = await fetch(
-        `http://localhost:3000/api/xeve/${item.MaXeVe}/status`,
+        `http://localhost:3000/api/xeve/sukien/${item.MaXeVe}/status`,
         { method: "PUT" }
       );
       const data = await res.json();
@@ -138,7 +138,7 @@ export function QlyXeVe() {
     console.log("📦 Dữ liệu truyền sang TTXeVe:", bookingData);
 
     // ✅ Dẫn tới trang thanh toán + truyền dữ liệu qua state
-    navigate("/ttxeve", { state: { bookingData } });
+    navigate("/ttxeve", { state: { bookingData, role: "quanly" } });
 
     setAddingId(null);
   };
@@ -224,6 +224,7 @@ export function QlyXeVe() {
                           <p className="intro">Thêm khách hàng</p>
                           <input
                             type="text"
+                            className="xeve-input"
                             placeholder="Tên khách hàng"
                             value={customer.ten}
                             onChange={(e) =>
@@ -236,7 +237,7 @@ export function QlyXeVe() {
                           <input
                             type="text"
                             placeholder="Số điện thoại"
-                            className="sdt-input"
+                            className="sdt-input xeve-input"
                             value={customer.sdt}
                             onChange={(e) =>
                               setCustomer((prev) => ({
@@ -247,6 +248,7 @@ export function QlyXeVe() {
                           />
                           <input
                             type="number"
+                            className="xeve-input"
                             placeholder="Số vé muốn đặt"
                             value={customer.soVe}
                             onChange={(e) =>

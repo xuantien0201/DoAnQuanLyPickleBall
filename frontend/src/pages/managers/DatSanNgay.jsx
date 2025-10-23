@@ -5,10 +5,56 @@ import { Link } from "react-router";
 import { useNavigate } from "react-router"; // thêm đầu file
 
 export function DatSanNgay() {
+  //   const currentUser =
+  //   JSON.parse(localStorage.getItem("user")) ||
+  //   JSON.parse(localStorage.getItem("khach"));
+
+  // if (currentUser?.role === "Nhân viên" || currentUser?.role === "Quản lý") {
+  //   console.log("Mã nhân viên:", currentUser.maNV);
+  // }
+  // else if (currentUser?.id && !currentUser?.maNV) {
+  //   console.log("👉 Khách hàng:");
+  //   console.log("Mã khách hàng:", currentUser.id);
+  //   console.log("Tên KH:", currentUser.TenKh);
+  //   console.log("SĐT:", currentUser.SDT);
+  // }
+  const [user, setUser] = useState(null);
+  const [role, setRole] = useState("");
+  const [maNguoiDung, setMaNguoiDung] = useState("");
   const navigate = useNavigate();
   const openingHour = 5;
   const closingHour = 24;
   const slotMinutes = 60;
+
+useEffect(() => {
+  const currentUser =
+    JSON.parse(localStorage.getItem("user")) ||
+    JSON.parse(localStorage.getItem("khach"));
+
+  if (!currentUser) return;
+
+  let role = "";
+  let maNguoiDung = "";
+
+  if (currentUser?.role === "Nhân viên" || currentUser?.role === "Quản lý") {
+    role = "nhanvien";
+    maNguoiDung = currentUser.maNV;
+    console.log("🔹 Đang đăng nhập với vai trò:", currentUser.role);
+    console.log("Mã nhân viên:", maNguoiDung);
+  } else if (currentUser?.MaKH) {  // ✅ sửa từ currentUser.id => currentUser.MaKH
+    role = "khachhang";
+    maNguoiDung = currentUser.MaKH;  // ✅ sửa từ currentUser.id => currentUser.MaKH
+    console.log("🔹 Khách hàng đăng nhập:");
+    console.log("Mã KH:", maNguoiDung);
+    console.log("Tên KH:", currentUser.TenKh);
+    console.log("SĐT:", currentUser.SDT);
+  }
+
+  setUser(currentUser);
+  setRole(role);
+  setMaNguoiDung(maNguoiDung);
+}, []);
+
 
   const [courts, setCourts] = useState([]);
   const [bookedSlots, setBookedSlots] = useState({});
@@ -19,6 +65,7 @@ export function DatSanNgay() {
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0]
   );
+  // 🔹 Giả lập role và mã khách hàng (sau này sẽ lấy từ API đăng nhập)
 
   const API_BASE = "http://localhost:3000/api/san";
 
@@ -349,7 +396,9 @@ export function DatSanNgay() {
           if (i === thangSlot.start) {
             const thangCell = document.createElement("div");
             thangCell.className = "cell slot month";
-            thangCell.textContent = thangSlot.khach;
+            // thangCell.textContent = thangSlot.khach;
+            thangCell.textContent =
+              role === "khachhang" ? "Sân đặt tháng" : thangSlot.khach;
             thangCell.style.gridColumn = `span ${
               thangSlot.end - thangSlot.start
             }`;
@@ -448,6 +497,8 @@ export function DatSanNgay() {
         return { courtIndex: ci, slotIndex };
       }),
       bookingType: "Đặt sân ngày",
+      role: role,
+      maNguoiDung: maNguoiDung,
     };
 
     // lưu vào localStorage để XacNhanDatSan đọc
@@ -459,7 +510,7 @@ export function DatSanNgay() {
 
   return (
     <div className="sanngay-container">
-      <Sidebar />
+      {role !== "khachhang" && <Sidebar />}
 
       <div className="sanngay-content">
         <header className="datsan-header">

@@ -9,14 +9,19 @@ export function TTXeVe() {
   const navigate = useNavigate();
   const [method, setMethod] = useState("tt-qr");
   const [isLoading, setIsLoading] = useState(false);
+  const [paymentScreenshot, setPaymentScreenshot] = useState(null);
 
   // ✅ Lấy dữ liệu truyền từ trang trước
   const bookingData = state?.bookingData;
+  const role = bookingData?.role || "quanly";
+
+  console.log("Role la: " + role);
 
   if (!bookingData) {
     return (
       <div className="app">
-        <Sidebar />
+        {role !== "khach" && <Sidebar />}
+
         <div className="tt-container">
           <header className="tt-header">Xác nhận thanh toán</header>
           <p style={{ padding: "20px", textAlign: "center" }}>
@@ -37,6 +42,7 @@ export function TTXeVe() {
 
   // Lấy dữ liệu
   const {
+    MaKH,
     ten,
     sdt,
     soVe,
@@ -46,7 +52,17 @@ export function TTXeVe() {
     thoiGianBatDau,
     thoiGianKetThuc,
     maXeVe,
+    services = [], // thêm mặc định []
   } = bookingData;
+
+  console.log("ma khach hang la: " + MaKH);
+
+  const ticketPrice = Number(soVe) * 100000; // tiền vé
+  const serviceTotal = services.reduce(
+    (sum, s) => sum + (s.price || 0) * (s.qty || 1),
+    0
+  );
+  const totalAmount = ticketPrice + serviceTotal;
 
   // Format ngày và giờ
   const ngayToChucDisplay = ngayToChuc
@@ -77,46 +93,84 @@ export function TTXeVe() {
         return;
       }
 
-      setIsLoading(true);
-
-      // 2️⃣ Sinh mã khách hàng ngẫu nhiên dạng KH700714
-      const randomPart = Math.floor(100000 + Math.random() * 900000); // 6 số ngẫu nhiên
-      const maKH = `KH${randomPart}`;
-
-      // 3️⃣ Gửi yêu cầu thêm khách hàng
-      const resKh = await fetch(API_KHACHHANG, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          MaKH: maKH, // ✅ thêm mã khách hàng
-          TenKh: ten,
-          SDT: sdt,
-          DiaChi: "",
-        }),
-      });
-
-      const dataKh = await resKh.json();
-      if (!resKh.ok) {
-        throw new Error(dataKh.message || "Lỗi thêm khách hàng!");
+      // ✅ Kiểm tra ảnh thanh toán nếu là khách
+      if (role === "khach" && !paymentScreenshot) {
+        alert("⚠️ Vui lòng nộp ảnh thanh toán trước khi xác nhận!");
+        return;
       }
 
-      console.log("✅ Thêm khách hàng thành công:", maKH);
+      setIsLoading(true);
+
+      // 2️⃣ Xử lý MaKH dựa theo role
+      let maKHFinal;
+
+      if (role === "khach") {
+        // Khách hàng → lấy mã có sẵn
+        maKHFinal = MaKH;
+        console.log("ℹ️ Role khách, sử dụng MaKH có sẵn:", maKHFinal);
+      } else {
+        // Quản lý hoặc role khác → sinh mã mới
+        const randomPart = Math.floor(100000 + Math.random() * 900000); // 6 số ngẫu nhiên
+        maKHFinal = `KH${randomPart}`;
+
+        // Thêm khách hàng mới
+        const resKh = await fetch(API_KHACHHANG, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            MaKH: maKHFinal,
+            TenKh: ten,
+            SDT: sdt,
+            DiaChi: "",
+          }),
+        });
+
+        const dataKh = await resKh.json();
+        if (!resKh.ok) {
+          throw new Error(dataKh.message || "Lỗi thêm khách hàng!");
+        }
+
+        console.log("✅ Thêm khách hàng thành công:", maKHFinal);
+      }
 
       // 4️⃣ Chuẩn bị payload đặt vé
-      const payload = {
-        MaXeVe: parseInt(maXeVe, 10),
-        MaKH: maKH,
-        NguoiLap: "NV001",
-        SoLuongSlot: parseInt(soVe, 10),
-        GhiChu: `Thanh toán bằng ${method}`,
-        ThoiGianDangKy: new Date().toISOString().slice(0, 19).replace("T", " "),
-      };
+      // const payload = {
+      //   MaXeVe: parseInt(maXeVe, 10),
+      //   MaKH: maKH,
+      //   NguoiLap: "NV001",
+      //   SoLuongSlot: parseInt(soVe, 10),
+      //   GhiChu: `Thanh toán bằng ${method}`,
+      //   ThoiGianDangKy: new Date().toISOString().slice(0, 19).replace("T", " "),
+      //   Role: role,
+      //   PaymentScreenshot: paymentScreenshot, // file cần upload lên server
+      // };
+
+      // Dùng FormData để gửi file
+      const formData = new FormData();
+      formData.append("MaXeVe", maXeVe);
+      formData.append("MaKH", maKHFinal);
+      formData.append("NguoiLap", "NV001");
+      formData.append("SoLuongSlot", soVe);
+      formData.append("GhiChu", `Thanh toán bằng ${method}`);
+      formData.append(
+        "ThoiGianDangKy",
+        new Date().toISOString().slice(0, 19).replace("T", " ")
+      );
+      formData.append("TongTien", totalAmount); // tổng tiền vé + dịch vụ
+      formData.append("DanhSachDichVu", JSON.stringify(services)); // mảng dịch vụ dạng JSON string
+      if (paymentScreenshot) {
+        formData.append("PaymentScreenshot", paymentScreenshot); // file upload
+      }
 
       // 5️⃣ Gửi yêu cầu thêm đặt vé
+      // const resDatVe = await fetch(API_DATVE, {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify(payload),
+      // });
       const resDatVe = await fetch(API_DATVE, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: formData, // gửi FormData kèm file
       });
 
       const dataDatVe = await resDatVe.json();
@@ -127,7 +181,9 @@ export function TTXeVe() {
       alert("🎉 Thanh toán & đặt vé thành công!");
       console.log("✅ Kết quả đặt vé:", dataDatVe);
 
-      navigate("/xeve");
+      if(role === 'khach')
+        navigate("/");
+      else  navigate("/qlyxeve");
     } catch (err) {
       console.error("❌ Lỗi khi xác nhận thanh toán:", err);
       alert(err.message || "Đã xảy ra lỗi, vui lòng thử lại!");
@@ -138,7 +194,7 @@ export function TTXeVe() {
 
   return (
     <div className="dat-san-wrapper">
-      <Sidebar />
+      {role !== "khach" && <Sidebar />}
 
       <div className="tt-container">
         <header className="tt-header">Xác nhận thanh toán</header>
@@ -192,12 +248,65 @@ export function TTXeVe() {
                 Số vé: <b>{soVe}</b>
               </span>
             </div>
+            {services.length > 0 && (
+              <div className="tt-info-item">
+                💰{" "}
+                <span>
+                  Tổng tiền dịch vụ: {serviceTotal.toLocaleString()} ₫
+                </span>
+              </div>
+            )}
+
             <div className="tt-info-item">
               💰{" "}
               <span>
-                Tổng tiền: <b>{Number(soVe) * 100000} ₫</b>
+                Tổng tiền: <b>{totalAmount.toLocaleString()} ₫</b>
               </span>
             </div>
+
+            {role === "khach" && (
+              <div className="customer-payment-upload">
+                <h4>💳 Nộp ảnh chụp màn hình chuyển khoản</h4>
+                {/* Khung hiển thị ảnh */}
+                <div
+                  className="payment-preview"
+                  onClick={() =>
+                    document.getElementById("payment-input").click()
+                  }
+                >
+                  {paymentScreenshot ? (
+                    <img
+                      src={URL.createObjectURL(paymentScreenshot)}
+                      alt="Ảnh đã chọn"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                    />
+                  ) : (
+                    <span style={{ color: "#999" }}>
+                      Click vào đây để chọn ảnh
+                    </span>
+                  )}
+                </div>
+
+                {/* Input file ẩn */}
+                <input
+                  id="payment-input"
+                  type="file"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  onChange={(e) => setPaymentScreenshot(e.target.files[0])}
+                />
+
+                {paymentScreenshot && (
+                  <p style={{ marginTop: "5px", color: "#333" }}>
+                    Ảnh đã chọn thành công!
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Thanh toán */}
@@ -238,8 +347,9 @@ export function TTXeVe() {
                     </p>
                   </div>
                   <div className="tt-note">
-                    Vui lòng chuyển khoản <b>{Number(soVe) * 100000} ₫</b> và
-                    gửi ảnh xác nhận sau khi thanh toán.
+                    Vui lòng chuyển khoản{" "}
+                    <b>{totalAmount.toLocaleString()} ₫</b> và gửi ảnh xác nhận
+                    sau khi thanh toán.
                     <br />
                     Hệ thống sẽ giữ vé của bạn trong <b>5 phút</b>.
                   </div>

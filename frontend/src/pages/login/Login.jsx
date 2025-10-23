@@ -8,6 +8,8 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    localStorage.removeItem("user");
+    localStorage.removeItem("khach");
     try {
       let res;
       if (role === "employee") {
@@ -33,17 +35,20 @@ export default function Login() {
           window.location.href = "/";
         } else alert("❌ Sai tài khoản hoặc mật khẩu!");
       } else {
-        res = await axios.post("http://localhost:3000/api/taikhoan/loginKhachHang", {
-          userName: username,
-          passWord: password,
-        });
-        if (res.data.success) {
-          alert("✅ Đăng nhập khách hàng thành công!");
-          // Sau khi backend cập nhật, res.data.user sẽ có TenKH
-          localStorage.setItem("user", JSON.stringify(res.data.user)); 
-          window.location.href = "/";
-        } else alert("❌ " + res.data.message);
-      }
+        res = await axios.post(
+          "http://localhost:3000/api/taikhoan/loginKhachHang",
+          {
+            userName: username,
+            passWord: password,
+          }
+        );
+        if (res.data.success) {
+          alert("✅ Đăng nhập khách hàng thành công!"); // Sau khi backend cập nhật, res.data.user sẽ có TenKH
+          localStorage.setItem("khach", JSON.stringify(res.data.user));
+          console.log("🔹 Parsed object:", JSON.parse(localStorage.getItem("khach")));
+          window.location.href = "/";
+        } else alert("❌ " + res.data.message);
+      }
     } catch (err) {
       console.error("Lỗi khi đăng nhập:", err);
       alert("❌ Lỗi kết nối server!");
@@ -51,7 +56,15 @@ export default function Login() {
   };
 
   return (
-    <div className={`login-bg ${role === "employee" ? "login-employee-mode" : role === "Quản lý" ? "login-admin-mode" : "login-customer-mode"}`}>
+    <div
+      className={`login-bg ${
+        role === "employee"
+          ? "login-employee-mode"
+          : role === "Quản lý"
+          ? "login-admin-mode"
+          : "login-customer-mode"
+      }`}
+    >
       <div className="login-pickleball-ball"></div>
       <div className="login-card animate-pop">
         <div className="login-header">
@@ -72,9 +85,30 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="login-form">
           <div className="login-role-selector">
-            <span className={role === "customer" ? "login-role active" : "login-role"} onClick={() => setRole("customer")}>Khách hàng</span>
-            <span className={role === "employee" ? "login-role active" : "login-role"} onClick={() => setRole("employee")}>Nhân viên</span>
-            <span className={role === "Quản lý" ? "login-role active" : "login-role"} onClick={() => setRole("Quản lý")}>Quản lý</span>
+            <span
+              className={
+                role === "customer" ? "login-role active" : "login-role"
+              }
+              onClick={() => setRole("customer")}
+            >
+              Khách hàng
+            </span>
+            <span
+              className={
+                role === "employee" ? "login-role active" : "login-role"
+              }
+              onClick={() => setRole("employee")}
+            >
+              Nhân viên
+            </span>
+            <span
+              className={
+                role === "Quản lý" ? "login-role active" : "login-role"
+              }
+              onClick={() => setRole("Quản lý")}
+            >
+              Quản lý
+            </span>
           </div>
 
           <input
@@ -92,7 +126,11 @@ export default function Login() {
             required
           />
           <button type="submit">
-            {role === "employee" ? "Đăng nhập nhân viên" : role === "Quản lý" ? "Đăng nhập quản lý" : "Đăng nhập khách hàng"}
+            {role === "employee"
+              ? "Đăng nhập nhân viên"
+              : role === "Quản lý"
+              ? "Đăng nhập quản lý"
+              : "Đăng nhập khách hàng"}
           </button>
         </form>
 

@@ -7,7 +7,10 @@ import { DatSanThang } from './pages/managers/DatSanThang'
 import { XacNhanDatSan } from './pages/managers/XacNhanDatSan'
 import { QlyXeVe } from './pages/managers/QlyXeVe'
 import { ThemXeVe } from './pages/managers/ThemXeVe'
-import { TTXeVe } from './pages/managers/TTXeVe'
+import { TTXeVe } from './pages/managers/TTXeVe';
+import { DatXeVe } from './pages/customers/DatXeVe';
+import { ChiTietXeVe } from './pages/customers/ChiTietXeVe';
+import { DichVu } from './pages/customers/DichVu';
 import { POS } from './pages/customers/POS'; // Thêm import này
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -36,10 +39,35 @@ import LichSuNhapHang from './pages/managers/LichSuNhapHang'
 
 
 function App() {
+  // 🧩 Lấy thông tin đăng nhập từ localStorage
+// const currentUser =
+//   JSON.parse(localStorage.getItem("user")) ||
+//   JSON.parse(localStorage.getItem("khach"));
+
+// let role = "";
+// let maNguoiDung = "";
+// let isKhachHang = false;
+
+// if (currentUser?.role === "Nhân viên" || currentUser?.role === "Quản lý") {
+//   role = "nhanvien";
+//   maNguoiDung = currentUser.maNV;
+//   console.log("🔹 Đang đăng nhập với vai trò:", currentUser.role);
+//   console.log("Mã nhân viên:", maNguoiDung);
+// } else if (currentUser?.id && !currentUser?.maNV) {
+//   role = "khachhang";
+//   maNguoiDung = currentUser.id;
+//   isKhachHang = true;
+//   console.log("🔹 Khách hàng đăng nhập:");
+//   console.log("Mã KH:", currentUser.id);
+//   console.log("Tên KH:", currentUser.TenKh);
+//   console.log("SĐT:", currentUser.SDT);
+// }
+
+
   const location = useLocation();
 
   const noHeaderFooterRoutes = ['/xacnhansan', '/dat-san', '/xeve', '/categories', '/products', '/orders', '/santhang',
-    '/nhaphang', '/nhacungcap', '/taophieunhap', '/lichsunhap', , '/calam', '/quanlycalam', '/quanlytaikhoan', '/nhanvien',
+    '/nhaphang', '/nhacungcap', '/taophieunhap', '/lichsunhap','/calam', '/quanlycalam', '/quanlytaikhoan', '/nhanvien',
      '/register', '/forgot-password','/login'
   ];
   const hideHeaderFooter = noHeaderFooterRoutes.includes(location.pathname);
@@ -56,6 +84,9 @@ function App() {
           <Route path="xacnhansan" element={<XacNhanDatSan />} />
           <Route path="xeve" element={<QlyXeVe />} />
           <Route path="themxeve" element={<ThemXeVe />} />
+          <Route path="datve" element={<DatXeVe />} />
+          <Route path="chitietve" element={<ChiTietXeVe />} />
+          <Route path="/dichvu" element={<DichVu />} />
           <Route path="ttxeve" element={<TTXeVe />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/product/:id" element={<ProductDetail />} />

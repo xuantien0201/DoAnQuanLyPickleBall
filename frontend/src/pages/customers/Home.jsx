@@ -1,13 +1,30 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import ProductCard from '../../components/ProductCard';
-import '../../css/Home.css';
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import ProductCard from "../../components/ProductCard";
+import "../../css/Home.css";
 
 const Home = () => {
   const [newArrivals, setNewArrivals] = useState([]);
   const [onSaleProducts, setOnSaleProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [role, setRole] = useState(""); // nhanvien | khachhang
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user")); // nhân viên/quản lý
+    const khach = JSON.parse(localStorage.getItem("khach")); // khách hàng
+
+    if (user) {
+      setCurrentUser(user);
+      setRole("nhanvien"); // bao gồm quản lý
+      console.log("🔹 Nhân viên/Quản lý:", user.role, "Mã NV:", user.maNV);
+    } else if (khach) {
+      setCurrentUser(khach);
+      setRole("khachhang");
+      console.log("👉 Khách hàng:", khach.MaKH, khach.TenKh, khach.SDT, khach.role);
+    }
+  }, []);
 
   useEffect(() => {
     fetchNewArrivals();
@@ -17,28 +34,30 @@ const Home = () => {
 
   const fetchNewArrivals = async () => {
     try {
-      const response = await axios.get('/api/client/products/featured/new-arrivals');
+      const response = await axios.get(
+        "/api/client/products/featured/new-arrivals"
+      );
       setNewArrivals(response.data);
     } catch (error) {
-      console.error('Lỗi khi tải sản phẩm mới:', error);
+      console.error("Lỗi khi tải sản phẩm mới:", error);
     }
   };
 
   const fetchOnSaleProducts = async () => {
     try {
-      const response = await axios.get('/api/client/products/featured/on-sale');
+      const response = await axios.get("/api/client/products/featured/on-sale");
       setOnSaleProducts(response.data);
     } catch (error) {
-      console.error('Lỗi khi tải sản phẩm giảm giá:', error);
+      console.error("Lỗi khi tải sản phẩm giảm giá:", error);
     }
   };
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('/api/client/categories');
+      const response = await axios.get("/api/client/categories");
       setCategories(response.data.slice(0, 5));
     } catch (error) {
-      console.error('Lỗi khi tải danh mục:', error);
+      console.error("Lỗi khi tải danh mục:", error);
     }
   };
 
@@ -49,14 +68,18 @@ const Home = () => {
         <div className="hero-content">
           <div className="hero-text">
             <h1>
-              <span>Đơn giản – Khác biệt</span><br />
+              <span>Đơn giản – Khác biệt</span>
+              <br />
               Chơi hay hơn, với vợt tốt hơn
             </h1>
             <p>
-              Khám phá bộ sưu tập vợt pickleball cao cấp được thiết kế dành cho mọi cấp độ người chơi —
-              từ người mới bắt đầu đến vận động viên chuyên nghiệp.
+              Khám phá bộ sưu tập vợt pickleball cao cấp được thiết kế dành cho
+              mọi cấp độ người chơi — từ người mới bắt đầu đến vận động viên
+              chuyên nghiệp.
             </p>
-            <Link to="/shop" className="btn hero-btn">Mua Ngay</Link>
+            <Link to="/shop" className="btn hero-btn">
+              Mua Ngay
+            </Link>
           </div>
         </div>
 
@@ -87,9 +110,7 @@ const Home = () => {
                 <div className="category-overlay"></div>
                 <div className="category-content">
                   <h3>{category.name}</h3>
-                  <span className="shop-now">
-                    Xem ngay →
-                  </span>
+                  <span className="shop-now">Xem ngay →</span>
                 </div>
               </Link>
             ))}
@@ -134,10 +155,16 @@ const Home = () => {
       <section className="features-section">
         <div className="container">
           <div className="features-grid">
-
             <div className="feature">
               <div className="feature-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  width="48"
+                  height="48"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <path d="M12 2l4 4-4 4-4-4z" />
                   <path d="M4 13h16v8H4z" />
                 </svg>
@@ -148,7 +175,14 @@ const Home = () => {
 
             <div className="feature">
               <div className="feature-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  width="48"
+                  height="48"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20z" />
                   <path d="M12 6v6l4 2" />
                 </svg>
@@ -159,7 +193,14 @@ const Home = () => {
 
             <div className="feature">
               <div className="feature-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  width="48"
+                  height="48"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <path d="M4 4h16v16H4z" />
                   <path d="M9 9h6v6H9z" />
                 </svg>
@@ -170,18 +211,23 @@ const Home = () => {
 
             <div className="feature">
               <div className="feature-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  width="48"
+                  height="48"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                 </svg>
               </div>
               <h3>Hỗ trợ nhanh chóng</h3>
               <p>Liên hệ qua hotline hoặc fanpage 24/7</p>
             </div>
-
           </div>
         </div>
       </section>
-
     </div>
   );
 };

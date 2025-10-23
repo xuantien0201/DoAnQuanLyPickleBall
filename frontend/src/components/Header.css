@@ -287,3 +287,66 @@
 .login-button:hover {
   color: #ffcc00;
 }
+
+/* Container chính của dropdown */
+.nav-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Tiêu đề menu chính */
+.dropdown-title {
+  cursor: pointer;
+  color: #333;
+  padding: 10px 15px;
+  font-weight: 500;
+  transition: color 0.2s;
+  user-select: none;
+}
+
+.dropdown-title:hover {
+  color: #007bff;
+}
+
+/* Menu con */
+.dropdown-menu {
+  position: absolute;
+  top: 100%; /* nằm ngay dưới nút chính */
+  left: 0;
+  background-color: #fff;
+  min-width: 180px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  z-index: 999;
+  display: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+/* Khi hover vào cả nút hoặc menu con đều giữ mở */
+.nav-dropdown:hover .dropdown-menu,
+.dropdown-menu:hover {
+  display: block;
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Các item con */
+.dropdown-menu a {
+  display: block;
+  padding: 10px 15px;
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+  transition: background 0.2s;
+  border-bottom: 1px solid #eee;
+}
+
+.dropdown-menu a:last-child {
+  border-bottom: none;
+}
+
+.dropdown-menu a:hover {
+  background-color: #f0f8ff;
+}

@@ -85,7 +85,7 @@ export function SuaXeVe({ MaXeVe, onClose, onUpdated }) {
     try {
       setIsLoading(true);
       const res = await fetch(
-        `http://localhost:3000/api/xeve/putXeVe/${MaXeVe}`,
+        `http://localhost:3000/api/xeve/sukien/${MaXeVe}`, // ✅ Đúng URL
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
