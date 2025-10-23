@@ -61,6 +61,7 @@ const ProductCard = ({ product }) => {
           ) : (
             <span className="out-of-stock">Hết hàng</span>
           )}
+          <span className="sold-count">Đã bán: {product.total_sold || 0}</span>
         </div>
       </div>
     </Link>

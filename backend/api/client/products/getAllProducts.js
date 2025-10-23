@@ -53,22 +53,18 @@ router.get('/', async (req, res) => {
         const totalCount = totalCountResult[0].totalCount;
 
         // Build the main query for fetching products
-        let selectClause = 'SELECT p.*';
-        let fromClause = 'FROM products p LEFT JOIN categories c ON p.category = c.name';
+        // Luôn tính toán total_sold bằng cách JOIN với bảng order
+        let selectClause = 'SELECT p.*, COALESCE(SUM(oi.quantity), 0) AS total_sold';
+        let fromClause = `
+            FROM products p 
+            LEFT JOIN categories c ON p.category = c.name
+            LEFT JOIN order_items oi ON p.id = oi.product_id
+            LEFT JOIN orders o ON oi.order_id = o.id AND o.status = 'da_nhan'
+        `;
         let whereClause = 'WHERE 1=1';
-        let groupByClause = '';
+        let groupByClause = 'GROUP BY p.id'; // Luôn nhóm theo ID sản phẩm
         let orderByClause = '';
         const params = [];
-
-        // Adjust for best-selling sort, which requires joining with order tables
-        if (sort === 'best_selling') {
-            selectClause = 'SELECT p.*, COALESCE(SUM(oi.quantity), 0) AS total_sold';
-            fromClause += `
-                LEFT JOIN order_items oi ON p.id = oi.product_id
-                LEFT JOIN orders o ON oi.order_id = o.id AND o.status = 'da_nhan'
-            `; // Only count items from successfully delivered orders
-            groupByClause = 'GROUP BY p.id';
-        }
 
         // Build WHERE clause from filters
         if (category) {

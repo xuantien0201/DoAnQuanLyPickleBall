@@ -134,6 +134,7 @@ const ProductDetail = () => {
                             ) : (
                                 <span className="out-of-stock">Hết hàng</span>
                             )}
+                            <span className="sold-count">Đã bán: {product.total_sold || 0}</span>
                         </div>
 
                         {/* Quantity and Add to Cart */}
@@ -194,12 +195,6 @@ const ProductDetail = () => {
                         {activeTab === 'description' && (
                             <div className="tab-pane">
                                 <p>{product.description}</p>
-                                <ul>
-                                    <li>Chất liệu cao cấp</li>
-                                    <li>Cấu trúc bền bỉ</li>
-                                    <li>Phù hợp cho mọi cấp độ kỹ năng</li>
-                                    <li>Tay cầm thoải mái</li>
-                                </ul>
                             </div>
                         )}
 

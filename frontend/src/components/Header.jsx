@@ -25,14 +25,13 @@ const Header = () => {
             </nav>
 
             <div className="header-actions">
-               <Link to="/login" className="action-icon login-icon">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z" />
-      <path d="M4 20v-1c0-2.21 3.58-4 8-4s8 1.79 8 4v1" />
-    </svg>
-    <span>Đăng nhập</span>
-  </Link>
-              {/* Giỏ hàng */}
+              <Link to="/login" className="action-icon login-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z" />
+                  <path d="M4 20v-1c0-2.21 3.58-4 8-4s8 1.79 8 4v1" />
+                </svg>
+                <span>Đăng nhập</span>
+              </Link>
               <Link to="/cart" className="cart-icon-wrapper">
                 <div className="cart-icon">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">

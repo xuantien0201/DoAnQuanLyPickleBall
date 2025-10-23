@@ -6,21 +6,18 @@ export function POS() {
     const [cart, setCart] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
 
-    // New customer & payment state
     const [customerName, setCustomerName] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
-    const [customerSex, setcustomerSex] = useState(''); // <-- Thêm state giới tính
+    const [customerSex, setcustomerSex] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('Tiền mặt');
 
-    // Thêm state cho phân trang
     const [currentPage, setCurrentPage] = useState(1);
-    const [productsPerPage] = useState(12); // Số sản phẩm trên mỗi trang cho POS
-    const [totalProducts, setTotalProducts] = useState(0); // Tổng số sản phẩm từ backend
+    const [productsPerPage] = useState(12); 
+    const [totalProducts, setTotalProducts] = useState(0); 
 
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                // Lấy danh sách sản phẩm từ API với tham số phân trang và tìm kiếm
                 const params = new URLSearchParams({
                     page: currentPage,
                     limit: productsPerPage,
@@ -35,21 +32,20 @@ export function POS() {
                 }
                 const data = await response.json();
                 setProducts(data.products);
-                setTotalProducts(data.totalCount); // Cập nhật tổng số sản phẩm
+                setTotalProducts(data.totalCount); 
             } catch (err) {
                 console.error("Lỗi khi tải sản phẩm:", err);
             }
         };
 
         fetchProducts();
-    }, [currentPage, productsPerPage, searchTerm]); // Thêm searchTerm vào dependencies
+    }, [currentPage, productsPerPage, searchTerm]); 
 
-    const addToCart = (productToAdd) => { // Đổi tên tham số để tránh nhầm lẫn với state 'products'
+    const addToCart = (productToAdd) => { 
         console.log('POS - Sản phẩm được thêm vào giỏ hàng:', productToAdd);
         setCart(currentCart => {
             const existingItem = currentCart.find(item => item.id === productToAdd.id);
 
-            // Lấy thông tin tồn kho thực tế từ danh sách sản phẩm
             const actualProduct = products.find(p => p.id === productToAdd.id);
             if (!actualProduct) {
                 alert('Không tìm thấy thông tin tồn kho cho sản phẩm này.');
@@ -66,7 +62,7 @@ export function POS() {
                     item.id === productToAdd.id ? { ...item, quantity: newQuantity } : item
                 );
             } else {
-                if (1 > actualProduct.stock) { // Thêm 1 sản phẩm
+                if (1 > actualProduct.stock) { 
                     alert(`Không đủ hàng tồn kho cho ${productToAdd.name}. Chỉ còn ${actualProduct.stock} sản phẩm.`);
                     return currentCart;
                 }
@@ -79,28 +75,26 @@ export function POS() {
         setCart(currentCart => {
             return currentCart.map(item => {
                 if (item.id === productId) {
-                    // Lấy thông tin tồn kho thực tế từ danh sách sản phẩm
                     const actualProduct = products.find(p => p.id === productId);
                     if (!actualProduct) {
                         alert('Không tìm thấy thông tin tồn kho cho sản phẩm này.');
-                        return item; // Không thay đổi số lượng nếu không có thông tin tồn kho
+                        return item; 
                     }
 
                     const newQuantity = item.quantity + amount;
 
                     if (newQuantity <= 0) {
-                        return null; // Xóa sản phẩm nếu số lượng <= 0
+                        return null; 
                     }
 
-                    // Kiểm tra tồn kho chỉ khi tăng số lượng
                     if (amount > 0 && newQuantity > actualProduct.stock) {
                         alert(`Không đủ hàng tồn kho cho ${item.name}. Chỉ còn ${actualProduct.stock} sản phẩm.`);
-                        return item; // Không cập nhật số lượng
+                        return item; 
                     }
                     return { ...item, quantity: newQuantity };
                 }
                 return item;
-            }).filter(Boolean); // Lọc bỏ sản phẩm có số lượng <= 0
+            }).filter(Boolean);
         });
     };
 
@@ -112,57 +106,60 @@ export function POS() {
         setCart([]);
         setCustomerName('');
         setCustomerPhone('');
-        setcustomerSex(''); // <-- Reset giới tính
+        setcustomerSex(''); 
         setPaymentMethod('Tiền mặt');
     };
 
-    // filteredProducts không còn cần thiết vì backend đã xử lý việc lọc
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const total = subtotal;
 
     const handleCheckout = async () => {
         if (cart.length === 0) {
-            alert("Giỏ hàng trống!");
+            alert("Giỏ hàng trống! Vui lòng thêm sản phẩm.");
             return;
         }
 
-        // Basic validation for customer info
         if (!customerName.trim()) {
-            alert("Vui lòng nhập tên khách hàng.");
+            alert("Vui lòng nhập Tên khách hàng.");
             return;
         }
         if (!customerPhone.trim()) {
-            alert("Vui lòng nhập số điện thoại khách hàng.");
+            alert("Vui lòng nhập Số điện thoại khách hàng.");
+            return;
+        }
+        if (!/^\d{10,11}$/.test(customerPhone.trim())) {
+            alert('Số điện thoại không hợp lệ. Vui lòng nhập 10 hoặc 11 chữ số.');
             return;
         }
 
         try {
             const itemsToSend = cart.map(item => ({
-                id: item.id, // Đây là product ID
+                product_id: item.id, 
                 name: item.name,
                 price: item.price,
-                quantity: item.quantity
+                quantity: item.quantity,
+                color: item.color || null 
             }));
 
-            console.log('POS Checkout - Dữ liệu items đang được gửi:', itemsToSend); // THÊM DÒNG NÀY
+            console.log('POS Checkout - Dữ liệu items đang được gửi:', itemsToSend);
 
             const response = await fetch('/api/client/orders', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    items: itemsToSend, // Sử dụng mảng đã log
+                    items: itemsToSend,
                     total,
                     paymentMethod: paymentMethod,
-                    status: 'da_nhan',
+                    status: 'da_nhan', 
+                    orderType: 'pos', 
                     customer: {
                         name: customerName,
                         phone: customerPhone,
-                        sex: customerSex // <-- Gửi giới tính lên server
+                        sex: customerSex
                     }
                 })
             });
             if (!response.ok) {
-                // Cải thiện xử lý lỗi để hiển thị thông báo từ server
                 const errorData = await response.json().catch(() => ({ error: 'Thanh toán thất bại' }));
                 throw new Error(errorData.error || 'Thanh toán thất bại');
             }
@@ -193,20 +190,15 @@ export function POS() {
         );
     };
 
-    // Xử lý thay đổi tìm kiếm và reset trang về 1
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
         setCurrentPage(1);
     };
 
-    // Tính toán tổng số trang
     const totalPages = Math.ceil(totalProducts / productsPerPage);
 
-    // Hàm xử lý thay đổi trang
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
-        // Có thể cuộn lên đầu trang nếu muốn
-        // window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     return (
@@ -214,7 +206,7 @@ export function POS() {
             <div className="pos-products">
                 <input
                     type="text"
-                    placeholder="Tìm kiếm sản phẩm..." // Đã sửa tiếng Việt
+                    placeholder="Tìm kiếm sản phẩm..." 
                     className="pos-search"
                     value={searchTerm}
                     onChange={handleSearchChange}
@@ -290,10 +282,10 @@ export function POS() {
 
                     <form className="sale-form" onSubmit={(e) => { e.preventDefault(); handleCheckout(); }}>
                         <label>Tên khách hàng *</label>
-                        <input type="text" placeholder="Nhập tên khách hàng" value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
+                        <input required type="text" placeholder="Nhập tên khách hàng" value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
 
                         <label>Số điện thoại *</label>
-                        <input type="text" placeholder="Nhập số điện thoại" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} />
+                        <input required type="text" placeholder="Nhập số điện thoại" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} />
 
                         <label>Giới tính</label>
                         <select value={customerSex} onChange={(e) => setcustomerSex(e.target.value)}>
