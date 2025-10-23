@@ -86,3 +86,23 @@ export async function getKhachHangProfile(req, res) {
     });
   }
 }
+export const updateCustomerProfile = async (req, res) => {
+  const { id } = req.query; // id khách hàng
+  const { TenKh, SDT, email, DiaChi, GioiTinh } = req.body;
+
+  if (!id) return res.status(400).json({ success: false, message: "Thiếu id khách hàng" });
+
+  try {
+    // Câu lệnh cập nhật
+    const sql = `UPDATE tbl_khachhang 
+                 SET TenKh=?, SDT=?, email=?, DiaChi=?, GioiTinh=? 
+                 WHERE id=?`;
+    
+    await db.execute(sql, [TenKh, SDT, email, DiaChi, GioiTinh, id]);
+
+    res.json({ success: true, message: "Cập nhật thông tin thành công" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Lỗi server" });
+  }
+};

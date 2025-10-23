@@ -61,9 +61,10 @@ const Header = () => {
               {(role === "Nhân viên") && (
                 <>
                   <Link to="/pos">Bán hàng tại quầy</Link>
+                <Link to="/calam">Đăng ký ca làm</Link>
                 </>
               )}
-              {(role === "Quản lý") && (
+               {( role === "Quản lý") && (
                 <>
                   <Link to="/dat-san">Quản lý</Link>
                   <Link to="/pos">Bán hàng tại quầy</Link>
