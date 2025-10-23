@@ -298,8 +298,8 @@ const AdminProducts = () => {
                 {/* Modal */}
                 {showModal && (
                     <div className="modal-overlay" onClick={closeModal}>
-                        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                            <div className="modal-header">
+                        <div className="modal-content-product" onClick={(e) => e.stopPropagation()}>
+                            <div className="modal-header-product">
                                 <h3>{editMode ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm mới'}</h3>
                                 <button className="modal-close" onClick={closeModal}>×</button>
                             </div>

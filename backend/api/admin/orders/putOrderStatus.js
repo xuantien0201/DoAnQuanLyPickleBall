@@ -32,11 +32,15 @@ router.put('/:id/status', async (req, res) => {
       cho_xac_nhan: ['da_xac_nhan', 'da_huy'],
       da_xac_nhan: ['dang_giao', 'huy_sau_xac_nhan'],
       dang_giao: ['da_nhan', 'giao_that_bai'],
-      da_nhan: [],
+      da_nhan: ['doi_hang', 'tra_hang'],
+      doi_hang: ['da_nhan', 'tra_hang'],
+      tra_hang: ['hoan_tien'],
+      hoan_tien: [],
       da_huy: [],
       huy_sau_xac_nhan: [],
       giao_that_bai: [],
     };
+
 
 
     const allowedNext = allowedTransitions[oldStatus] || [];

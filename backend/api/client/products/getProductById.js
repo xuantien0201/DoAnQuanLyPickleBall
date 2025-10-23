@@ -3,7 +3,6 @@ import { db } from '../../../config/db.js';
 
 const router = express.Router();
 
-// Get a single product by ID, including total sold count
 router.get('/:id', async (req, res) => {
     try {
         const [products] = await db.query(`
