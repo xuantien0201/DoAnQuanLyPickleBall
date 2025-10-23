@@ -11,6 +11,7 @@ import { TTXeVe } from './pages/managers/TTXeVe';
 import { DatXeVe } from './pages/customers/DatXeVe';
 import { ChiTietXeVe } from './pages/customers/ChiTietXeVe';
 import { DichVu } from './pages/customers/DichVu';
+import { CheckSanNgay } from './pages/managers/CheckSanNgay';
 import { POS } from './pages/customers/POS'; // Thêm import này
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -99,6 +100,7 @@ if (currentUser?.role === "Nhân viên" || currentUser?.role === "Quản lý") {
           <Route path="xeve" element={<QlyXeVe />} />
           <Route path="themxeve" element={<ThemXeVe />} />
           <Route path="datve" element={<DatXeVe />} />
+          <Route path="checksanngay" element={<CheckSanNgay />} />
           <Route path="chitietve" element={<ChiTietXeVe />} />
           <Route path="/dichvu" element={<DichVu />} />
           <Route path="ttxeve" element={<TTXeVe />} />

@@ -3,8 +3,14 @@ import "../../css/DatSanNgay.css";
 import { Sidebar } from "../../components/Sidebar";
 import { Link } from "react-router";
 import { useNavigate } from "react-router"; // thêm đầu file
+import axios from "axios";
 
 export function DatSanNgay() {
+  const [zoomedImage, setZoomedImage] = useState(null); // lưu ảnh đang phóng to
+  const [notificationCount, setNotificationCount] = useState(0);
+  const [pendingBookings, setPendingBookings] = useState([]);
+
+  const [pendingModalOpen, setPendingModalOpen] = useState(false);
   //   const currentUser =
   //   JSON.parse(localStorage.getItem("user")) ||
   //   JSON.parse(localStorage.getItem("khach"));
@@ -453,6 +459,16 @@ export function DatSanNgay() {
             bookedCell.style.backgroundColor = "#fa4f4fff";
             bookedCell.style.color = "#ffffff";
             bookedCell.style.borderRight = "1px solid #fff";
+            bookedCell.style.position = "relative"; // thêm để position icon bên trong
+
+            // 🔔 Nếu trạng thái pending, thêm icon cảnh báo
+            if (bookedSlot.TrangThai === "pending") {
+              const warningIcon = document.createElement("span");
+              warningIcon.className = "pending-icon";
+              warningIcon.innerHTML = "⚠️"; // hoặc dùng svg/font-awesome
+              bookedCell.appendChild(warningIcon);
+            }
+
             row.appendChild(bookedCell);
           }
           continue;
@@ -539,6 +555,45 @@ export function DatSanNgay() {
     navigate("/xacnhansan");
   };
 
+const handleAccept = (bookingId) => {
+  axios
+    .put("http://localhost:3000/api/san/accept", { MaDatSan: bookingId }) // ✅ PUT
+    .then(() => {
+      setPendingBookings((prev) =>
+        prev.filter((b) => b.MaDatSan !== bookingId)
+      );
+      alert("Booking đã được chấp nhận!");
+    })
+    .catch((err) => {
+      console.error(err);
+      alert("Có lỗi khi chấp nhận booking");
+    });
+};
+
+  const handleBellClick = () => {
+    axios
+      .get(`${BASE_URL}/api/san?date=${selectedDate}`)
+      .then((res) => {
+        const pending = res.data
+          .flatMap((san) => san.bookedSlots || [])
+          .filter((b) => b.TrangThai === "pending")
+          .map((b) => ({
+            ...b,
+            NgayLap: new Date(b.NgayLap).toLocaleDateString("sv-SE", {
+              timeZone: "Asia/Ho_Chi_Minh",
+            }),
+          }));
+
+        console.log("Pending bookings:", pending);
+        setPendingBookings(pending);
+        setPendingModalOpen(true);
+        setNotificationCount(pending.length);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const BASE_URL = "http://localhost:3000"; // port backend của bạn
+
   return (
     <div className="sanngay-container">
       {role !== "khachhang" && <Sidebar />}
@@ -546,7 +601,7 @@ export function DatSanNgay() {
       <div className="sanngay-content">
         <header className="datsan-header">
           <div className="left">
-            <div className="brand">Pickleball Bồ Đề</div>
+            {/* <div className="brand">Pickleball Bồ Đề</div> */}
             <div className="control">
               <label>Ngày</label>
               <input
@@ -557,6 +612,84 @@ export function DatSanNgay() {
               />
             </div>
           </div>
+          {/* 🔔 Nút chuông thông báo */}
+          <div className="notification-bell" onClick={handleBellClick}>
+            <i className="fa fa-bell"></i>
+            {notificationCount > 0 && (
+              <span className="badge">{notificationCount}</span>
+            )}
+          </div>
+
+          {/* Modal pending */}
+          {pendingModalOpen && (
+            <div className="pending-modal">
+              <div className="pending-modal-content">
+                <div className="modal-header">
+                  <h3>Danh sách sân pending</h3>
+                  <button
+                    className="close-btn"
+                    onClick={() => setPendingModalOpen(false)}
+                  >
+                    &times; Thoát
+                  </button>
+                </div>
+
+                <div className="modal-table-wrapper">
+                  <table className="pending-table">
+                    <thead>
+                      <tr>
+                        <th>MaDatSan</th>
+                        <th>MaSan</th>
+                        <th>MaKH</th>
+                        <th>NgayLap</th>
+                        <th>GioVao</th>
+                        <th>GioRa</th>
+                        <th>TongTien</th>
+                        <th>Payment Screenshot</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pendingBookings.map((b) => (
+                        <tr key={b.MaDatSan}>
+                          <td>{b.MaDatSan}</td>
+                          <td>{b.MaSan}</td>
+                          <td>{b.MaKH}</td>
+                          <td>{b.NgayLap?.split("T")[0]}</td>
+                          <td>{b.GioVao}</td>
+                          <td>{b.GioRa}</td>
+                          <td>{b.TongTien?.toLocaleString("vi-VN")} đ</td>
+                          <td>
+                            {b.PaymentScreenshot ? (
+                              <img
+                                src={`${BASE_URL}/uploads/payments/${b.PaymentScreenshot}`}
+                                className="payment-img"
+                                alt="Payment"
+                                onClick={() =>
+                                  setZoomedImage(b.PaymentScreenshot)
+                                } // click mở modal
+                                style={{ cursor: "pointer" }}
+                              />
+                            ) : (
+                              "Chưa có"
+                            )}
+                          </td>
+                          <td>
+                            <button
+                              className="accept-btn"
+                              onClick={() => handleAccept(b.MaDatSan)}
+                            >
+                              Chấp nhận
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="right legend">
             <span className="dot a"></span>
@@ -581,6 +714,19 @@ export function DatSanNgay() {
             XÁC NHẬN
           </button>
         </div>
+
+        {/* Modal phóng to ảnh */}
+        {zoomedImage && (
+          <div
+            className="image-modal"
+            onClick={() => setZoomedImage(null)} // click ngoài sẽ tắt
+          >
+            <img
+              src={`${BASE_URL}/uploads/payments/${zoomedImage}`}
+              alt="Payment"
+            />
+          </div>
+        )}
       </div>
     </div>
   );

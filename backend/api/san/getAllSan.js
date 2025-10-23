@@ -38,6 +38,7 @@ export async function getAllSan(req, res) {
           GhiChu: ds.GhiChu,
           TrangThai: ds.TrangThai,
           LoaiDat: ds.LoaiDat,
+          PaymentScreenshot: ds.PaymentScreenshot,
         }));
 
       return {
