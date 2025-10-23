@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 23, 2025 lúc 06:51 AM
+-- Thời gian đã tạo: Th10 23, 2025 lúc 10:36 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.0.30
 
@@ -132,6 +132,8 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`id`, `order_code`, `customer_id`, `customer_name`, `customer_email`, `customer_phone`, `shipping_address`, `shipping_city`, `notes`, `payment_method`, `total_amount`, `status`, `created_at`, `order_type`) VALUES
+(42, '19078709', NULL, '445', '312@gmail.com', '0984747372', '1231', 'HaNoi', '444', 'cod', 4800000, 'Pending', '2025-10-20 02:25:35', 'online'),
+(43, 'EAF0AF92', NULL, '445', '312@gmail.com', '0984747372', '1231', 'HaNoi', '6', 'cod', 4800000, 'Pending', '2025-10-20 02:31:30', 'online'),
 (76, '0B276690', 'KH809', 'Trần Xuân Tiến', 'xtien@gmail.com', '0854894838', 'KĐT Thanh Hà', 'Huyện Bình Minh, Hà Nội', 'giao giờ hành chính', 'cod', 5750000, 'cho_xac_nhan', '2025-10-23 03:53:59', 'online'),
 (77, '2C6A36C5', 'KH439', 'Nguyễn Đức Phương', 'phuongn@gmail.com', '0984323412', 'Phu Dien', 'Cau Giay Ha Nội', '', 'cod', 5950000, 'da_xac_nhan', '2025-10-23 04:20:18', 'online');
 
@@ -156,6 +158,8 @@ CREATE TABLE `order_items` (
 --
 
 INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `product_name`, `quantity`, `price`, `color`) VALUES
+(44, 42, 28, 'Anna Bright Scorpeus 3 14mm', 1, 4800000, 'Pink'),
+(45, 43, 28, 'Anna Bright Scorpeus 3 14mm', 1, 4800000, 'Pink'),
 (93, 76, 44, 'Heleus Pickleballs 4 Pack', 2, 350000, 'Yellow'),
 (94, 76, 28, 'Anna Bright Scorpeus 3 14mm', 1, 4800000, 'Black'),
 (95, 76, 43, 'Heleus Pickleball Pools', 1, 250000, 'Yellow'),
@@ -338,7 +342,7 @@ INSERT INTO `tbl_calam` (`maNV`, `tenNV`, `week_start`, `t2`, `t3`, `t4`, `t5`, 
 ('NV004', 'Lê Thị Thu Trang', '2025-10-13', 'morning', 'morning', 'morning', 'morning', 'morning', 'morning', 'morning', 'Chưa duyệt'),
 ('NV004', '', '2025-10-16', '', '', '', '', '', '', '', 'Chưa duyệt'),
 ('NV004', '', '2025-10-19', '', '', '', '', '', '', '', 'Chưa duyệt'),
-('NV004', '', '2025-10-20', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV004', 'Lê Thị Thu Trang', '2025-10-20', 'afternoon', 'afternoon', 'afternoon', 'afternoon', 'afternoon', 'afternoon', 'afternoon', 'Chưa duyệt'),
 ('NV004', '', '2025-10-21', '', '', '', '', '', '', '', 'Chưa duyệt'),
 ('NV004', '', '2025-10-22', '', '', '', '', '', '', '', 'Chưa duyệt'),
 ('NV004', '', '2025-10-23', '', '', '', '', '', '', '', 'Chưa duyệt'),
@@ -355,7 +359,54 @@ INSERT INTO `tbl_calam` (`maNV`, `tenNV`, `week_start`, `t2`, `t3`, `t4`, `t5`, 
 ('NV005', '', '2025-10-23', '', '', '', '', '', '', '', 'Chưa duyệt'),
 ('NV005', '', '2025-10-27', '', '', '', '', '', '', '', 'Chưa duyệt'),
 ('NV005', '', '2025-11-03', '', '', '', '', '', '', '', 'Chưa duyệt'),
-('NV005', '', '2025-11-10', '', '', '', '', '', '', '', 'Chưa duyệt');
+('NV005', '', '2025-11-10', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV001', 'Nguyễn Văn Minh', '0000-00-00', '', '', '', '', '', '', '', 'Đã duyệt'),
+('NV001', '', '2025-10-05', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV001', '', '2025-10-06', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV001', 'Nguyễn Văn Minh', '2025-10-12', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV001', 'Nguyễn Văn Minh', '2025-10-13', 'off', 'off', 'off', 'off', 'off', 'off', 'off', 'Đã duyệt'),
+('NV001', '', '2025-10-16', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV001', 'Nguyễn Văn Minh', '2025-10-19', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV001', '', '2025-10-20', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV001', '', '2025-10-21', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV001', '', '2025-10-22', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV001', '', '2025-10-23', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV001', '', '2025-10-27', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV001', '', '2025-11-03', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV001', '', '2025-11-10', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV002', '', '2025-10-06', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV002', 'Trần Thị Hạnh', '2025-10-13', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV002', '', '2025-10-16', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV002', '', '2025-10-19', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV002', '', '2025-10-20', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV002', '', '2025-10-21', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV002', '', '2025-10-22', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV002', '', '2025-10-23', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV002', '', '2025-10-27', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV002', '', '2025-11-03', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV002', '', '2025-11-10', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV003', '', '2025-10-06', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV003', 'Phạm Quốc Huy', '2025-10-13', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV003', '', '2025-10-16', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV003', '', '2025-10-19', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV003', '', '2025-10-20', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV003', '', '2025-10-21', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV003', '', '2025-10-22', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV003', '', '2025-10-23', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV003', '', '2025-10-27', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV003', '', '2025-11-03', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV003', '', '2025-11-10', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV004', 'Lê Thị Thu Trang', '2025-10-06', 'afternoon', 'afternoon', 'night', 'night', 'morning', 'morning', 'off', 'Chưa duyệt'),
+('NV004', 'Lê Thị Thu Trang', '2025-10-13', 'morning', 'morning', 'morning', 'morning', 'morning', 'morning', 'morning', 'Đã duyệt'),
+('NV004', '', '2025-10-16', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV004', '', '2025-10-19', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV004', 'Lê Thị Thu Trang', '2025-10-20', 'afternoon', 'afternoon', 'afternoon', 'afternoon', 'afternoon', 'afternoon', 'afternoon', 'Chưa duyệt'),
+('NV004', '', '2025-10-21', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV004', '', '2025-10-22', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV004', '', '2025-10-23', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV004', '', '2025-10-27', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV004', '', '2025-11-03', '', '', '', '', '', '', '', 'Chưa duyệt'),
+('NV004', '', '2025-11-10', '', '', '', '', '', '', '', 'Chưa duyệt');
 
 -- --------------------------------------------------------
 
@@ -494,17 +545,19 @@ INSERT INTO `tbl_khachhang` (`id`, `TenKh`, `GioiTinh`, `SDT`, `DiaChi`, `email`
 ('KH014', 'Hoàng Văn N', 'Nam', '923456789', 'Bà Rịa - Vũng Tàu', NULL),
 ('KH015', 'Nguyễn Thị O', 'Nữ', '976789012', 'Long An', NULL),
 ('KH111', '', NULL, '0931293924', '', 'xtien18@gmail.com'),
+('KH133', 'Nguyễn Minh Việt', NULL, '0389752695', NULL, 'viet@gmail.com'),
 ('KH209', '', NULL, '0987654321', '', 'nam@gmail.com'),
 ('KH230370', 'nguyen trung nguyen day', '', '0345137846', '', NULL),
 ('KH266662', 'hải lý', NULL, '0912314134', '', NULL),
-('KH439', 'Nguyễn Đức Phương', NULL, '0984323412', NULL, 'phuongn@gmail.com'),
+('KH439', 'Nguyễn Đức Phương', 'Nam', '0984323412', 'Bắc Giang  ', 'phuongn@gmail.com'),
 ('KH573815', 'a', NULL, '0909090909', '', NULL),
 ('KH610', 'Trần Quang Trung', NULL, '0984735342', '', 'trung2@gmail.com'),
 ('KH697865', 'abc', '', '0354553546', '', NULL),
 ('KH700714', 'nguyen van thanh tung', '', '0976313548', '', NULL),
 ('KH731893', 'nguyen van thanh', '', '0354553589', '', NULL),
-('KH809', 'Trần Xuân Tiến', NULL, '0854894838', '', 'xtien@gmail.com'),
-('KH886389', 'hey hey', '', '0654664684', '', NULL);
+('KH809', 'Trần Xuân Tiến', 'Nam', '0854894838', '', 'xtien@gmail.com'),
+('KH886389', 'hey hey', '', '0654664684', '', NULL),
+('KH991', 'Nguyễn Trung Nguyên', NULL, '0357125964', NULL, 'nguyentn@gmail.com');
 
 -- --------------------------------------------------------
 
@@ -528,12 +581,12 @@ CREATE TABLE `tbl_nhanvien` (
 --
 
 INSERT INTO `tbl_nhanvien` (`maNV`, `tenNV`, `ngaySinh`, `gioiTinh`, `sdt`, `email`, `queQuan`, `maTK`) VALUES
-('NV001', 'Nguyễn Văn Minh', '1990-03-09', 'Nữ', '0902345678', 'minh.nguyen@pickleball.vn', 'Hà Nội', 'TK001'),
-('NV002', 'Trần Thị Hạnh', '1995-08-20', 'Nữ', '0911223344', 'hanh.tran@pickleball.vn', 'Hải Dương', 'TK002'),
-('NV003', 'Phạm Quốc Huy', '1992-11-05', 'Nam', '0978123456', 'huy.pham@pickleball.vn', 'TP. Hồ Chí Minh', 'TK003'),
-('NV004', 'Lê Thị Thu Trang', '1998-06-17', 'Nữ', '0934456677', 'trang.le@pickleball.vn', 'Đà Nẵng', 'TK004'),
-('NV005', 'Đỗ Văn Long', '1988-01-23', 'Nam', '0912333444', 'long.do@pickleball.vn', 'Bắc Giang', 'TK005'),
-('NV006', 'Nguyễn Trung Nguyên ', '2025-10-16', 'Nam', '0352658523', 'nguyen@gmail.com', 'Hà Nội ', 'TK006');
+('NV001', 'Nguyễn Trung Nguyên', '1990-03-06', 'Nam', '0902345678', 'tnnguyen@gmail.com', 'Hà Nội', 'TK001'),
+('NV002', 'Đào Đăng Khải', '1995-08-18', 'Nam', '0911223344', 'khaitran@gmail.com', 'Hải Dương', 'TK002'),
+('NV003', 'Nguyễn Minh Việt ', '1992-11-03', 'Nam', '0978123456', 'vietminh@gmail.com', 'TP. Hồ Chí Minh', 'TK003'),
+('NV004', 'Nguyễn Đức Phương ', '1998-06-15', 'Nữ', '0934456677', 'phuongnguyen@gmail.com', 'Đà Nẵng', 'TK004'),
+('NV005', 'Trần Xuân Tiến ', '1988-01-20', 'Nam', '0912333444', 'tientran@gmail.com', 'Bắc Giang', 'TK005'),
+('NV006', 'Cao Thu Trang ', '2025-10-14', 'Nữ', '0352658523', 'trang@gmail.com', 'Hà Nội ', 'TK006');
 
 -- --------------------------------------------------------
 
@@ -591,11 +644,12 @@ CREATE TABLE `tbl_taikhoan` (
 
 INSERT INTO `tbl_taikhoan` (`maTK`, `userName`, `passWord`, `role`) VALUES
 ('TK000', 'admin', 'admin', 'Quản lý'),
-('TK001', 'nguyen', '123456', 'Nhân viên'),
+('TK001', 'nguyen', '1', 'Nhân viên'),
 ('TK002', 'khai', '123', 'Nhân viên'),
 ('TK003', 'viet', '123456', 'Nhân viên'),
 ('TK004', 'phuong', '1', 'Nhân viên'),
-('TK005', 'AD', 'AD', 'Nhân viên');
+('TK005', 'tien', '123', 'Nhân viên'),
+('TK006', 'trang', '123', 'Nhân viên');
 
 -- --------------------------------------------------------
 
@@ -617,8 +671,10 @@ CREATE TABLE `tbl_taikhoankhachhang` (
 --
 
 INSERT INTO `tbl_taikhoankhachhang` (`id`, `userName`, `passWord`, `TenKh`, `SDT`, `email`) VALUES
-('KH439', 'phuong', '123', '', '0984323412', 'phuongn@gmail.com'),
-('KH809', 'tientran', '123', '', '0854894838', 'xtien@gmail.com');
+('KH133', 'viet', '1', 'Nguyễn Minh Việt', '0389752695', 'viet@gmail.com'),
+('KH439', 'phuong', '1', 'Nguyễn Đức Phương', '0984323412', 'phuongn@gmail.com'),
+('KH809', 'tientran', '123', '', '0854894838', 'xtien@gmail.com'),
+('KH991', 'nguyen', '123', '', '0357125964', 'nguyentn@gmail.com');
 
 -- --------------------------------------------------------
 
@@ -829,7 +885,7 @@ ALTER TABLE `tbl_xeve_sukien`
 -- AUTO_INCREMENT cho bảng `cart_items`
 --
 ALTER TABLE `cart_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=81;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
 
 --
 -- AUTO_INCREMENT cho bảng `categories`

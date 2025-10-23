@@ -7,52 +7,44 @@ export default function ForgotPassword() {
   const [role, setRole] = useState("customer");
   const [email, setEmail] = useState("");
   const [maTK, setMaTK] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
 
+    // 🔹 Kiểm tra mật khẩu
+    if (!newPassword || !confirmPassword) {
+      setMessage("❌ Vui lòng nhập mật khẩu mới và xác nhận.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setMessage("❌ Mật khẩu xác nhận không khớp.");
+      return;
+    }
+
     try {
-      if (role === "employee") {
-        // 🔹 Quên mật khẩu nhân viên
-        const res = await axios.post("http://localhost:3000/api/taikhoan/forgot-password", {
-          role: "Nhân viên",
-          maTK,
-        });
+      const payload = {
+        role:
+          role === "employee"
+            ? "Nhân viên"
+            : role === "Quản lý"
+            ? "Quản lý"
+            : "Khách hàng",
+        email,
+        maTK,
+        newPassword,
+        confirmPassword,
+      };
 
-        if (res.data.success) {
-          setMessage("✅ Mật khẩu mới của nhân viên đã được gửi tới email công ty hoặc cập nhật trong hệ thống!");
-        } else {
-          setMessage("❌ Không tìm thấy mã tài khoản nhân viên!");
-        }
+      const res = await axios.post(
+        "http://localhost:3000/api/taikhoan/forgot-password",
+        payload
+      );
 
-      } else if (role === "Quản lý") {
-        // 🔹 Quên mật khẩu quản lý
-        const res = await axios.post("http://localhost:3000/api/taikhoan/forgot-password", {
-          role: "Quản lý",
-          maTK,
-        });
-
-        if (res.data.success) {
-          setMessage("✅ Mật khẩu mới của Quản lý đã được gửi tới email hệ thống!");
-        } else {
-          setMessage("❌ Không tìm thấy mã tài khoản Quản lý!");
-        }
-
-      } else {
-        // 🔹 Quên mật khẩu khách hàng
-        const res = await axios.post("http://localhost:3000/api/taikhoan/forgot-password", {
-          role: "Khách hàng",
-          email,
-        });
-
-        if (res.data.success) {
-          setMessage("✅ Mật khẩu mới đã được gửi tới email của bạn!");
-        } else {
-          setMessage("❌ Email không tồn tại!");
-        }
-      }
+      setMessage(res.data.success ? `✅ ${res.data.message}` : `❌ ${res.data.message}`);
     } catch (error) {
       console.error("Lỗi khi gửi yêu cầu:", error);
       setMessage("❌ Lỗi kết nối đến server!");
@@ -97,13 +89,13 @@ export default function ForgotPassword() {
               checked={role === "Quản lý"}
               onChange={() => setRole("Quản lý")}
             />
-            Quản lý 
+            Quản lý
           </label>
         </div>
 
         {/* 🔹 Form nhập dữ liệu */}
         <form onSubmit={handleSubmit}>
-          {role === "customer" ? (
+          {role === "customer" && (
             <input
               type="email"
               placeholder="Nhập email của bạn"
@@ -111,7 +103,9 @@ export default function ForgotPassword() {
               onChange={(e) => setEmail(e.target.value)}
               required
             />
-          ) : (
+          )}
+
+          {(role === "employee" || role === "Quản lý") && (
             <input
               type="text"
               placeholder="Nhập mã tài khoản (maTK)"
@@ -121,7 +115,22 @@ export default function ForgotPassword() {
             />
           )}
 
-          <button type="submit">Gửi yêu cầu</button>
+          <input
+            type="password"
+            placeholder="Nhập mật khẩu mới"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Xác nhận mật khẩu mới"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
+
+          <button type="submit">Cập nhật mật khẩu</button>
         </form>
 
         {message && <p className="message">{message}</p>}

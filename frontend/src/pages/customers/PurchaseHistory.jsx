@@ -14,19 +14,19 @@ const PurchaseHistory = () => {
     useEffect(() => {
         const fetchOrders = async () => {
             setLoading(true);
-            setError(null); // Xóa lỗi trước đó
-
-            const userString = localStorage.getItem('user');
+            setError(null);
             let customerId = null;
+            const userString = localStorage.getItem('user');
 
             if (userString) {
                 try {
                     const user = JSON.parse(userString);
                     // Đảm bảo đây là tài khoản khách hàng, không phải admin/nhân viên
-                    if (user.id && !user.role) {
+                    if (user.id) { // Chỉ cần kiểm tra user.id tồn tại
                         customerId = user.id;
+                        console.log('Frontend: Extracted customerId from localStorage:', customerId);
                     } else {
-                        setError("Bạn đã đăng nhập, nhưng không phải là tài khoản khách hàng.");
+                        setError("Bạn đã đăng nhập, nhưng không phải là tài khoản khách hàng hợp lệ.");
                         setLoading(false);
                         return;
                     }
@@ -35,26 +35,29 @@ const PurchaseHistory = () => {
                     setLoading(false);
                     return;
                 }
-            }
-
-            if (!customerId) {
+            } else {
                 setError("Bạn chưa đăng nhập. Vui lòng đăng nhập để xem lịch sử mua hàng.");
                 setLoading(false);
                 return;
             }
 
+            if (!customerId) {
+                setError("Không tìm thấy ID khách hàng để lấy lịch sử đơn hàng.");
+                setLoading(false);
+                return;
+            }
+
             try {
-                // Gọi API mới để lấy lịch sử đơn hàng của người dùng
-                // Truyền customerId làm query parameter
-                const response = await axios.get(`/api/client/orders/history?customerId=${customerId}`);
+                const response = await axios.get(`http://localhost:3000/api/client/orders/history?customerId=${customerId}`);
                 setOrders(response.data);
-            } catch (error) {
-                console.error('Lỗi khi tải lịch sử mua hàng:', error);
-                setError(error.response?.data?.error || 'Không thể tải lịch sử mua hàng.');
+            } catch (err) {
+                console.error('Lỗi khi lấy lịch sử đơn hàng:', err);
+                setError('Không thể tải lịch sử đơn hàng. Vui lòng thử lại sau.');
             } finally {
                 setLoading(false);
             }
         };
+
         fetchOrders();
     }, []); // Dependency array rỗng để chỉ chạy một lần khi component mount
 
@@ -99,7 +102,7 @@ const PurchaseHistory = () => {
                     <h1 className="page-title">Lịch sử mua hàng</h1>
                     <div className="error-message">
                         <p>{error}</p>
-                        {!localStorage.getItem('user') && ( 
+                        {!localStorage.getItem('user') && (
                             <Link to="/login" className="btn btn-primary">Đăng nhập ngay</Link>
                         )}
                     </div>

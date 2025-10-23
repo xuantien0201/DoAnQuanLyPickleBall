@@ -84,16 +84,21 @@ const Checkout = () => {
         ...formData,
         paymentMethod,
         items: cartItems.map(item => ({
-          product_id: item.product_id,
+          product_id: item.product_id, 
           name: item.name,
-          price: item.price,
           quantity: item.quantity,
-          color: item.color
+          price: item.price,
+          color: item.color,
+          // Thêm các trường khác nếu cần
         })),
-        total
+        total: total,
+        status: 'cho_xac_nhan', // Trạng thái mặc định
+        customer: isLoggedIn ? JSON.parse(localStorage.getItem('user')) : null // Gửi thông tin user nếu đã đăng nhập
       };
 
-      const response = await axios.post('/api/client/orders', orderData);
+      console.log("Dữ liệu đơn hàng gửi đi:", orderData); // THÊM DÒNG NÀY ĐỂ KIỂM TRA
+
+      const response = await axios.post('http://localhost:3000/api/client/orders', orderData); // Đảm bảo URL đầy đủ
 
       if (response.data.orderCode) {
         await clearCart();
@@ -231,7 +236,7 @@ const Checkout = () => {
 
             <div className="order-items">
               {cartItems.map((item) => (
-                <div key={item.id} className="order-item">
+                <div key={item.product_id} className="order-item">
                   <img src={item.image_url || '/images/placeholder.jpg'} alt={item.name} />
                   <div className="item-details">
                     <h4>{item.name}</h4>

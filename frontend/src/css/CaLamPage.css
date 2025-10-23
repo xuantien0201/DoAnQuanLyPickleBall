@@ -32,17 +32,18 @@ body {
   min-height: 100vh;
 }
 
-
-
-/* Nội dung chính */
-.calam-main {
-  flex: 1;
-  padding: 24px;
-  max-width: 1100px;
-  margin: 0 auto; /* căn giữa theo chiều ngang */
-  margin-top: 20px; /* khoảng cách sát trên, bạn có thể chỉnh giá trị */
+.calam-back-btn {
+  background-color: #6b7280; /* màu xám cho nút quay lại */
 }
 
+.calam-main {
+  flex: 1;
+  padding: 16px;
+  max-width: 1100px;
+  margin: 0 auto;
+  margin-top: 20px;
+  overflow-x: auto; /* nếu grid rộng, cho scroll ngang */
+}
 /* Nếu muốn căn form luôn sát trên mà không có padding, sửa padding */
 .calam-card {
   background: var(--panel);

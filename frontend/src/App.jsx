@@ -40,7 +40,7 @@ function App() {
 
   const noHeaderFooterRoutes = ['/xacnhansan', '/dat-san', '/xeve', '/categories', '/products', '/orders', '/santhang',
     '/nhaphang', '/nhacungcap', '/taophieunhap', '/lichsunhap', , '/calam', '/quanlycalam', '/quanlytaikhoan', '/nhanvien',
-    '/login', '/register', '/forgot-password',
+     '/register', '/forgot-password',
   ];
   const hideHeaderFooter = noHeaderFooterRoutes.includes(location.pathname);
   return (
@@ -83,7 +83,7 @@ function App() {
         </Routes>
       </main>
 
-      {!hideHeaderFooter && location.pathname !== '/pos' && <Footer />}
+      {!hideHeaderFooter && location.pathname !== '/pos' && location.pathname !== '/login'&& <Footer />}
     </div >
   )
 }

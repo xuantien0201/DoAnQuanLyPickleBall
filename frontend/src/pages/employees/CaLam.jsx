@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../../css/CaLamPage.css"; // đổi tên file CSS
-import { Sidebar } from "../../components/Sidebar";
-
+import { Link } from "react-router-dom";
 export default function CaLam() {
   const API = "http://localhost:3000/api/calam";
 
@@ -121,17 +120,21 @@ export default function CaLam() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  const unselectedDays = Object.entries(selected)
-    .filter(([_, shifts]) => {
-      if (!Array.isArray(shifts)) return true;
-      return shifts.length === 0;
-    })
-    .map(([day]) => day.toUpperCase());
+    const unselectedDays = Object.entries(selected)
+      .filter(([_, shifts]) => {
+        if (!Array.isArray(shifts)) return true;
+        return shifts.length === 0;
+      })
+      .map(([day]) => day.toUpperCase());
 
-  if (unselectedDays.length > 0) {
-    alert(`❌ Bạn phải chọn ít nhất 1 ca cho tất cả các ngày!\nNgày chưa chọn: ${unselectedDays.join(", ")}`);
-    return;
-  }
+    if (unselectedDays.length > 0) {
+      alert(
+        `❌ Bạn phải chọn ít nhất 1 ca cho tất cả các ngày!\nNgày chưa chọn: ${unselectedDays.join(
+          ", "
+        )}`
+      );
+      return;
+    }
     if (savedWeek?.status === "Đã duyệt") {
       alert("✅ Ca làm tuần này đã được duyệt, bạn không thể gửi lại!");
       return;
@@ -140,7 +143,7 @@ export default function CaLam() {
     const invalidDays = Object.entries(selected)
       .filter(([_, shifts]) => {
         if (!Array.isArray(shifts)) return false;
-        return shifts.length > 1 || (shifts.includes("none") && shifts.some(s => s !== "none"));
+        return shifts.length > 1 || (shifts.includes("none") && shifts.some((s) => s !== "none"));
       })
       .map(([day]) => day.toUpperCase());
 
@@ -196,10 +199,11 @@ export default function CaLam() {
 
   return (
     <div className="calam-app">
-      <Sidebar />
       <main className="calam-main">
+        {/* Form đăng ký ca làm */}
         <form className="calam-card" onSubmit={handleSubmit}>
           <div className="calam-head">
+            
             <div>
               <h1>Đăng ký ca làm theo tuần</h1>
             </div>
@@ -223,6 +227,9 @@ export default function CaLam() {
               >
                 Gửi đăng ký
               </button>
+              <Link to="/" className="calam-btn calam-back-btn">
+    Trang Chủ
+  </Link>
             </div>
           </div>
 

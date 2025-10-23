@@ -2,44 +2,47 @@ import { db } from "../../config/db.js";
 
 // Lấy danh sách ca làm theo tuần (nếu có)
 export async function getAllCaLam(req, res) {
-  const { week_start } = req.query;
+  const { week_start } = req.query;
 
-  if (!week_start) {
-    // Yêu cầu week_start để có thể JOIN đúng ca làm
-    return res.status(400).json({ message: "Thiếu tham số 'week_start'!" });
-  }
+  if (!week_start) {
+    // Yêu cầu week_start để có thể JOIN đúng ca làm
+    return res.status(400).json({ message: "Thiếu tham số 'week_start'!" });
+  }
 
-  try {
-    // LEFT JOIN tbl_nhanvien (N) với tbl_calam (C) chỉ cho tuần đã chọn
-    const query = `
+  try {
+    // LEFT JOIN tbl_nhanvien (N) với tbl_calam (C) chỉ cho tuần đã chọn
+    // THÊM GROUP BY để đảm bảo mỗi maNV chỉ hiện 1 lần
+    const query = `
 SELECT 
   N.maNV, 
   N.tenNV, 
   C.week_start, 
-  COALESCE(C.t2, 'none') AS t2, 
-  COALESCE(C.t3, 'none') AS t3, 
-  COALESCE(C.t4, 'none') AS t4, 
-  COALESCE(C.t5, 'none') AS t5, 
-  COALESCE(C.t6, 'none') AS t6, 
-  COALESCE(C.t7, 'none') AS t7, 
-  COALESCE(C.cn, 'none') AS cn, 
+  COALESCE(C.t2, 'Nghỉ') AS t2, 
+  COALESCE(C.t3, 'Nghỉ') AS t3, 
+  COALESCE(C.t4, 'Nghỉ') AS t4, 
+  COALESCE(C.t5, 'Nghỉ') AS t5, 
+  COALESCE(C.t6, 'Nghỉ') AS t6, 
+  COALESCE(C.t7, 'Nghỉ') AS t7, 
+  COALESCE(C.cn, 'Nghỉ') AS cn, 
   COALESCE(C.status, 'Chưa duyệt') AS status
 FROM tbl_nhanvien N
 LEFT JOIN tbl_calam C 
   ON N.maNV = C.maNV AND C.week_start = ?
+GROUP BY 
+    N.maNV, N.tenNV, C.week_start, C.t2, C.t3, C.t4, C.t5, C.t6, C.t7, C.cn, C.status
 ORDER BY N.maNV ASC
 `.trim();
 
-    const params = [week_start];
-        
-    const [rows] = await db.execute(query, params);
-    
-    // Dữ liệu đã được chuẩn hóa thành 'none' ngay trong SQL (COALESCE)
-    res.json(rows);
-  } catch (err) {
-    console.error("❌ Lỗi khi lấy danh sách ca làm:", err);
-    res.status(500).json({ message: "Lỗi khi lấy danh sách ca làm!" });
-  }
+    const params = [week_start];
+        
+    const [rows] = await db.execute(query, params);
+    
+    // Dữ liệu đã được chuẩn hóa thành 'Nghỉ' ngay trong SQL (COALESCE)
+    res.json(rows);
+  } catch (err) {
+    console.error("❌ Lỗi khi lấy danh sách ca làm:", err);
+    res.status(500).json({ message: "Lỗi khi lấy danh sách ca làm!" });
+  }
 }
 
 // Thêm mới / Cập nhật ca làm (Upsert)

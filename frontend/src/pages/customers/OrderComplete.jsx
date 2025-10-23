@@ -30,8 +30,8 @@ const OrderComplete = () => {
     switch (method) {
       case 'cod':
         return 'Thanh toán khi nhận hàng (COD)';
-      case 'card':
-        return 'Thẻ tín dụng';
+      // case 'card':
+      //   return 'Thẻ tín dụng';
       default:
         return method; // Hiển thị giá trị gốc nếu không khớp
     }
