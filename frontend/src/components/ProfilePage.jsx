@@ -6,6 +6,8 @@ const ProfilePage = () => {
   const [customerInfo, setCustomerInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [editing, setEditing] = useState(false); // trạng thái sửa
+  const [formData, setFormData] = useState({});
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -18,16 +20,14 @@ const ProfilePage = () => {
       try {
         if (userString) {
           const user = JSON.parse(userString);
-          customerId = user.id || user.MaKH; // kiểm tra id hoặc MaKH trong DB
-          
-          // Nếu user.role tồn tại, không phải khách hàng
-          if (user.role && user.role !== null) {
+          customerId = user.id || user.MaKH;
+          if (user.role) {
             setError("Bạn đã đăng nhập, nhưng không phải là Khách hàng.");
             setLoading(false);
             return;
           }
         }
-      } catch (e) {
+      } catch {
         setError("Lỗi dữ liệu đăng nhập. Vui lòng đăng nhập lại.");
         setLoading(false);
         return;
@@ -40,13 +40,16 @@ const ProfilePage = () => {
       }
 
       try {
-        const response = await axios.get(`http://localhost:3000/api/taikhoan/customer/profile?id=${customerId}`);
+        const response = await axios.get(
+          `http://localhost:3000/api/taikhoan/customer/profile?id=${customerId}`
+        );
         if (response.data.success) {
-          setCustomerInfo(response.data.customer); // 👈 quan trọng, phải set dữ liệu
+          setCustomerInfo(response.data.customer);
+          setFormData(response.data.customer);
         } else {
           setError(response.data.message || "Lỗi khi tải thông tin khách hàng");
         }
-      } catch (err) {
+      } catch {
         setError("Lỗi khi kết nối server");
       } finally {
         setLoading(false);
@@ -56,42 +59,94 @@ const ProfilePage = () => {
     fetchProfile();
   }, []);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleEditToggle = () => {
+    setEditing(!editing);
+    setFormData(customerInfo);
+  };
+
+  const handleSave = async () => {
+    try {
+      const response = await axios.put(
+        `http://localhost:3000/api/taikhoan/customer/profile/update?id=${customerInfo.id}`,
+        formData
+      );
+      if (response.data.success) {
+        setCustomerInfo(formData);
+        setEditing(false);
+        alert("Cập nhật thành công!");
+      } else {
+        alert(response.data.message || "Cập nhật thất bại!");
+      }
+    } catch {
+      alert("Lỗi khi kết nối server");
+    }
+  };
+
   if (loading) return <div className="profile-container">Đang tải thông tin...</div>;
   if (error) return <div className="profile-container error-message">{error}</div>;
 
-  // Chắc chắn customerInfo không null
   const customer = customerInfo || {};
+  const fields = [
+    { label: "Mã khách hàng", name: "id", value: customer.id, readOnly: true },
+    { label: "Họ và tên", name: "TenKh", value: customer.TenKh },
+    { label: "Số điện thoại", name: "SDT", value: customer.SDT },
+    { label: "Email", name: "email", value: customer.email },
+    { label: "Địa chỉ", name: "DiaChi", value: customer.DiaChi, fullWidth: true },
+    { label: "Giới tính", name: "GioiTinh", value: customer.GioiTinh, type: "select" },
+  ];
 
   return (
     <div className="profile-page">
       <div className="profile-container">
         <h2 className="profile-title">Thông tin Cá nhân Khách hàng</h2>
         <div className="profile-details-grid">
-          <div className="profile-item">
-            <span className="profile-label">Mã khách hàng:</span>
-            <span className="profile-value">{customer.id || "N/A"}</span>
-          </div>
-          <div className="profile-item">
-            <span className="profile-label">Họ và tên:</span>
-            <span className="profile-value">{customer.TenKh || "N/A"}</span>
-          </div>
-          <div className="profile-item">
-            <span className="profile-label">Số điện thoại:</span>
-            <span className="profile-value">{customer.SDT || "N/A"}</span>
-          </div>
-          <div className="profile-item">
-            <span className="profile-label">Email:</span>
-            <span className="profile-value">{customer.email || "N/A"}</span>
-          </div>
-          <div className="profile-item full-width">
-            <span className="profile-label">Địa chỉ:</span>
-            <span className="profile-value">{customer.DiaChi || "N/A"}</span>
-          </div>
-          <div className="profile-item">
-            <span className="profile-label">Giới tính:</span>
-            <span className="profile-value">{customer.GioiTinh || "N/A"}</span>
-          </div>
-         
+          {fields.map((field, index) => (
+            <div
+              key={index}
+              className={`profile-item ${field.fullWidth ? "full-width" : ""}`}
+            >
+              <span className="profile-label">{field.label}:</span>
+              {editing && !field.readOnly ? (
+                field.type === "select" ? (
+                  <select
+                    name={field.name}
+                    value={formData[field.name] || ""}
+                    onChange={handleChange}
+                  >
+                    <option value="">Chọn giới tính</option>
+                    <option value="Nam">Nam</option>
+                    <option value="Nữ">Nữ</option>
+                    <option value="Khác">Khác</option>
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    name={field.name}
+                    value={formData[field.name] || ""}
+                    onChange={handleChange}
+                  />
+                )
+              ) : (
+                <span className="profile-value">{customer[field.name] || "N/A"}</span>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div className="profile-actions">
+          {editing ? (
+            <>
+              <button className="btn btn-primary" onClick={handleSave}>Lưu</button>
+              <button className="btn btn-secondary" onClick={handleEditToggle}>Hủy</button>
+            </>
+          ) : (
+            <button className="btn btn-primary" onClick={handleEditToggle}>Sửa thông tin</button>
+          )}
         </div>
       </div>
     </div>
