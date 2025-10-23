@@ -65,8 +65,10 @@ const Header = () => {
               {/* Chỉ hiện menu Quản lý/Bán hàng cho Nhân viên hoặc Quản lý */}
               {(role === "Nhân viên") && (
                 <>
+                <Link to="/">Trang chủ</Link>
                   <Link to="/pos">Bán hàng tại quầy</Link>
                   <Link to="/calam">Đăng ký ca làm</Link>
+                  
                 </>
               )}
               {(role === "Quản lý") && (
