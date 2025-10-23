@@ -19,7 +19,6 @@ const AdminOrders = () => {
   const [dashboardStats, setDashboardStats] = useState({
     totalOrdersFiltered: 0,
     totalRevenueFiltered: 0,
-    processingOrders: 0,
     failedOrders: 0,
     successfulOrders: 0,
     totalItemsSold: 0,
@@ -30,7 +29,7 @@ const AdminOrders = () => {
   const [filterStartDate, setFilterStartDate] = useState('');
   const [filterEndDate, setFilterEndDate] = useState('');
   const [filterSalesType, setFilterSalesType] = useState('all'); // 'all', 'online', 'pos'
-  const [activeTab, setActiveTab] = useState('all'); // 'all', 'cho_xac_nhan', 'dang_xu_ly', ...
+  const [activeTab, setActiveTab] = useState('all');
 
   useEffect(() => { fetchOrders(); }, [currentPage, searchTerm, filterStartDate, filterEndDate, filterSalesType, activeTab]);
 
@@ -110,14 +109,15 @@ const AdminOrders = () => {
       da_xac_nhan: { color: 'info', text: 'Đã xác nhận' },
       dang_giao: { color: 'primary', text: 'Đang giao hàng' },
       da_nhan: { color: 'success', text: 'Đã nhận hàng' },
+      doi_hang: { color: 'info', text: 'Đổi hàng' },
+      tra_hang: { color: 'danger', text: 'Trả hàng' },
+      hoan_tien: { color: 'warning', text: 'Hoàn tiền' },
       da_huy: { color: 'danger', text: 'Đã hủy (trước xác nhận)' },
       huy_sau_xac_nhan: { color: 'danger', text: 'Hủy sau xác nhận' },
       giao_that_bai: { color: 'danger', text: 'Giao thất bại' },
     };
     return statuses[status] || { color: 'secondary', text: status };
   };
-
-
 
   const formatDate = (d) => new Date(d).toLocaleString('vi-VN');
 
@@ -144,14 +144,16 @@ const AdminOrders = () => {
       cho_xac_nhan: ['da_xac_nhan', 'da_huy'],
       da_xac_nhan: ['dang_giao', 'huy_sau_xac_nhan'],
       dang_giao: ['da_nhan', 'giao_that_bai'],
-      da_nhan: [],
+      da_nhan: ['doi_hang', 'tra_hang'],
+      doi_hang: ['da_nhan', 'tra_hang'],
+      tra_hang: ['hoan_tien'],
+      hoan_tien: [], // Cập nhật
       da_huy: [],
       huy_sau_xac_nhan: [],
       giao_that_bai: [],
     };
     return allowedTransitionsFrontend[current] || [];
   };
-
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
@@ -268,7 +270,19 @@ const AdminOrders = () => {
           {/* Hàng chứa status + ô tìm kiếm bên phải */}
           <div className="status-search-row">
             <div className="status-tabs">
-              {['all', 'cho_xac_nhan', 'da_xac_nhan', 'dang_giao', 'da_nhan', 'da_huy', 'huy_sau_xac_nhan', 'giao_that_bai'].map(status => (
+              {[
+                'all',
+                'cho_xac_nhan',
+                'da_xac_nhan',
+                'dang_giao',
+                'da_nhan',
+                'doi_hang', 
+                'tra_hang', 
+                'hoan_tien', 
+                'da_huy',
+                'huy_sau_xac_nhan',
+                'giao_that_bai'
+              ].map(status => (
                 <button
                   key={status}
                   className={`status-tab-btn ${activeTab === status ? 'active' : ''}`}
@@ -337,6 +351,9 @@ const AdminOrders = () => {
                 <option value="da_xac_nhan">✅ Xác nhận đơn</option>
                 <option value="dang_giao">🚚 Đang giao hàng</option>
                 <option value="da_nhan">🎉 Đã nhận hàng</option>
+                <option value="doi_hang">🔄 Đổi hàng</option> {/* Thêm trạng thái mới */}
+                <option value="tra_hang">↩️ Trả hàng</option> {/* Thêm trạng thái mới */}
+                <option value="hoan_tien">💲 Hoàn tiền</option> {/* Thêm trạng thái mới */}
                 <option value="da_huy">❌ Hủy (trước xác nhận)</option>
                 <option value="huy_sau_xac_nhan">♻️ Hủy sau xác nhận (hoàn kho)</option>
                 <option value="giao_that_bai">⚠️ Giao thất bại (hoàn kho)</option>
@@ -401,8 +418,8 @@ const AdminOrders = () => {
                     <span className={`order-type-badge order-type-${order.order_type || 'unknown'}`}>
                       {/* Điều chỉnh logic hiển thị cho Kiểu bán */}
                       {order.order_type === 'pos' ? 'Tại quầy' :
-                       order.order_type === 'online' ? 'Online' : // Kiểm tra trực tiếp 'online'
-                       'Không xác định'}
+                        order.order_type === 'online' ? 'Online' : // Kiểm tra trực tiếp 'online'
+                          'Không xác định'}
                     </span>
                   </td>
                   <td>
@@ -450,7 +467,7 @@ const AdminOrders = () => {
         {showModal && selectedOrder && (
           <div className="modal-overlay" onClick={closeModal}>
             <div className="modal-content order-details-modal" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-header">
+              <div className="modal-header-order">
                 <h3>Chi tiết Đơn hàng - {selectedOrder.order_code}</h3>
                 <button className="modal-close" onClick={closeModal}>×</button>
               </div>

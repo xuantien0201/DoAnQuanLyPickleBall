@@ -224,7 +224,7 @@
   padding: 20px;
 }
 
-.modal-content {
+.modal-content-product {
   background: white;
   border-radius: 12px;
   width: 100%;
@@ -234,7 +234,7 @@
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
 }
 
-.modal-header {
+.modal-header-product {
   position: relative; /* để h3 căn giữa tuyệt đối */
   display: flex;
   justify-content: flex-end; /* đẩy nút sang bên phải */

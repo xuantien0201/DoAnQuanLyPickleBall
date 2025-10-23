@@ -82,6 +82,9 @@ const PurchaseHistory = () => {
             da_xac_nhan: { color: 'info', text: 'Đã xác nhận' },
             dang_giao: { color: 'primary', text: 'Đang giao hàng' },
             da_nhan: { color: 'success', text: 'Đã nhận hàng' },
+            doi_hang: { color: 'info', text: 'Đổi hàng' }, // Trạng thái mới
+            tra_hang: { color: 'danger', text: 'Trả hàng' }, // Trạng thái mới
+            hoan_tien: { color: 'warning', text: 'Hoàn tiền' }, // Trạng thái mới
             da_huy: { color: 'danger', text: 'Đã hủy (trước xác nhận)' },
             huy_sau_xac_nhan: { color: 'danger', text: 'Hủy sau xác nhận' },
             giao_that_bai: { color: 'danger', text: 'Giao thất bại' },
@@ -163,7 +166,7 @@ const PurchaseHistory = () => {
             {showModal && selectedOrder && (
                 <div className="modal-overlay" onClick={closeModal}>
                     <div className="modal-content order-details-modal" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
+                        <div className="modal-header-history">
                             <h3>Chi tiết Đơn hàng - {selectedOrder.order_code}</h3>
                             <button className="modal-close" onClick={closeModal}>×</button>
                         </div>

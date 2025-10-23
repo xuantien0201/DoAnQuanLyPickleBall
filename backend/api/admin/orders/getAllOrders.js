@@ -10,7 +10,7 @@ router.get('/', async (req, res) => {
         const searchPattern = `%${search}%`;
 
         let whereClause = 'WHERE 1=1';
-        const queryParams = []; // Dùng cho cả orders, totalCount và dashboardStats
+        const queryParams = [];
 
         if (search) {
             whereClause += ' AND (o.order_code LIKE ? OR kh.TenKh LIKE ? OR kh.SDT LIKE ?)';
@@ -23,7 +23,7 @@ router.get('/', async (req, res) => {
         }
         if (endDate) {
             whereClause += ' AND o.created_at <= ?';
-            queryParams.push(endDate + ' 23:59:59'); // Bao gồm cả ngày kết thúc
+            queryParams.push(endDate + ' 23:59:59');
         }
         if (salesType && salesType !== 'all') {
             whereClause += ' AND o.order_type = ?';
@@ -34,7 +34,7 @@ router.get('/', async (req, res) => {
             queryParams.push(statusFilter);
         }
 
-        // 1. Lấy tổng số đơn hàng (áp dụng bộ lọc)
+        // 1️⃣ Đếm tổng số đơn hàng
         const [totalCountResult] = await db.query(
             `SELECT COUNT(o.id) AS totalCount
              FROM orders o
@@ -44,7 +44,7 @@ router.get('/', async (req, res) => {
         );
         const totalCount = totalCountResult[0].totalCount;
 
-        // 2. Lấy danh sách đơn hàng có phân trang và lọc
+        // 2️⃣ Lấy danh sách đơn hàng (phân trang)
         const [orders] = await db.query(
             `SELECT o.*, kh.TenKh AS customer_name, kh.SDT AS customer_phone, kh.email AS customer_email, kh.GioiTinh AS customer_gender
              FROM orders o
@@ -55,20 +55,23 @@ router.get('/', async (req, res) => {
             [...queryParams, parseInt(limit), offset]
         );
 
-        // 3. Lấy dữ liệu cho Dashboard Mini (áp dụng cùng bộ lọc)
+        // 3️⃣ Lấy dữ liệu Dashboard mini (áp dụng cùng bộ lọc)
         const [dashboardStatsResult] = await db.query(`
             SELECT
-                COUNT(o.id) AS totalOrdersFiltered,
-                SUM(CASE WHEN o.status = 'da_nhan' THEN o.total_amount ELSE 0 END) AS totalRevenueFiltered,
-                SUM(CASE WHEN o.status = 'dang_xu_ly' THEN 1 ELSE 0 END) AS processingOrders,
-                SUM(CASE WHEN o.status IN ('da_huy', 'giao_that_bai', 'huy_sau_xac_nhan') THEN 1 ELSE 0 END) AS failedOrders,
-                SUM(CASE WHEN o.status = 'da_nhan' THEN 1 ELSE 0 END) AS successfulOrders
-            FROM orders o
-            LEFT JOIN tbl_khachhang kh ON o.customer_id = kh.id
-            ${whereClause}
+            COUNT(o.id) AS totalOrdersFiltered,
+            SUM(CASE
+                WHEN o.status IN ('da_nhan', 'doi_hang', 'tra_hang') THEN o.total_amount -- Doanh thu dương cho đơn đã nhận và đổi hàng, trả hàng
+                ELSE 0 -- Các trạng thái khác không ảnh hưởng đến doanh thu
+            END) AS totalRevenueFiltered,
+            SUM(CASE WHEN o.status = 'cho_xac_nhan' THEN 1 ELSE 0 END) AS pendingOrders,
+            SUM(CASE WHEN o.status IN ('da_huy', 'giao_that_bai', 'huy_sau_xac_nhan', 'hoan_tien') THEN 1 ELSE 0 END) AS failedOrders,
+            SUM(CASE WHEN o.status = 'da_nhan' THEN 1 ELSE 0 END) AS successfulOrders
+        FROM orders o
+        LEFT JOIN tbl_khachhang kh ON o.customer_id = kh.id
+        ${whereClause}
         `, queryParams);
 
-        // Lấy tổng số lượng sản phẩm đã bán và top sản phẩm (chỉ từ đơn hàng thành công)
+        // 4️⃣ Tổng số lượng sản phẩm bán được và top sản phẩm
         const successfulOrdersWhereClause = whereClause + " AND o.status = 'da_nhan'";
 
         const [totalItemsSoldResult] = await db.query(`
@@ -99,7 +102,7 @@ router.get('/', async (req, res) => {
             dashboardStats: {
                 totalOrdersFiltered: stats.totalOrdersFiltered || 0,
                 totalRevenueFiltered: stats.totalRevenueFiltered || 0,
-                processingOrders: stats.processingOrders || 0,
+                pendingOrders: stats.pendingOrders || 0,
                 failedOrders: stats.failedOrders || 0,
                 successfulOrders: stats.successfulOrders || 0,
                 totalItemsSold: totalItemsSold,
