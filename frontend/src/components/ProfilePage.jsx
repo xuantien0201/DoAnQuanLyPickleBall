@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import PurchaseHistory from '../pages/customers/PurchaseHistory'; // Import PurchaseHistory
 import './ProfilePage.css';
 
 const ProfilePage = () => {
@@ -18,8 +19,8 @@ const ProfilePage = () => {
       try {
         if (userString) {
           const user = JSON.parse(userString);
-          customerId = user.id || user.MaKH; // kiểm tra id hoặc MaKH trong DB
-          
+          customerId = user.id; // Lấy id từ tbl_taikhoankhachhang
+
           // Nếu user.role tồn tại, không phải khách hàng
           if (user.role && user.role !== null) {
             setError("Bạn đã đăng nhập, nhưng không phải là Khách hàng.");
@@ -42,7 +43,7 @@ const ProfilePage = () => {
       try {
         const response = await axios.get(`http://localhost:3000/api/taikhoan/customer/profile?id=${customerId}`);
         if (response.data.success) {
-          setCustomerInfo(response.data.customer); // 👈 quan trọng, phải set dữ liệu
+          setCustomerInfo(response.data.customer);
         } else {
           setError(response.data.message || "Lỗi khi tải thông tin khách hàng");
         }
@@ -59,7 +60,6 @@ const ProfilePage = () => {
   if (loading) return <div className="profile-container">Đang tải thông tin...</div>;
   if (error) return <div className="profile-container error-message">{error}</div>;
 
-  // Chắc chắn customerInfo không null
   const customer = customerInfo || {};
 
   return (
@@ -91,8 +91,12 @@ const ProfilePage = () => {
             <span className="profile-label">Giới tính:</span>
             <span className="profile-value">{customer.GioiTinh || "N/A"}</span>
           </div>
-         
         </div>
+      </div>
+
+      {/* Thêm phần lịch sử mua hàng */}
+      <div className="purchase-history-section">
+        <PurchaseHistory />
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import axios from 'axios';
@@ -17,8 +17,51 @@ const Checkout = () => {
     notes: '',
     sex: ''
   });
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Thêm state để kiểm tra đăng nhập
 
   const total = getCartTotal();
+
+  useEffect(() => {
+    const loadCustomerData = async () => {
+      const userString = localStorage.getItem('user');
+      if (userString) {
+        try {
+          const user = JSON.parse(userString);
+          // Kiểm tra nếu user có id và không phải là admin/nhân viên
+          if (user.id && !user.role) {
+            setIsLoggedIn(true);
+            const response = await axios.get(`http://localhost:3000/api/taikhoan/customer/profile?id=${user.id}`);
+            if (response.data.success) {
+              const customer = response.data.customer;
+              // Phân tách DiaChi thành address và city nếu có
+              let address = customer.DiaChi || '';
+              let city = '';
+              if (address.includes(',')) {
+                const parts = address.split(',');
+                city = parts.pop().trim(); // Lấy phần cuối làm city
+                address = parts.join(',').trim(); // Phần còn lại là address
+              }
+
+              setFormData({
+                fullName: customer.TenKh || '',
+                email: customer.email || '',
+                phone: customer.SDT || '',
+                address: address,
+                city: city,
+                notes: '', // Ghi chú luôn trống cho đơn hàng mới
+                sex: customer.GioiTinh || ''
+              });
+            }
+          }
+        } catch (error) {
+          console.error('Lỗi khi tải thông tin khách hàng:', error);
+          // Xử lý lỗi hoặc để form trống
+        }
+      }
+    };
+
+    loadCustomerData();
+  }, []); // Chạy một lần khi component mount
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -199,7 +242,7 @@ const Checkout = () => {
                 </div>
               ))}
             </div>
-{/* 
+            {/* 
             <div className="coupon-input">
               <input type="text" placeholder="Mã khuyến mãi" />
               <button type="button" className="btn btn-outline">Áp dụng</button>

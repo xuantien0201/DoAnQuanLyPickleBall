@@ -37,9 +37,10 @@ import LichSuNhapHang from './pages/managers/LichSuNhapHang'
 
 function App() {
   const location = useLocation();
- 
+
   const noHeaderFooterRoutes = ['/xacnhansan', '/dat-san', '/xeve', '/categories', '/products', '/orders', '/santhang',
-    '/nhaphang', '/nhacungcap', '/taophieunhap', '/lichsunhap',,'/calam','/quanlycalam','/quanlytaikhoan','/nhanvien','/login', '/register', '/forgot-password'
+    '/nhaphang', '/nhacungcap', '/taophieunhap', '/lichsunhap', , '/calam', '/quanlycalam', '/quanlytaikhoan', '/nhanvien',
+    '/login', '/register', '/forgot-password',
   ];
   const hideHeaderFooter = noHeaderFooterRoutes.includes(location.pathname);
   return (
@@ -65,7 +66,7 @@ function App() {
           <Route path="/products" element={<AdminProducts />} />
           <Route path="/categories" element={<AdminCategories />} />
           <Route path="/orders" element={<AdminOrders />} />
-          <Route path="/pos" element={<POS />} />         
+          <Route path="/pos" element={<POS />} />
           <Route path="nhanvien" element={<NhanVien />} />
           <Route path="calam" element={<CaLam />} />
           <Route path="quanlycalam" element={<QuanLyCaLam />} />
@@ -77,12 +78,12 @@ function App() {
           <Route path="nhacungcap" element={<QuanLyNhaCungCap />} />
           <Route path="taophieunhap" element={<NhapHang />} />
           <Route path="lichsunhap" element={<LichSuNhapHang />} />
-      <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile" element={<ProfilePage />} />
 
         </Routes>
       </main>
 
-      {!hideHeaderFooter && <Footer />}
+      {!hideHeaderFooter && location.pathname !== '/pos' && <Footer />}
     </div >
   )
 }

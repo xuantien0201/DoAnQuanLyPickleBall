@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 23, 2025 lúc 03:33 AM
+-- Thời gian đã tạo: Th10 23, 2025 lúc 06:51 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.0.30
 
@@ -42,7 +42,7 @@ CREATE TABLE `cart_items` (
 --
 
 INSERT INTO `cart_items` (`id`, `session_id`, `product_id`, `quantity`, `color`, `created_at`, `updated_at`) VALUES
-(72, 'session_1760853385557_rhhi6zzlm', 44, 1, 'Yellow', '2025-10-22 17:17:26', '2025-10-22 17:17:26');
+(80, 'session_1760853385557_rhhi6zzlm', 44, 1, 'Yellow', '2025-10-23 04:33:23', '2025-10-23 04:33:23');
 
 -- --------------------------------------------------------
 
@@ -132,28 +132,8 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`id`, `order_code`, `customer_id`, `customer_name`, `customer_email`, `customer_phone`, `shipping_address`, `shipping_city`, `notes`, `payment_method`, `total_amount`, `status`, `created_at`, `order_type`) VALUES
-(43, 'EAF0AF92', 'KH886395', 'Nguyễn Ngân', 'ngannguyen33@gmail.com', '0984747372', 'Hà Đông', 'Hà Noi', '6', 'cod', 4800000, 'da_nhan', '2025-10-01 02:31:30', 'online'),
-(48, '78294D2E', NULL, 'Test', '4441@gmail.com', '4', '1231', 'HaNoi', '3', 'cod', 250000, 'da_nhan', '2025-10-22 01:48:02', 'online'),
-(50, 'B7118C9F', NULL, '4', '4441@gmail.com', '4', '1231', 'HaNoi', '', 'cod', 350000, 'da_nhan', '2025-10-22 02:19:18', 'online'),
-(51, 'A39B50FA', NULL, '445', '312@gmail.com', '0984747372', '1231', 'HaNoi', '', 'cod', 8269999, 'da_nhan', '2025-10-22 02:21:43', 'online'),
-(53, 'E306D6B3', 'KH886393', '12333', '123@gmail.com', '123444', '1231', 'HaNoi', '4', 'cod', 950000, 'da_huy', '2025-10-22 03:28:30', 'online'),
-(54, '691B9EA9', NULL, '4441412', 'khanhtoan@gmail.com', '398474744', 'Phu Dien', 'Cau Giay Ha Nội', '', 'cod', 3149999, 'da_huy', '2025-10-22 03:34:18', 'online'),
-(57, '8DFC955C', 'KH886397', 'Nguyễn Trung Kiến', 'kien@gmail.com', '0938128334', 'số nhà 3 ngách 67 phường Bắc Ninh', 'Quảng Ninh', '', 'cod', 250000, 'da_nhan', '2025-10-22 04:26:05', 'online'),
-(58, '928E541D', 'KH886398', 'tien', '', '09123841', '231', '1234', '1234', 'cod', 1700000, 'da_nhan', '2025-10-22 04:47:07', 'online'),
-(60, '861D6FBD', 'KH886399', 'Trần Xuân Tùng', '', '091233331', '231', '1234', '', 'cod', 2999000, 'giao_that_bai', '2025-10-22 05:27:54', 'online'),
-(62, 'E3023762', 'KH886401', 'Nguyen Khanh Trung', '', '098474722', '33', 'HaNoi', '', 'cod', 1500000, 'da_nhan', '2025-10-22 06:46:49', 'online'),
-(64, '4190C578', 'KH886403', 'Nguyen Khanh Trung', 'trungnguyenkhanh2@gmail.com', '0984743323', 'Đống Đa', 'Hà Nội', 'giờ hành chính', 'cod', 250000, 'da_huy', '2025-10-22 07:24:54', 'online'),
-(65, '70259B09', 'KH886404', 'Nguyen Khanh Toan', 'khanhtoan4@gmail.com', '98474733', 'Phu Dien', 'Cau Giay Ha Nội', '33', 'cod', 250000, 'da_nhan', '2025-10-22 14:46:02', 'online'),
-(66, 'C241B1A6', 'KH886404', 'Nguyen Khanh Toan', 'khanhtoan4@gmail.com', '98474733', 'Phu Dien', 'Cau Giay Ha Nội', '', 'cod', 300000, 'da_nhan', '2025-10-22 14:47:12', 'online'),
-(67, 'BE84E9AD', 'KH886404', 'Nguyen Khanh Toan', 'khanhtoan4@gmail.com', '98474733', 'Phu Dien', 'Cau Giay Ha Nội', '', 'cod', 2849999, 'da_nhan', '2025-10-22 14:48:26', 'online'),
-(68, '4D43C7AC', 'KH886404', 'Nguyen Khanh Toan', 'khanhtoan4@gmail.com', '98474733', 'Phu Dien', 'Cau Giay Ha Nội', '3', 'cod', 250000, 'huy_sau_xac_nhan', '2025-10-22 15:09:33', 'online'),
-(69, '98EDA2DF', 'KH886405', 'Trần Trung Tiến', '', '0984747222', '1231', 'HaNoi', '', 'cod', 350000, 'giao_that_bai', '2025-10-22 15:09:47', 'online'),
-(70, '4814630D', 'KH886406', 'Trần Trung Quân', NULL, '091283848', NULL, NULL, NULL, 'Tiền mặt', 9850000, 'da_nhan', '2025-10-22 15:27:13', 'pos'),
-(71, '1BC09A2C', 'KH886407', 'Quân Trần', NULL, '091283842', NULL, NULL, NULL, 'Tiền mặt', 4850000, 'da_nhan', '2025-10-22 15:42:44', 'pos'),
-(72, '9AA8C7DE', 'KH886405', 'Trần Trung Tiến', '', '0984747222', '1231', 'HaNoi', '', 'cod', 19995000, 'da_nhan', '2025-10-22 15:55:24', 'online'),
-(73, '9F337609', 'KH886405', 'Trần Trung Tiến', '', '0984747222', '1231', 'HaNoi', '', 'cod', 24000000, 'da_nhan', '2025-10-22 15:56:40', 'online'),
-(74, 'B292B0A6', 'KH886405', 'Trần Trung Tiến', '', '0984747222', '1231', 'HaNoi', '', 'cod', 270000, 'da_nhan', '2025-10-22 16:52:18', 'online'),
-(75, '507CE052', 'KH886405', 'Trần Trung Tiến', '', '0984747222', '1231', 'HaNoi', '', 'cod', 9600000, 'da_nhan', '2025-10-22 16:57:42', 'online');
+(76, '0B276690', 'KH809', 'Trần Xuân Tiến', 'xtien@gmail.com', '0854894838', 'KĐT Thanh Hà', 'Huyện Bình Minh, Hà Nội', 'giao giờ hành chính', 'cod', 5750000, 'cho_xac_nhan', '2025-10-23 03:53:59', 'online'),
+(77, '2C6A36C5', 'KH439', 'Nguyễn Đức Phương', 'phuongn@gmail.com', '0984323412', 'Phu Dien', 'Cau Giay Ha Nội', '', 'cod', 5950000, 'da_xac_nhan', '2025-10-23 04:20:18', 'online');
 
 -- --------------------------------------------------------
 
@@ -176,41 +156,13 @@ CREATE TABLE `order_items` (
 --
 
 INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `product_name`, `quantity`, `price`, `color`) VALUES
-(45, 43, 28, 'Anna Bright Scorpeus 3 14mm', 1, 4800000, 'Pink'),
-(46, 48, 43, 'Heleus Pickleball Pools', 1, 250000, 'Yellow'),
-(48, 50, 44, 'Heleus Pickleballs 4 Pack', 1, 350000, 'Yellow'),
-(49, 51, 43, 'Heleus Pickleball Pools', 1, 250000, 'Yellow'),
-(50, 51, 44, 'Heleus Pickleballs 4 Pack', 1, 350000, 'Yellow'),
-(51, 51, 45, 'Bóng tập 50 quả', 1, 200000, 'Green'),
-(52, 51, 46, 'Joola Primo 3 Star 20 Pack', 1, 1500000, 'White'),
-(53, 51, 47, 'Joola Primo 3 Star 4 Pack', 1, 320000, 'White'),
-(54, 51, 48, 'Bong Pickleball Joola Primo 4 Qua', 1, 300000, 'Yellow'),
-(55, 51, 71, 'Giày Nikecourt Air Zoom Vapor Pro 2', 1, 2849999, 'White'),
-(56, 51, 72, 'Giày Pickleball Asics', 1, 2500000, 'Blue'),
-(61, 53, 43, 'Heleus Pickleball Pools', 1, 250000, 'Yellow'),
-(62, 53, 44, 'Heleus Pickleballs 4 Pack', 2, 350000, 'Yellow'),
-(63, 54, 71, 'Giày Nikecourt Air Zoom Vapor Pro 2', 1, 2849999, 'White'),
-(64, 54, 48, 'Bong Pickleball Joola Primo 4 Qua', 1, 300000, 'Yellow'),
-(69, 57, 43, 'Heleus Pickleball Pools', 1, 250000, 'Yellow'),
-(70, 58, 45, 'Bóng tập 50 quả', 1, 200000, 'Green'),
-(71, 58, 46, 'Joola Primo 3 Star 20 Pack', 1, 1500000, 'White'),
-(73, 60, 75, 'Giày Nike Zoom Gp Challenge 1 Premium', 1, 2999000, 'White'),
-(76, 62, 46, 'Joola Primo 3 Star 20 Pack', 1, 1500000, 'White'),
-(78, 64, 43, 'Heleus Pickleball Pools', 1, 250000, 'Yellow'),
-(79, 65, 43, 'Heleus Pickleball Pools', 1, 250000, 'Yellow'),
-(80, 66, 48, 'Bong Pickleball Joola Primo 4 Qua', 1, 300000, 'Yellow'),
-(81, 67, 71, 'Giày Nikecourt Air Zoom Vapor Pro 2', 1, 2849999, 'White'),
-(82, 68, 43, 'Heleus Pickleball Pools', 1, 250000, 'Yellow'),
-(83, 69, 44, 'Heleus Pickleballs 4 Pack', 1, 350000, 'Yellow'),
-(84, 70, 30, 'Ben Johns Hyperion 3 14mm', 1, 4950000, NULL),
-(85, 70, 31, 'Ben Johns Perseus 3 14mm', 1, 4900000, NULL),
-(86, 71, 39, 'Tyson Mcguffin Magnus 3 14mm', 1, 4850000, NULL),
-(87, 72, 43, 'Heleus Pickleball Pools', 20, 250000, 'Yellow'),
-(88, 72, 75, 'Giày Nike Zoom Gp Challenge 1 Premium', 5, 2999000, 'White'),
-(89, 73, 28, 'Anna Bright Scorpeus 3 14mm', 5, 4800000, 'Black'),
-(90, 74, 51, 'Cuon Can Chinh Hang Joola', 1, 150000, 'Gray'),
-(91, 74, 52, 'Edge Tape 24mm', 1, 120000, 'Black'),
-(92, 75, 28, 'Anna Bright Scorpeus 3 14mm', 2, 4800000, 'Black');
+(93, 76, 44, 'Heleus Pickleballs 4 Pack', 2, 350000, 'Yellow'),
+(94, 76, 28, 'Anna Bright Scorpeus 3 14mm', 1, 4800000, 'Black'),
+(95, 76, 43, 'Heleus Pickleball Pools', 1, 250000, 'Yellow'),
+(96, 77, 44, 'Heleus Pickleballs 4 Pack', 2, 350000, 'Yellow'),
+(97, 77, 28, 'Anna Bright Scorpeus 3 14mm', 1, 4800000, 'Black'),
+(98, 77, 43, 'Heleus Pickleball Pools', 1, 250000, 'Yellow'),
+(99, 77, 45, 'Bóng tập 50 quả', 1, 200000, 'Green');
 
 -- --------------------------------------------------------
 
@@ -257,7 +209,7 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `name`, `description`, `price`, `original_price`, `category`, `image_url`, `colors`, `rating`, `reviews_count`, `stock`, `is_new`, `discount_percent`, `created_at`, `updated_at`) VALUES
-(28, 'Anna Bright Scorpeus 3 14mm', 'Vợt nhẹ với khả năng kiểm soát tuyệt vời, dòng signature của Anna Bright.', 4800000, NULL, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760925530248.webp', '[\"Black\"]', 0.0, 0, 33, 0, NULL, '2025-10-20 01:43:44', '2025-10-22 16:57:50'),
+(28, 'Anna Bright Scorpeus 3 14mm', 'Vợt nhẹ với khả năng kiểm soát tuyệt vời, dòng signature của Anna Bright.', 4800000, NULL, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760925530248.webp', '[\"Black\"]', 0.0, 0, 32, 0, NULL, '2025-10-20 01:43:44', '2025-10-23 04:20:46'),
 (29, 'Ben Johns Blue Lightning Set', 'Bộ vợt và phụ kiện Ben Johns phiên bản Blue Lightning.', 5200000, NULL, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760925520526.webp', '[\"Blue\"]', 0.0, 0, 30, 0, NULL, '2025-10-20 01:43:44', '2025-10-22 08:55:16'),
 (30, 'Ben Johns Hyperion 3 14mm', 'Vợt Ben Johns Hyperion thế hệ 3, dày 14mm.', 4950000, 5500000, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760925515107.webp', '[\"Black\"]', 0.0, 0, 59, 0, 10, '2025-10-20 01:43:44', '2025-10-22 15:27:13'),
 (31, 'Ben Johns Perseus 3 14mm', 'Vợt Ben Johns Perseus thế hệ 3, dày 14mm, tối ưu sức mạnh.', 4900000, NULL, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760925509481.webp', '[\"Black\",\"Red\"]', 0.0, 0, 54, 0, 10, '2025-10-20 01:43:44', '2025-10-22 15:27:13'),
@@ -272,9 +224,9 @@ INSERT INTO `products` (`id`, `name`, `description`, `price`, `original_price`, 
 (40, 'Tyson Mcguffin Magnus 3 16mm', 'Vợt Tyson Mcguffin Magnus 3, dày 16mm.', 4950000, 5200000, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760925422283.webp', '[\"Red\",\"White\",\"Black\"]', 0.0, 0, 35, 0, 5, '2025-10-20 01:43:44', '2025-10-22 08:55:16'),
 (41, 'Vot Joola Ben Johns Hyperion Cgs 16', 'Vợt Joola Ben Johns Hyperion CGS 16.', 4700000, NULL, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760925412693.webp', '[\"Black\",\"Gray\"]', 0.0, 0, 70, 0, NULL, '2025-10-20 01:43:44', '2025-10-22 08:55:16'),
 (42, 'Vot Joola Ben Johns Hyperion Cas 135', 'Vợt Joola Ben Johns Hyperion CAS 13.5.', 4650000, NULL, 'Vợt Pickleball', 'http://localhost:3000/uploads/products/product-1760925400676.webp', '[\"Blue\",\"Black\"]', 0.0, 0, 65, 0, NULL, '2025-10-20 01:43:44', '2025-10-22 08:55:16'),
-(43, 'Heleus Pickleball Pools', 'Bóng pickleball Heleus độ nảy chuẩn, bền bỉ.', 250000, NULL, 'Bóng Pickleball', 'http://localhost:3000/uploads/products/product-1760925376892.webp', '[\"Yellow\"]', 0.0, 0, 176, 0, NULL, '2025-10-20 01:43:44', '2025-10-22 15:56:22'),
-(44, 'Heleus Pickleballs 4 Pack', 'Hộp 4 bóng pickleball Heleus tiêu chuẩn thi đấu.', 350000, 400000, 'Bóng Pickleball', 'http://localhost:3000/uploads/products/product-1760925369335.webp', '[\"Yellow\",\"Orange\"]', 0.0, 0, 147, 0, 13, '2025-10-20 01:43:44', '2025-10-22 15:19:31'),
-(45, 'Bóng tập 50 quả', 'Bóng pickleball chất lượng cao.', 200000, NULL, 'Bóng Pickleball', 'http://localhost:3000/uploads/products/product-1760925361505.webp', '[\"Green\"]', 0.0, 0, 298, 0, NULL, '2025-10-20 01:43:44', '2025-10-22 12:17:26'),
+(43, 'Heleus Pickleball Pools', 'Bóng pickleball Heleus độ nảy chuẩn, bền bỉ.', 250000, NULL, 'Bóng Pickleball', 'http://localhost:3000/uploads/products/product-1760925376892.webp', '[\"Yellow\"]', 0.0, 0, 175, 0, NULL, '2025-10-20 01:43:44', '2025-10-23 04:20:46'),
+(44, 'Heleus Pickleballs 4 Pack', 'Hộp 4 bóng pickleball Heleus tiêu chuẩn thi đấu.', 350000, 400000, 'Bóng Pickleball', 'http://localhost:3000/uploads/products/product-1760925369335.webp', '[\"Yellow\",\"Orange\"]', 0.0, 0, 145, 0, 13, '2025-10-20 01:43:44', '2025-10-23 04:20:46'),
+(45, 'Bóng tập 50 quả', 'Bóng pickleball chất lượng cao.', 200000, NULL, 'Bóng Pickleball', 'http://localhost:3000/uploads/products/product-1760925361505.webp', '[\"Green\"]', 0.0, 0, 297, 0, NULL, '2025-10-20 01:43:44', '2025-10-23 04:20:46'),
 (46, 'Joola Primo 3 Star 20 Pack', 'Hộp 20 bóng Joola Primo 3 sao.', 1500000, NULL, 'Bóng Pickleball', 'http://localhost:3000/uploads/products/product-1760925334317.webp', '[\"White\"]', 0.0, 0, 77, 0, NULL, '2025-10-20 01:43:44', '2025-10-22 12:17:26'),
 (47, 'Joola Primo 3 Star 4 Pack', 'Hộp 4 bóng Joola Primo 3 sao.', 320000, NULL, 'Bóng Pickleball', 'http://localhost:3000/uploads/products/product-1760925327601.webp', '[\"White\",\"Yellow\"]', 0.0, 0, 249, 0, NULL, '2025-10-20 01:43:44', '2025-10-22 08:55:16'),
 (48, 'Bong Pickleball Joola Primo 4 Qua', 'Bóng Joola Primo, hộp 4 quả.', 300000, 350000, 'Bóng Pickleball', 'http://localhost:3000/uploads/products/product-1760925301614.webp', '[\"Yellow\"]', 0.0, 0, 178, 0, 14, '2025-10-20 01:43:44', '2025-10-22 14:47:35'),
@@ -517,7 +469,7 @@ CREATE TABLE `tbl_khachhang` (
   `TenKh` varchar(100) NOT NULL,
   `GioiTinh` varchar(3) DEFAULT NULL,
   `SDT` varchar(12) DEFAULT NULL,
-  `DiaChi` varchar(300) NOT NULL,
+  `DiaChi` varchar(300) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -541,27 +493,18 @@ INSERT INTO `tbl_khachhang` (`id`, `TenKh`, `GioiTinh`, `SDT`, `DiaChi`, `email`
 ('KH013', 'Lưu Thị M', 'Nữ', '980112233', 'Bình Dương', NULL),
 ('KH014', 'Hoàng Văn N', 'Nam', '923456789', 'Bà Rịa - Vũng Tàu', NULL),
 ('KH015', 'Nguyễn Thị O', 'Nữ', '976789012', 'Long An', NULL),
+('KH111', '', NULL, '0931293924', '', 'xtien18@gmail.com'),
+('KH209', '', NULL, '0987654321', '', 'nam@gmail.com'),
 ('KH230370', 'nguyen trung nguyen day', '', '0345137846', '', NULL),
 ('KH266662', 'hải lý', NULL, '0912314134', '', NULL),
+('KH439', 'Nguyễn Đức Phương', NULL, '0984323412', NULL, 'phuongn@gmail.com'),
 ('KH573815', 'a', NULL, '0909090909', '', NULL),
+('KH610', 'Trần Quang Trung', NULL, '0984735342', '', 'trung2@gmail.com'),
 ('KH697865', 'abc', '', '0354553546', '', NULL),
 ('KH700714', 'nguyen van thanh tung', '', '0976313548', '', NULL),
 ('KH731893', 'nguyen van thanh', '', '0354553589', '', NULL),
-('KH886389', 'hey hey', '', '0654664684', '', NULL),
-('KH886393', '12333', NULL, '123444', '1231, HaNoi', '123@gmail.com'),
-('KH886395', '4', NULL, '6', '1231, HaNoi', '312@gmail.com'),
-('KH886396', '131', NULL, '3113', '333, 333', '312@gmail.com'),
-('KH886397', 'Nguyễn Trung Kiến', NULL, '0938128334', 'số nhà 3 ngách 67 phường Bắc Ninh, Quảng Ninh', 'kien@gmail.com'),
-('KH886398', 'tien', NULL, '09123841', '231, 1234', ''),
-('KH886399', 'Trần Xuân Tùng', 'Nam', '091233331', '231, 1234', ''),
-('KH886400', 'tao là nam', 'Nam', '091923913', '', NULL),
-('KH886401', 'Nguyen Khanh Trung', 'Nữ', '098474722', '33, HaNoi', ''),
-('KH886402', 'ahiahi', 'Nữ', '012039491942', '', NULL),
-('KH886403', 'Nguyen Khanh Trung', 'Nam', '0984743323', 'Đống Đa, Hà Nội', 'trungnguyenkhanh2@gmail.com'),
-('KH886404', 'Nguyen Khanh Toan', 'Nam', '98474733', 'Phu Dien, Cau Giay Ha Nội', 'khanhtoan4@gmail.com'),
-('KH886405', 'Trần Trung Tiến', 'Nam', '0984747222', '1231, HaNoi', ''),
-('KH886406', 'Trần Trung Quân', 'Nam', '091283848', '', NULL),
-('KH886407', 'Quân Trần', 'Nam', '091283842', '', NULL);
+('KH809', 'Trần Xuân Tiến', NULL, '0854894838', '', 'xtien@gmail.com'),
+('KH886389', 'hey hey', '', '0654664684', '', NULL);
 
 -- --------------------------------------------------------
 
@@ -661,23 +604,21 @@ INSERT INTO `tbl_taikhoan` (`maTK`, `userName`, `passWord`, `role`) VALUES
 --
 
 CREATE TABLE `tbl_taikhoankhachhang` (
-  `id` int(11) NOT NULL,
-  `userName` varchar(50) NOT NULL,
-  `passWord` varchar(255) NOT NULL,
-  `email` varchar(100) NOT NULL
+  `id` varchar(255) NOT NULL,
+  `userName` varchar(50) DEFAULT NULL,
+  `passWord` varchar(50) DEFAULT NULL,
+  `TenKh` varchar(100) NOT NULL,
+  `SDT` varchar(20) DEFAULT NULL,
+  `email` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `tbl_taikhoankhachhang`
 --
 
-INSERT INTO `tbl_taikhoankhachhang` (`id`, `userName`, `passWord`, `email`) VALUES
-(1, 'anh', '1', 'khach1@gmail.com'),
-(2, 'khach2', '456', 'khach2@gmail.com'),
-(3, 'nguyenphuong', 'abc123', 'phuong@gmail.com'),
-(4, 'lethanh', 'pass789', 'lethanh@gmail.com'),
-(5, 'minhvu', 'password', 'minhvu@gmail.com'),
-(6, 'anh123', '1', 'anh@gmail.com');
+INSERT INTO `tbl_taikhoankhachhang` (`id`, `userName`, `passWord`, `TenKh`, `SDT`, `email`) VALUES
+('KH439', 'phuong', '123', '', '0984323412', 'phuongn@gmail.com'),
+('KH809', 'tientran', '123', '', '0854894838', 'xtien@gmail.com');
 
 -- --------------------------------------------------------
 
@@ -864,9 +805,7 @@ ALTER TABLE `tbl_taikhoan`
 -- Chỉ mục cho bảng `tbl_taikhoankhachhang`
 --
 ALTER TABLE `tbl_taikhoankhachhang`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `userName` (`userName`),
-  ADD UNIQUE KEY `email` (`email`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Chỉ mục cho bảng `tbl_xeve_datve`
@@ -890,7 +829,7 @@ ALTER TABLE `tbl_xeve_sukien`
 -- AUTO_INCREMENT cho bảng `cart_items`
 --
 ALTER TABLE `cart_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=81;
 
 --
 -- AUTO_INCREMENT cho bảng `categories`
@@ -914,13 +853,13 @@ ALTER TABLE `nhacungcap`
 -- AUTO_INCREMENT cho bảng `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
 
 --
 -- AUTO_INCREMENT cho bảng `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=93;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=100;
 
 --
 -- AUTO_INCREMENT cho bảng `phieunhap`
@@ -945,12 +884,6 @@ ALTER TABLE `reviews`
 --
 ALTER TABLE `tbl_datsan`
   MODIFY `MaDatSan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
-
---
--- AUTO_INCREMENT cho bảng `tbl_taikhoankhachhang`
---
-ALTER TABLE `tbl_taikhoankhachhang`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT cho bảng `tbl_xeve_datve`

@@ -36,7 +36,7 @@ const Footer = () => {
 
             <div className="footer-column">
               <h4>Liên hệ chúng tôi</h4>
-              <ul class="no-list-style">
+              <ul className="no-list-style">
                 <li><span> Địa chỉ :</span> 237 Phú Viên, Phường Bồ Đề, Quận Long Biên, Thành phố Hà Nội</li>
                 <li><span> Phone :</span> <a href="tel:079 668 2288">079 668 2288</a></li>
                 <li><span> Chủ sân :</span> <a href="#">Pickleball Bồ Đề</a></li>
