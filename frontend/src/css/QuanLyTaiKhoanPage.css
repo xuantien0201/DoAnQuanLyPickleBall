@@ -3,7 +3,13 @@
   grid-template-columns: 260px 1fr;
   min-height: 100vh;
 }
-
+.tk-table {
+  border-radius: 10px;
+  overflow: hidden;
+  /* Thêm dòng này để căn chỉnh cột dễ dàng hơn */
+  table-layout: fixed; /* 💡 Bắt buộc trình duyệt cố định độ rộng cột */
+  width: 100%; /* Đảm bảo bảng chiếm toàn bộ chiều rộng có sẵn */
+}
 .tk-container {
   background: #ffffff;
   padding: 24px;

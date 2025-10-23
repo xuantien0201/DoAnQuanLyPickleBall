@@ -8,7 +8,7 @@ import { login } from "./Login.js";
 import { forgotPassword } from "./forgot-password.js";
 import { loginKhachHang } from "./LoginKH.js";
 import { registerKhachHang } from "./register.js";
-
+import { getKhachHangProfile } from "./LoginKH.js";
 const router = express.Router();
 
 router.post("/login", login);
@@ -20,5 +20,5 @@ router.delete("/:maTK", deleteTaiKhoan);
 router.post("/forgot-password", forgotPassword);
 router.post("/loginKhachHang", loginKhachHang);
 router.post("/registerKhachHang", registerKhachHang);
-
+router.get("/customer/profile", getKhachHangProfile);
 export default router;

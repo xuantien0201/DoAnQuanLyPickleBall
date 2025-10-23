@@ -13,6 +13,7 @@ import { TTXeVe } from './pages/managers/TTXeVe'
 import { POS } from './pages/customers/POS'; // Thêm import này
 import Header from './components/Header';
 import Footer from './components/Footer';
+import ProfilePage from './components/ProfilePage';
 import Home from './pages/customers/Home';
 import Shop from './pages/customers/Shop';
 import ProductDetail from './pages/customers/ProductDetail';
@@ -34,7 +35,7 @@ import { NhanVien } from './pages/managers/NhanVien'
 
 function App() {
   const location = useLocation();
-  const noHeaderFooterRoutes = ['/xacnhansan','/dat-san','/xeve', '/categories', '/products', '/orders', '/santhang'];
+  const noHeaderFooterRoutes = ['/xacnhansan','/dat-san','/xeve', '/categories', '/products', '/orders', '/santhang','/calam','/quanlycalam','/quanlytaikhoan','/nhanvien','/login', '/register', '/forgot-password', ];
   const hideHeaderFooter = noHeaderFooterRoutes.includes(location.pathname);
   return (
     <div className="app">
@@ -67,7 +68,7 @@ function App() {
       <Route path="login" element={<Login />} />
       <Route path="register" element={<Register />} />
       <Route path="forgot-password" element={<ForgotPassword />} />
-      
+      <Route path="/profile" element={<ProfilePage />} />
         </Routes>
       </main>
 

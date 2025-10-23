@@ -33,16 +33,17 @@ export default function Login() {
           window.location.href = "/nhanvien";
         } else alert("❌ Sai tài khoản hoặc mật khẩu!");
       } else {
-        res = await axios.post("http://localhost:3000/api/taikhoan/loginKhachHang", {
-          userName: username,
-          passWord: password,
-        });
-        if (res.data.success) {
-          alert("✅ Đăng nhập khách hàng thành công!");
-          localStorage.setItem("user", JSON.stringify(res.data.user));
-          window.location.href = "/trangchu";
-        } else alert("❌ " + res.data.message);
-      }
+        res = await axios.post("http://localhost:3000/api/taikhoan/loginKhachHang", {
+          userName: username,
+          passWord: password,
+        });
+        if (res.data.success) {
+          alert("✅ Đăng nhập khách hàng thành công!");
+          // Sau khi backend cập nhật, res.data.user sẽ có TenKH
+          localStorage.setItem("user", JSON.stringify(res.data.user)); 
+          window.location.href = "/trangchu";
+        } else alert("❌ " + res.data.message);
+      }
     } catch (err) {
       console.error("Lỗi khi đăng nhập:", err);
       alert("❌ Lỗi kết nối server!");

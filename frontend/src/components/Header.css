@@ -8,7 +8,54 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   font-family: "Poppins", sans-serif;
 }
+/* Đảm bảo các action-icon có kiểu dáng đồng nhất */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px; /* Khoảng cách giữa các mục hành động */
+}
 
+.action-icon {
+    display: flex;
+    align-items: center;
+    color: #333; /* Màu chữ mặc định */
+    text-decoration: none;
+    transition: color 0.2s ease;
+    cursor: pointer; /* Cho cả nút logout */
+}
+
+.action-icon:hover {
+    color: #4CAF50; /* Màu khi hover (tương ứng với màu xanh logo) */
+}
+
+.action-icon svg {
+    margin-right: 4px;
+    width: 20px;
+    height: 20px;
+    stroke-width: 2;
+}
+
+/* Kiểu dáng cho icon Đăng xuất mới */
+.logout-icon {
+    /* Đảm bảo nó có cùng kiểu dáng với login-icon */
+    display: flex;
+    align-items: center;
+    font-size: 15px; /* Giữ kích thước chữ đồng nhất */
+    white-space: nowrap; /* Ngăn chữ bị xuống dòng */
+}
+
+/* Điều chỉnh lại khoảng cách tổng thể nếu cần */
+.cart-icon-wrapper {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #333;
+    transition: color 0.2s ease;
+}
+
+.cart-icon-wrapper:hover {
+    color: #4CAF50;
+}
 .header-main {
   padding: 15px 0;
 }

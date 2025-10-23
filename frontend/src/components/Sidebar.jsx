@@ -52,10 +52,6 @@ export function Sidebar() {
             <span className="ic">💵</span>
             <span>Bán hàng tại quầy</span>
           </Link>
-          <Link className="slink" to="/">
-            <span className="ic">🗓️</span>
-            <span>Trở về Trang chủ</span>
-          </Link>
           <Link className="slink" to="#">
             <span className="ic">🎟️</span>
             <span>Khuyến mãi</span>
@@ -63,6 +59,18 @@ export function Sidebar() {
           <Link className="slink active" to="/nhanvien">
             <span className="ic">👥</span>
             <span>Nhân viên</span>
+          </Link>
+           <Link className="slink" to="/calam">
+            <span className="ic">📅</span>
+            <span>Đăng kí ca làm</span>
+          </Link>
+          <Link className="slink" to="/quanlycalam">
+            <span className="ic">📝</span>
+            <span>Quản lí ca làm</span>
+          </Link>
+          <Link className="slink" to="/quanlytaikhoan">
+            <span className="ic">🔑</span>
+            <span>Quản lí tài khoản</span>
           </Link>
           <Link className="slink" to="#">
             <span className="ic">📇</span>
@@ -81,10 +89,15 @@ export function Sidebar() {
             <span className="ic">⚙️</span>
             <span>Cài đặt</span>
           </Link>
+           <Link className="slink" to="/trangchu">
+            <span className="ic">🗓️</span>
+            <span>Đăng xuất</span>
+          </Link>
           <Link className="slink" to="#">
             <span className="ic">❓</span>
             <span>Trung tâm trợ giúp</span>
           </Link>
+          
         </nav>
 
         <div className="user">
