@@ -16,33 +16,49 @@ const PurchaseHistory = () => {
             setLoading(true);
             setError(null);
             let customerId = null;
-            const userString = localStorage.getItem('user');
 
+            const khachString = localStorage.getItem('khach'); // Lấy thông tin khách hàng
+            const userString = localStorage.getItem('user'); // Lấy thông tin nhân viên/quản lý
+
+            // Ưu tiên kiểm tra nếu có nhân viên/quản lý đăng nhập
             if (userString) {
                 try {
                     const user = JSON.parse(userString);
-                    // Đảm bảo đây là tài khoản khách hàng, không phải admin/nhân viên
-                    if (user.id) { // Chỉ cần kiểm tra user.id tồn tại
-                        customerId = user.id;
-                        console.log('Frontend: Extracted customerId from localStorage:', customerId);
-                    } else {
-                        setError("Bạn đã đăng nhập, nhưng không phải là tài khoản khách hàng hợp lệ.");
+                    // Nếu là nhân viên hoặc quản lý, trang này không dành cho họ
+                    if (user.role === "Nhân viên" || user.role === "Quản lý") {
+                        setError("Trang này chỉ dành cho khách hàng. Bạn đã đăng nhập với vai trò " + user.role + ".");
                         setLoading(false);
                         return;
                     }
                 } catch (e) {
+                    console.error("Lỗi parse userString trong PurchaseHistory:", e);
+                    // Nếu userString bị lỗi, tiếp tục kiểm tra khachString
+                }
+            }
+
+            // Kiểm tra thông tin khách hàng
+            if (khachString) {
+                try {
+                    const khach = JSON.parse(khachString);
+                    if (khach.role === "khachhang" && khach.MaKH) {
+                        customerId = khach.MaKH; // Lấy MaKH làm ID khách hàng
+                        console.log('Frontend: Extracted customerId from localStorage (khach):', customerId);
+                    } else {
+                        setError("Dữ liệu đăng nhập khách hàng không hợp lệ. Vui lòng đăng nhập lại.");
+                        setLoading(false);
+                        return;
+                    }
+                } catch (e) {
+                    console.error("Lỗi parse khachString trong PurchaseHistory:", e);
                     setError("Lỗi dữ liệu người dùng trong bộ nhớ cục bộ. Vui lòng đăng nhập lại.");
                     setLoading(false);
                     return;
                 }
-            } else {
-                setError("Bạn chưa đăng nhập. Vui lòng đăng nhập để xem lịch sử mua hàng.");
-                setLoading(false);
-                return;
             }
 
+            // Nếu không tìm thấy ID khách hàng hợp lệ
             if (!customerId) {
-                setError("Không tìm thấy ID khách hàng để lấy lịch sử đơn hàng.");
+                setError("Bạn chưa đăng nhập. Vui lòng đăng nhập để xem lịch sử mua hàng.");
                 setLoading(false);
                 return;
             }
@@ -84,7 +100,7 @@ const PurchaseHistory = () => {
             da_nhan: { color: 'success', text: 'Đã nhận hàng' },
             doi_hang: { color: 'info', text: 'Đổi hàng' }, // Trạng thái mới
             tra_hang: { color: 'danger', text: 'Trả hàng' }, // Trạng thái mới
-            hoan_tien: { color: 'warning', text: 'Hoàn tiền' }, // Trạng thái mới
+            hoan_tien: { color: 'danger', text: 'Hoàn tiền' }, // Trạng thái mới
             da_huy: { color: 'danger', text: 'Đã hủy (trước xác nhận)' },
             huy_sau_xac_nhan: { color: 'danger', text: 'Hủy sau xác nhận' },
             giao_that_bai: { color: 'danger', text: 'Giao thất bại' },

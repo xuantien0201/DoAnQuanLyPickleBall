@@ -1,4 +1,4 @@
-body {
+.ctxeve-container body {
   font-family: "Segoe UI", sans-serif;
   background-color: #f9fbff;
   margin: 0;
@@ -15,7 +15,7 @@ body {
   box-shadow: 0 4px 12px rgba(0, 80, 200, 0.1);
 }
 
-h1 {
+.ctxeve-container h1 {
   text-align: center;
   color: #007bff;
   margin-bottom: 24px;

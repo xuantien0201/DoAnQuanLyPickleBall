@@ -111,7 +111,7 @@ const AdminOrders = () => {
       da_nhan: { color: 'success', text: 'Đã nhận hàng' },
       doi_hang: { color: 'info', text: 'Đổi hàng' },
       tra_hang: { color: 'danger', text: 'Trả hàng' },
-      hoan_tien: { color: 'warning', text: 'Hoàn tiền' },
+      hoan_tien: { color: 'danger', text: 'Hoàn tiền' },
       da_huy: { color: 'danger', text: 'Đã hủy (trước xác nhận)' },
       huy_sau_xac_nhan: { color: 'danger', text: 'Hủy sau xác nhận' },
       giao_that_bai: { color: 'danger', text: 'Giao thất bại' },
@@ -184,15 +184,22 @@ const AdminOrders = () => {
         status: bulkActionStatus,
       });
 
-      const { message, skippedCount, invalidOrders } = response.data;
+      const data = response.data;
+      const { message, skippedCount, invalidOrders, stockMessages } = data;
       let alertMessage = message;
+
+      // 🟢 Hiển thị thông tin kho nếu có
+      if (stockMessages && stockMessages.length > 0) {
+        alertMessage += `\n\n📦 Thông tin kho:\n${stockMessages.join('\n')}`;
+      }
 
       if (skippedCount > 0) {
         const skippedDetails = invalidOrders.map(order => `${order.order_code}: ${order.reason}`).join('\n');
-        alertMessage += `\n\n⚠️ Đã bỏ qua ${skippedDetails} đơn hàng không hợp lệ:\n${skippedDetails}`;
+        alertMessage += `\n\n⚠️ Đã bỏ qua ${skippedCount} đơn hàng không hợp lệ:\n${skippedDetails}`;
       }
 
       alert(alertMessage);
+
 
       fetchOrders();
       setSelectedOrders([]);
@@ -276,9 +283,9 @@ const AdminOrders = () => {
                 'da_xac_nhan',
                 'dang_giao',
                 'da_nhan',
-                'doi_hang', 
-                'tra_hang', 
-                'hoan_tien', 
+                'doi_hang',
+                'tra_hang',
+                'hoan_tien',
                 'da_huy',
                 'huy_sau_xac_nhan',
                 'giao_that_bai'
@@ -295,7 +302,7 @@ const AdminOrders = () => {
 
             <input
               type="text"
-              placeholder="Tìm kiếm theo mã HĐ, tên, SĐT..."
+              placeholder="Tìm kiếm theo mã ĐH, tên, SĐT..."
               className="simple-search-input"
               value={searchTerm}
               onChange={handleSearchChange}
@@ -351,8 +358,8 @@ const AdminOrders = () => {
                 <option value="da_xac_nhan">✅ Xác nhận đơn (trừ kho) </option>
                 <option value="dang_giao">🚚 Đang giao hàng</option>
                 <option value="da_nhan">🎉 Đã nhận hàng</option>
-                <option value="doi_hang">🔄 Đổi hàng</option> 
-                <option value="tra_hang">↩️ Trả hàng (hoàn kho chờ hoàn tiền)</option> 
+                <option value="doi_hang">🔄 Đổi hàng</option>
+                <option value="tra_hang">↩️ Trả hàng (hoàn kho chờ hoàn tiền)</option>
                 <option value="hoan_tien">💲 Hoàn tiền</option>
                 <option value="da_huy">❌ Hủy (trước xác nhận)</option>
                 <option value="huy_sau_xac_nhan">♻️ Hủy sau xác nhận (hoàn kho)</option>
@@ -381,7 +388,7 @@ const AdminOrders = () => {
                     onChange={handleSelectAll}
                   />
                 </th>
-                <th>Mã HĐ</th>
+                <th>Mã ĐH</th>
                 <th>Khách hàng</th>
                 <th>Ngày đặt</th>
                 <th>Tổng tiền</th>

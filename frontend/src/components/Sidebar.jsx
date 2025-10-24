@@ -53,7 +53,7 @@ export function Sidebar() {
         </Link>
         <Link className="slink" to="/orders">
           <span className="ic">🧾</span>
-          <span>Hóa đơn</span>
+          <span>Đơn hàng</span>
         </Link>
         <Link className="slink" to="/pos">
           <span className="ic">💵</span>
@@ -82,6 +82,10 @@ export function Sidebar() {
         <Link className="slink" to="/nhaphang">
           <span className="ic">🎟️</span>
           <span>Nhập hàng</span>
+        </Link>
+        <Link className="slink" to="/lichsunhap">
+          <span className="ic">🎟️</span>
+          <span>Lịch sử nhập hàng</span>
         </Link>
       </nav>
 

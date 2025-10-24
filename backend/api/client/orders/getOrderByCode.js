@@ -1,12 +1,9 @@
 import express from 'express';
-import { db } from '../../../config/db.js'; // Adjusted path
-
+import { db } from '../../../config/db.js'; 
 const router = express.Router();
 
-// Get order by order code
 router.get('/:orderCode', async (req, res) => {
     try {
-        // Join với bảng khách hàng để lấy thêm thông tin giới tính
         const [orders] = await db.query(`
             SELECT o.*, kh.GioiTinh as customer_gender
             FROM orders o

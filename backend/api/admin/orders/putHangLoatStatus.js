@@ -12,8 +12,6 @@ router.put('/hangloat/status', async (req, res) => {
     if (!newStatus)
         return res.status(400).json({ error: 'Trạng thái mới là bắt buộc.' });
 
-    // Sửa lỗi: Bắt đầu transaction trực tiếp trên đối tượng 'db'
-    // vì nó là một kết nối đơn lẻ, không phải là một pool.
     await db.beginTransaction();
 
     try {
@@ -30,17 +28,15 @@ router.put('/hangloat/status', async (req, res) => {
             giao_that_bai: [],
         };
 
-
-        // 1. Lấy tất cả các đơn hàng được chọn để kiểm tra
-        // Sử dụng 'db.query' thay vì 'connection.query'
+        // 1. Lấy tất cả đơn hàng
         const [allSelectedOrders] = await db.query(
             'SELECT id, status, order_code FROM orders WHERE id IN (?) FOR UPDATE',
             [orderIds]
         );
 
-        // 2. Lọc ra những đơn hàng hợp lệ và không hợp lệ
         const validOrders = [];
         const invalidOrders = [];
+        const stockMessages = []; // 🟢 thêm mảng lưu thông báo kho
 
         for (const order of allSelectedOrders) {
             const allowedNext = allowedTransitions[order.status] || [];
@@ -54,9 +50,8 @@ router.put('/hangloat/status', async (req, res) => {
             }
         }
 
-        // Nếu không có đơn hàng nào hợp lệ để cập nhật
         if (validOrders.length === 0) {
-            await db.rollback(); // Không cần transaction nữa
+            await db.rollback();
             return res.status(400).json({
                 error: 'Không có đơn hàng nào hợp lệ để cập nhật.',
                 invalidOrders,
@@ -65,7 +60,7 @@ router.put('/hangloat/status', async (req, res) => {
 
         const validOrderIds = validOrders.map(o => o.id);
 
-        // 3. Tiếp tục xử lý logic kho hàng CHỈ với các đơn hàng hợp lệ
+        // 2. Lấy danh sách sản phẩm trong đơn
         const [orderItems] = await db.query(
             `SELECT oi.order_id, oi.product_id, oi.quantity, p.name
              FROM order_items oi
@@ -83,6 +78,7 @@ router.put('/hangloat/status', async (req, res) => {
         const productMap = new Map(products.map(p => [p.id, p]));
         const stockUpdates = new Map();
 
+        // 3. Xử lý trừ / hoàn kho
         for (const order of validOrders) {
             const oldStatus = order.status;
             const itemsForThisOrder = orderItems.filter(item => item.order_id === order.id);
@@ -94,21 +90,28 @@ router.put('/hangloat/status', async (req, res) => {
             if (oldDeducted === newDeducted) continue;
 
             for (const item of itemsForThisOrder) {
-                const currentStock = productMap.get(item.product_id)?.stock || 0;
+                const product = productMap.get(item.product_id);
+                if (!product) continue;
+
+                const currentStock = product.stock;
                 const stockChange = stockUpdates.get(item.product_id) || 0;
 
-                if (!oldDeducted && newDeducted) { // Trừ kho
+                if (!oldDeducted && newDeducted) {
+                    // 🟢 Trừ kho
                     if (currentStock + stockChange < item.quantity) {
                         throw new Error(`Không đủ hàng tồn kho cho "${item.name}". Chỉ còn ${currentStock}.`);
                     }
                     stockUpdates.set(item.product_id, stockChange - item.quantity);
-                } else { // Hoàn kho
+                    stockMessages.push(`Đã trừ ${item.quantity} sản phẩm "${item.name}" khỏi kho.`);
+                } else {
+                    // 🟢 Hoàn kho
                     stockUpdates.set(item.product_id, stockChange + item.quantity);
+                    stockMessages.push(`Đã hoàn ${item.quantity} sản phẩm "${item.name}" vào kho.`);
                 }
             }
         }
 
-        // 4. Thực hiện cập nhật hàng loạt vào DB
+        // 4. Cập nhật DB
         for (const [productId, change] of stockUpdates.entries()) {
             if (change === 0) continue;
             await db.query(
@@ -123,10 +126,12 @@ router.put('/hangloat/status', async (req, res) => {
         );
 
         await db.commit();
+
         res.json({
             message: `✅ Cập nhật ${validOrders.length} đơn hàng thành công.`,
             skippedCount: invalidOrders.length,
-            invalidOrders, // Gửi kèm danh sách đơn bị bỏ qua để frontend hiển thị
+            invalidOrders,
+            stockMessages, // 🟢 Trả về cho frontend
         });
 
     } catch (error) {
@@ -134,7 +139,6 @@ router.put('/hangloat/status', async (req, res) => {
         console.error('Lỗi khi cập nhật hangloat status:', error);
         res.status(400).json({ error: error.message });
     }
-    // Không cần 'finally' và 'connection.release()' nữa
 });
 
 export default router;

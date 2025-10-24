@@ -60,7 +60,7 @@ const Cart = () => {
   return (
     <div className="cart-page">
       <div className="container">
-        <h1 className="page-title">Giỏ hàng</h1>
+        <h1 className="page-title-cart">Giỏ hàng</h1>
 
         {/* Steps */}
         <div className="checkout-steps">

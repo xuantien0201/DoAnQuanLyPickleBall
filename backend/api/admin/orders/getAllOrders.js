@@ -34,7 +34,6 @@ router.get('/', async (req, res) => {
             queryParams.push(statusFilter);
         }
 
-        // 1️⃣ Đếm tổng số đơn hàng
         const [totalCountResult] = await db.query(
             `SELECT COUNT(o.id) AS totalCount
              FROM orders o
@@ -44,7 +43,6 @@ router.get('/', async (req, res) => {
         );
         const totalCount = totalCountResult[0].totalCount;
 
-        // 2️⃣ Lấy danh sách đơn hàng (phân trang)
         const [orders] = await db.query(
             `SELECT o.*, kh.TenKh AS customer_name, kh.SDT AS customer_phone, kh.email AS customer_email, kh.GioiTinh AS customer_gender
              FROM orders o
@@ -55,7 +53,6 @@ router.get('/', async (req, res) => {
             [...queryParams, parseInt(limit), offset]
         );
 
-        // 3️⃣ Lấy dữ liệu Dashboard mini (áp dụng cùng bộ lọc)
         const [dashboardStatsResult] = await db.query(`
             SELECT
             COUNT(o.id) AS totalOrdersFiltered,
@@ -71,7 +68,6 @@ router.get('/', async (req, res) => {
         ${whereClause}
         `, queryParams);
 
-        // 4️⃣ Tổng số lượng sản phẩm bán được và top sản phẩm
         const successfulOrdersWhereClause = whereClause + " AND o.status = 'da_nhan'";
 
         const [totalItemsSoldResult] = await db.query(`

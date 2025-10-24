@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import PurchaseHistory from '../pages/customers/PurchaseHistory'; // Import PurchaseHistory
 import './ProfilePage.css';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const ProfilePage = () => {
   const [customerInfo, setCustomerInfo] = useState(null);
@@ -9,31 +10,58 @@ const ProfilePage = () => {
   const [error, setError] = useState(null);
   const [editing, setEditing] = useState(false); // trạng thái sửa
   const [formData, setFormData] = useState({});
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
     const fetchProfile = async () => {
       setLoading(true);
       setError(null);
 
-      const userString = localStorage.getItem('user');
-      let customerId = null;
+      const userString = localStorage.getItem('user'); // Check for employee/manager login
+      const khachString = localStorage.getItem('khach'); // Check for customer login
 
-      try {
-        if (userString) {
+      let customerId = null;
+      let loggedInRole = null;
+
+      // 1. Check if an employee/manager is logged in
+      if (userString) {
+        try {
           const user = JSON.parse(userString);
-          customerId = user.id || user.MaKH;
-          if (user.role) {
-            setError("Bạn đã đăng nhập, nhưng không phải là Khách hàng.");
+          loggedInRole = user.role;
+          if (loggedInRole === "Nhân viên" || loggedInRole === "Quản lý") {
+            setError("Trang này chỉ dành cho khách hàng. Bạn đã đăng nhập với vai trò " + loggedInRole + ".");
+            setLoading(false);
+            // Optionally redirect employees/managers away from this page
+            // navigate('/'); 
+            return;
+          }
+        } catch (e) {
+          console.error("Lỗi parse userString:", e);
+          // If userString is corrupted, proceed to check khachString
+        }
+      }
+
+      // 2. Check for customer login
+      try {
+        if (khachString) {
+          const khach = JSON.parse(khachString);
+          if (khach.role === "khachhang") {
+            customerId = khach.MaKH; // Sử dụng MaKH làm ID khách hàng
+          } else {
+            // This handles the specific error "Bạn đã đăng nhập, nhưng không phải là Khách hàng."
+            setError("Dữ liệu đăng nhập khách hàng không hợp lệ. Vui lòng đăng nhập lại.");
             setLoading(false);
             return;
           }
         }
-      } catch {
+      } catch (e) {
+        console.error("Lỗi parse khachString:", e);
         setError("Lỗi dữ liệu đăng nhập. Vui lòng đăng nhập lại.");
         setLoading(false);
         return;
       }
 
+      // 3. If no valid customer ID is found
       if (!customerId) {
         setError("Bạn chưa đăng nhập.");
         setLoading(false);
@@ -50,7 +78,8 @@ const ProfilePage = () => {
         } else {
           setError(response.data.message || "Lỗi khi tải thông tin khách hàng");
         }
-      } catch {
+      } catch (e) {
+        console.error("Lỗi khi kết nối server:", e);
         setError("Lỗi khi kết nối server");
       } finally {
         setLoading(false);
@@ -58,7 +87,7 @@ const ProfilePage = () => {
     };
 
     fetchProfile();
-  }, []);
+  }, [navigate]); // Add navigate to dependency array
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -139,7 +168,7 @@ const ProfilePage = () => {
           ))}
         </div>
 
-   
+
         <div className="profile-actions">
           {editing ? (
             <>
@@ -151,14 +180,14 @@ const ProfilePage = () => {
           )}
         </div>
       </div>
-         {/* Thêm phần lịch sử mua hàng */}
+      {/* Thêm phần lịch sử mua hàng */}
       <div className="purchase-history-section">
         <PurchaseHistory />
       </div>
     </div>
-    
+
   );
-  
+
 };
 
 
