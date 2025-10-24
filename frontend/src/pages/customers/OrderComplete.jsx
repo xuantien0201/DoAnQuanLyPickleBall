@@ -129,7 +129,6 @@ const OrderComplete = () => {
             <div className="info-card">
               <h4>Địa chỉ giao hàng</h4>
               <p><strong>Địa chỉ:</strong> {order.shipping_address}</p>
-              <p><strong>Tỉnh/Thành phố:</strong> {order.shipping_city}</p>
               {order.notes && <p><strong>Ghi chú:</strong> {order.notes}</p>}
             </div>
             <div className="info-card">

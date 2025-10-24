@@ -117,7 +117,7 @@ const QuanLyNhaCungCap = () => {
           </div>
           <button
             type="submit"
-            className="btn btn-primary"
+            className="btn btn-primary-ncc"
             disabled={!tenMoi.trim() || dangThem}
           >
             {dangThem ? 'Đang thêm...' : '➕ Thêm'}

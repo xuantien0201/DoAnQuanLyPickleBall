@@ -117,15 +117,15 @@ export function DichVu() {
             {category.items.map((item) => {
               const qty = cart[item.name] || 0;
               return (
-                <div key={item.name} className="item-card">
-                  <div className="item-image"></div>
-                  <div className="item-info">
-                    <div className="item-name">{item.name}</div>
-                    <div className="item-price">
+                <div key={item.name} className="item-card-dichvu">
+                  <div className="item-image-dichvu"></div>
+                  <div className="item-info-dichvu">
+                    <div className="item-name-dichvu">{item.name}</div>
+                    <div className="item-price-dichvu">
                       {item.price.toLocaleString()} đ
                     </div>
                   </div>
-                  <div className="item-actions">
+                  <div className="item-actions-dichvu">
                     {qty > 0 && (
                       <button onClick={() => handleRemove(item)}>-</button>
                     )}
@@ -140,7 +140,7 @@ export function DichVu() {
       ))}
 
       {Object.keys(cart).length > 0 && (
-        <div className="cart-summary">
+        <div className="cart-summary-dichvu">
           {Object.values(cart).reduce((a, b) => a + b, 0)} món | Tổng cộng:{" "}
           {Object.entries(cart)
             .reduce((sum, [name, qty]) => {

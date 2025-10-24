@@ -83,7 +83,7 @@ if (currentUser?.role === "Nhân viên" || currentUser?.role === "Quản lý") {
 
   const noHeaderFooterRoutes = ['/xacnhansan', '/xeve', '/categories', '/products', '/orders',
     '/nhaphang', '/nhacungcap', '/taophieunhap', '/lichsunhap','/calam', '/quanlycalam', '/quanlytaikhoan', '/nhanvien',
-     '/register', '/forgot-password','/login'
+     '/register', '/forgot-password'
   ];
   const hideHeaderFooter = noHeaderFooterRoutes.includes(location.pathname);
   return (
@@ -130,7 +130,7 @@ if (currentUser?.role === "Nhân viên" || currentUser?.role === "Quản lý") {
         </Routes>
       </main>
 
-      {!hideHeaderFooter && location.pathname !== '/pos' && location.pathname !== '/login'&& <Footer />}
+      {!hideHeaderFooter && location.pathname !== '/pos' && location.pathname !== '/login' && <Footer />}
     </div >
   )
 }

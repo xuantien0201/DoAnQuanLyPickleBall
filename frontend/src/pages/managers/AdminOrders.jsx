@@ -488,7 +488,7 @@ const AdminOrders = () => {
                 </div>
                 <div className="detail-section">
                   <h4>Địa chỉ giao hàng</h4>
-                  <p>{selectedOrder.shipping_address}, {selectedOrder.shipping_city}</p>
+                  <p>{selectedOrder.shipping_address}</p>
                 </div>
                 {selectedOrder.notes && (
                   <div className="detail-section">

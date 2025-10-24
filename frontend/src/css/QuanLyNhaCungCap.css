@@ -82,16 +82,16 @@
   transition: all 0.2s;
 }
 
-.btn-primary {
+.btn-primary-ncc {
   background: #3b82f6;
   color: white;
 }
 
-.btn-primary:hover:not(:disabled) {
+.btn-primary-ncc:hover:not(:disabled) {
   background: #2563eb;
 }
 
-.btn-primary:disabled {
+.btn-primary-ncc:disabled {
   background: #9ca3af;
   cursor: not-allowed;
 }

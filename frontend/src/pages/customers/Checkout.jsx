@@ -13,32 +13,30 @@ const Checkout = () => {
     email: '',
     phone: '',
     address: '',
-    city: '',
     notes: '',
     sex: ''
   });
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Thêm state để kiểm tra đăng nhập
+  const [customerId, setCustomerId] = useState(null); // Thêm state để lưu customerId
 
   const total = getCartTotal();
 
   useEffect(() => {
     const loadCustomerData = async () => {
-      const userString = localStorage.getItem('user');
-      if (userString) {
+      const khachString = localStorage.getItem('khach'); // Thay đổi: Đọc từ 'khach'
+      if (khachString) {
         try {
-          const user = JSON.parse(userString);
-          // Kiểm tra nếu user có id và không phải là admin/nhân viên
-          if (user.id && !user.role) {
+          const khach = JSON.parse(khachString);
+          // Kiểm tra nếu là khách hàng và có MaKH
+          if (khach.role === "khachhang" && khach.MaKH) { // Thay đổi: Điều kiện kiểm tra vai trò và ID khách hàng
             setIsLoggedIn(true);
-            const response = await axios.get(`http://localhost:3000/api/taikhoan/customer/profile?id=${user.id}`);
+            setCustomerId(khach.MaKH); // Lưu customerId vào state
+            const response = await axios.get(`http://localhost:3000/api/taikhoan/customer/profile?id=${khach.MaKH}`); // Thay đổi: Sử dụng khach.MaKH
             if (response.data.success) {
               const customer = response.data.customer;
-              // Phân tách DiaChi thành address và city nếu có
               let address = customer.DiaChi || '';
-              let city = '';
               if (address.includes(',')) {
                 const parts = address.split(',');
-                city = parts.pop().trim(); // Lấy phần cuối làm city
                 address = parts.join(',').trim(); // Phần còn lại là address
               }
 
@@ -47,7 +45,6 @@ const Checkout = () => {
                 email: customer.email || '',
                 phone: customer.SDT || '',
                 address: address,
-                city: city,
                 notes: '', // Ghi chú luôn trống cho đơn hàng mới
                 sex: customer.GioiTinh || ''
               });
@@ -84,7 +81,7 @@ const Checkout = () => {
         ...formData,
         paymentMethod,
         items: cartItems.map(item => ({
-          product_id: item.product_id, 
+          product_id: item.product_id,
           name: item.name,
           quantity: item.quantity,
           price: item.price,
@@ -93,7 +90,8 @@ const Checkout = () => {
         })),
         total: total,
         status: 'cho_xac_nhan', // Trạng thái mặc định
-        customer: isLoggedIn ? JSON.parse(localStorage.getItem('user')) : null // Gửi thông tin user nếu đã đăng nhập
+        customer_id: customerId, // Thay đổi: Thêm customer_id từ state
+        // Xóa dòng này: customer: isLoggedIn ? JSON.parse(localStorage.getItem('user')) : null 
       };
 
       console.log("Dữ liệu đơn hàng gửi đi:", orderData); // THÊM DÒNG NÀY ĐỂ KIỂM TRA
@@ -203,17 +201,7 @@ const Checkout = () => {
                   required
                 />
               </div>
-              <div className="form-group">
-                <label>TỈNH / THÀNH PHỐ *</label>
-                <input
-                  type="text"
-                  name="city"
-                  placeholder="Tỉnh / Thành phố"
-                  value={formData.city}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
+              
               <div className="form-group">
                 <label>GHI CHÚ (TÙY CHỌN)</label>
                 <textarea
@@ -258,6 +246,7 @@ const Checkout = () => {
               <div className="payment-options">
                 <label className="payment-option">
                   <input
+                    className="payment-radio"
                     type="radio"
                     name="payment"
                     value="cod"

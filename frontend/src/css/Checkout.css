@@ -82,6 +82,10 @@
   cursor: pointer;
 }
 
+.payment-radio {
+  width: 0%;
+}
+
 /* Payment Options */
 .payment-options {
   display: flex;

@@ -33,14 +33,12 @@ router.post('/', async (req, res) => {
         let customerEmail = req.body.customer?.email || req.body.email;
         let customerPhone = req.body.customer?.phone || req.body.phone;
         let customerAddress = req.body.customer?.address || req.body.address;
-        let customerCity = req.body.customer?.city || req.body.city;
         let customerSex = req.body.customer?.sex || req.body.sex;
 
         customerName = customerName || null;
         customerPhone = customerPhone || null;
         customerEmail = customerEmail || null;
         customerAddress = customerAddress || null;
-        customerCity = customerCity || null;
         customerSex = customerSex || null;
 
         if (!customerName) {
@@ -114,13 +112,13 @@ router.post('/', async (req, res) => {
         }
 
         const orderData = [
-            orderCode, customerId, customerName, customerEmail, customerPhone, customerAddress, customerCity,
+            orderCode, customerId, customerName, customerEmail, customerPhone, customerAddress,
             notes, paymentMethod, total, initialStatus, orderType
         ];
 
         const [orderResult] = await db.query(
-            `INSERT INTO orders (order_code, customer_id, customer_name, customer_email, customer_phone, shipping_address, shipping_city, notes, payment_method, total_amount, status, order_type)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO orders (order_code, customer_id, customer_name, customer_email, customer_phone, shipping_address, notes, payment_method, total_amount, status, order_type)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             orderData
         );
 
