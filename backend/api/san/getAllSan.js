@@ -15,10 +15,14 @@ export async function getAllSan(req, res) {
     `);
 
     // 2️⃣ Lấy toàn bộ lịch đặt sân theo ngày được chọn
-    const [datSanRows] = await db.execute(
-      `SELECT * FROM tbl_datsan WHERE DATE(NgayLap) = ? ORDER BY GioVao ASC`,
-      [date]
-    );
+const [datSanRows] = await db.execute(
+  `SELECT ds.*, k.TenKh AS KhachHang
+   FROM tbl_datsan ds
+   LEFT JOIN tbl_khachhang k ON ds.MaKH = k.id
+   WHERE DATE(ds.NgayLap) = ?
+   ORDER BY ds.GioVao ASC`,
+  [date]
+);
 
     // 3️⃣ Gộp dữ liệu đặt sân theo từng sân
     const result = sanRows.map((san) => {
@@ -26,6 +30,7 @@ export async function getAllSan(req, res) {
         .filter((ds) => ds.MaSan === san.MaSan)
         .map((ds) => ({
           MaDatSan: ds.MaDatSan,
+          MaSan: ds.MaSan,          // 🔹 thêm dòng này
           MaKH: ds.MaKH,
           MaNV: ds.MaNV,
           NgayLap: ds.NgayLap,
@@ -39,6 +44,8 @@ export async function getAllSan(req, res) {
           TrangThai: ds.TrangThai,
           LoaiDat: ds.LoaiDat,
           PaymentScreenshot: ds.PaymentScreenshot,
+          // 🔹 cần thêm dòng sau
+    KhachHang: ds.KhachHang,
         }));
 
       return {

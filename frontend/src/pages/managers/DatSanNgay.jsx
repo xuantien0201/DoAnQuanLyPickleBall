@@ -11,6 +11,9 @@ export function DatSanNgay() {
   const [pendingBookings, setPendingBookings] = useState([]);
 
   const [pendingModalOpen, setPendingModalOpen] = useState(false);
+
+  const [selectedBooking, setSelectedBooking] = useState(null); // booking để hiển thị form
+
   //   const currentUser =
   //   JSON.parse(localStorage.getItem("user")) ||
   //   JSON.parse(localStorage.getItem("khach"));
@@ -433,46 +436,53 @@ export function DatSanNgay() {
           return i >= startIndex && i < endIndex;
         });
 
-        if (bookedSlot) {
-          if (
-            i ===
-            Math.floor(
-              (bookedSlot.GioVao.split(":")[0] * 60 +
-                Number(bookedSlot.GioVao.split(":")[1]) -
-                openingHour * 60) /
-                slotMinutes
-            )
-          ) {
-            const [startH, startM] = bookedSlot.GioVao.split(":").map(Number);
-            const [endH, endM] = bookedSlot.GioRa.split(":").map(Number);
-            const startIndex = Math.floor(
-              (startH * 60 + startM - openingHour * 60) / slotMinutes
-            );
-            const endIndex = Math.floor(
-              (endH * 60 + endM - openingHour * 60) / slotMinutes
-            );
+if (bookedSlot) {
+  if (i === Math.floor((bookedSlot.GioVao.split(":")[0]*60 + Number(bookedSlot.GioVao.split(":")[1]) - openingHour*60)/slotMinutes)) {
+    const [startH, startM] = bookedSlot.GioVao.split(":").map(Number);
+    const [endH, endM] = bookedSlot.GioRa.split(":").map(Number);
+    const startIndex = Math.floor((startH*60 + startM - openingHour*60)/slotMinutes);
+    const endIndex = Math.floor((endH*60 + endM - openingHour*60)/slotMinutes);
 
-            const bookedCell = document.createElement("div");
-            bookedCell.className = "cell slot booked";
-            bookedCell.textContent = bookedSlot.KhachHang || "";
-            bookedCell.style.gridColumn = `span ${endIndex - startIndex}`;
-            bookedCell.style.backgroundColor = "#fa4f4fff";
-            bookedCell.style.color = "#ffffff";
-            bookedCell.style.borderRight = "1px solid #fff";
-            bookedCell.style.position = "relative"; // thêm để position icon bên trong
+    const bookedCell = document.createElement("div");
+    bookedCell.className = "cell slot booked";
+    bookedCell.style.gridColumn = `span ${endIndex - startIndex}`;
+    bookedCell.style.backgroundColor = "#fa4f4fff";
+    bookedCell.style.color = "#ffffff";
+    bookedCell.style.borderRight = "1px solid #fff";
+    bookedCell.style.position = "relative";
 
-            // 🔔 Nếu trạng thái pending, thêm icon cảnh báo
-            if (bookedSlot.TrangThai === "pending") {
-              const warningIcon = document.createElement("span");
-              warningIcon.className = "pending-icon";
-              warningIcon.innerHTML = "⚠️"; // hoặc dùng svg/font-awesome
-              bookedCell.appendChild(warningIcon);
-            }
+    // 🔹 Role khác nhau
+if (role === "khachhang") {
+  if (bookedSlot.MaKH !== maNguoiDung) {
+    bookedCell.textContent = "Đã đặt";
+  } else {
+    bookedCell.textContent = bookedSlot.KhachHang || "Bạn";
+    bookedCell.style.cursor = "pointer"; // hiện pointer
+    bookedCell.addEventListener("click", () =>
+      setSelectedBooking(bookedSlot)
+    );
+  }
+} else {
+  // Nhân viên/quản lý hiển thị tên khách
+  bookedCell.textContent = bookedSlot.KhachHang || "";
+  bookedCell.style.cursor = "pointer";
+  bookedCell.addEventListener("click", () => setSelectedBooking(bookedSlot));
+}
 
-            row.appendChild(bookedCell);
-          }
-          continue;
-        }
+
+    // 🔔 Icon pending vẫn giữ
+    if (bookedSlot.TrangThai === "pending") {
+      const warningIcon = document.createElement("span");
+      warningIcon.className = "pending-icon";
+      warningIcon.innerHTML = "⚠️";
+      bookedCell.appendChild(warningIcon);
+    }
+
+    row.appendChild(bookedCell);
+  }
+  continue;
+}
+
 
         // Ô trống để chọn
         const cell = document.createElement("div");
@@ -555,20 +565,20 @@ export function DatSanNgay() {
     navigate("/xacnhansan");
   };
 
-const handleAccept = (bookingId) => {
-  axios
-    .put("http://localhost:3000/api/san/accept", { MaDatSan: bookingId }) // ✅ PUT
-    .then(() => {
-      setPendingBookings((prev) =>
-        prev.filter((b) => b.MaDatSan !== bookingId)
-      );
-      alert("Booking đã được chấp nhận!");
-    })
-    .catch((err) => {
-      console.error(err);
-      alert("Có lỗi khi chấp nhận booking");
-    });
-};
+  const handleAccept = (bookingId) => {
+    axios
+      .put("http://localhost:3000/api/san/accept", { MaDatSan: bookingId }) // ✅ PUT
+      .then(() => {
+        setPendingBookings((prev) =>
+          prev.filter((b) => b.MaDatSan !== bookingId)
+        );
+        alert("Booking đã được chấp nhận!");
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("Có lỗi khi chấp nhận booking");
+      });
+  };
 
   const handleBellClick = () => {
     axios
@@ -597,6 +607,65 @@ const handleAccept = (bookingId) => {
   return (
     <div className="sanngay-container">
       {role !== "khachhang" && <Sidebar />}
+
+      {/* Modal thông tin booking cho quản lý */}
+      {selectedBooking && (
+        (role === "nhanvien" || selectedBooking.MaKH === maNguoiDung) && (
+        <div className="booking-modal" onClick={() => setSelectedBooking(null)}>
+          <div
+            className="booking-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <h3>Thông tin đặt sân</h3>
+              <button
+                className="close-btn"
+                onClick={() => setSelectedBooking(null)}
+              >
+                &times;
+              </button>
+            </div>
+            <div className="modal-body">
+              <p>
+                <strong>MaDatSan:</strong> {selectedBooking.MaDatSan}
+              </p>
+              <p>
+                <strong>MaSan:</strong> {selectedBooking.MaSan}
+              </p>
+              <p>
+                <strong>Khách hàng:</strong> {selectedBooking.KhachHang}
+              </p>
+              <p>
+                <strong>Ngày:</strong> {selectedBooking.NgayLap?.split("T")[0]}
+              </p>
+              <p>
+                <strong>Giờ vào:</strong> {selectedBooking.GioVao}
+              </p>
+              <p>
+                <strong>Giờ ra:</strong> {selectedBooking.GioRa}
+              </p>
+              <p>
+                <strong>Tổng tiền:</strong>{" "}
+                {selectedBooking.TongTien?.toLocaleString("vi-VN")} đ
+              </p>
+              <p>
+                <strong>Trạng thái:</strong> {selectedBooking.TrangThai}
+              </p>
+              <p>
+                <strong>Ghi chú:</strong> {selectedBooking.GhiChu || "Không có"}
+              </p>
+              {selectedBooking.PaymentScreenshot && (
+                <img
+                  src={`${BASE_URL}/uploads/payments/${selectedBooking.PaymentScreenshot}`}
+                  alt="Payment"
+                  style={{ width: "100%", marginTop: "10px" }}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+        )
+      )}
 
       <div className="sanngay-content">
         <header className="datsan-header">
@@ -650,40 +719,46 @@ const handleAccept = (bookingId) => {
                       </tr>
                     </thead>
                     <tbody>
-                      {pendingBookings.map((b) => (
-                        <tr key={b.MaDatSan}>
-                          <td>{b.MaDatSan}</td>
-                          <td>{b.MaSan}</td>
-                          <td>{b.MaKH}</td>
-                          <td>{b.NgayLap?.split("T")[0]}</td>
-                          <td>{b.GioVao}</td>
-                          <td>{b.GioRa}</td>
-                          <td>{b.TongTien?.toLocaleString("vi-VN")} đ</td>
-                          <td>
-                            {b.PaymentScreenshot ? (
-                              <img
-                                src={`${BASE_URL}/uploads/payments/${b.PaymentScreenshot}`}
-                                className="payment-img"
-                                alt="Payment"
-                                onClick={() =>
-                                  setZoomedImage(b.PaymentScreenshot)
-                                } // click mở modal
-                                style={{ cursor: "pointer" }}
-                              />
-                            ) : (
-                              "Chưa có"
+                      {(role === "nhanvien" // quản lý/nhân viên
+                        ? pendingBookings
+                        : pendingBookings.filter((b) => b.MaKH === maNguoiDung)
+                      ) // khách hàng
+                        .map((b) => (
+                          <tr key={b.MaDatSan}>
+                            <td>{b.MaDatSan}</td>
+                            <td>{b.MaSan}</td>
+                            <td>{b.KhachHang || b.MaKH}</td>
+                            <td>{b.NgayLap?.split("T")[0]}</td>
+                            <td>{b.GioVao}</td>
+                            <td>{b.GioRa}</td>
+                            <td>{b.TongTien?.toLocaleString("vi-VN")} đ</td>
+                            <td>
+                              {b.PaymentScreenshot ? (
+                                <img
+                                  src={`${BASE_URL}/uploads/payments/${b.PaymentScreenshot}`}
+                                  className="payment-img"
+                                  alt="Payment"
+                                  onClick={() =>
+                                    setZoomedImage(b.PaymentScreenshot)
+                                  }
+                                  style={{ cursor: "pointer" }}
+                                />
+                              ) : (
+                                "Chưa có"
+                              )}
+                            </td>
+                            {role === "nhanvien" && (
+                              <td>
+                                <button
+                                  className="accept-btn"
+                                  onClick={() => handleAccept(b.MaDatSan)}
+                                >
+                                  Chấp nhận
+                                </button>
+                              </td>
                             )}
-                          </td>
-                          <td>
-                            <button
-                              className="accept-btn"
-                              onClick={() => handleAccept(b.MaDatSan)}
-                            >
-                              Chấp nhận
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
+                          </tr>
+                        ))}
                     </tbody>
                   </table>
                 </div>
