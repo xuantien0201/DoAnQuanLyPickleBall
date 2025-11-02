@@ -31,7 +31,7 @@ const [tenKh, setTenKh] = useState("");
     }
 
     try {
-      const res = await axios.post("http://localhost:3000/api/taikhoan/registerKhachHang", {
+      const res = await axios.post("http://localhost:3000/api/admin/taikhoan/registerKhachHang", {
   userName,
   passWord,
   email,

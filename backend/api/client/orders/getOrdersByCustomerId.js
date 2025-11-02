@@ -1,10 +1,10 @@
 import express from 'express';
-import { db } from '../../../config/db.js'; 
+import { db } from '../../../config/db.js';
 const router = express.Router();
 
 router.get('/history', async (req, res) => {
     try {
-        const { customerId } = req.query; 
+        const { customerId } = req.query;
 
         if (!customerId) {
             return res.status(400).json({ message: 'Thiếu ID khách hàng.' });
@@ -19,7 +19,7 @@ router.get('/history', async (req, res) => {
         `, [customerId]);
 
         if (orders.length === 0) {
-            return res.json([]); 
+            return res.json([]);
         }
 
         // For each order, fetch its items

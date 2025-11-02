@@ -1,5 +1,5 @@
 import express from 'express';
-import { db } from '../../../config/db.js'; 
+import { db } from '../../../config/db.js';
 import { v4 as uuidv4 } from 'uuid';
 
 const router = express.Router();
@@ -24,8 +24,8 @@ router.post('/', async (req, res) => {
 
         const {
             notes, paymentMethod, items, total,
-            status: requestStatus, 
-            orderType: requestOrderType 
+            status: requestStatus,
+            orderType: requestOrderType
         } = req.body;
 
         let customerId = req.body.customer?.id;
@@ -55,12 +55,12 @@ router.post('/', async (req, res) => {
         const orderCode = uuidv4().split('-')[0].toUpperCase();
         let initialStatus;
 
-        if (customerId) { 
+        if (customerId) {
             await db.query(
                 `UPDATE tbl_khachhang SET TenKh = ?, SDT = ?, email = ?, DiaChi = ?, GioiTinh = ? WHERE id = ?`,
                 [customerName, customerPhone, customerEmail, customerAddress, customerSex, customerId]
             );
-        } else { 
+        } else {
             const [existingCustomers] = await db.query(
                 "SELECT id FROM tbl_khachhang WHERE email = ? OR SDT = ?",
                 [customerEmail, customerPhone]

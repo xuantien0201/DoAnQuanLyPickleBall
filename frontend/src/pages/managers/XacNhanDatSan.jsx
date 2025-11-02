@@ -109,7 +109,7 @@ export function XacNhanDatSan() {
 
   console.log("userRole:", userRole, "maNguoiDung:", userId);
 
-  const API_BASE = "http://localhost:3000/api/khachhang";
+  const API_BASE = "http://localhost:3000/api/admin/khachhang";
   const typingTimeout = useRef(null);
 
   useEffect(() => {
@@ -235,7 +235,7 @@ export function XacNhanDatSan() {
 
   const fetchKhachHangInfo = async (maKH) => {
     try {
-      const res = await axios.get(`/api/khachhang/idsearch?MaKH=${maKH}`);
+      const res = await axios.get(`/api/admin/khachhang/idsearch?MaKH=${maKH}`);
       const kh = res.data;
       setTenKhach(kh.TenKh || kh.ten || kh.HoTen || "");
       setSdt(kh.SDT || kh.sdt || kh.SoDienThoai || "");
@@ -544,7 +544,7 @@ export function XacNhanDatSan() {
         console.log("✅ Dữ liệu gửi API đặt sân tháng:", reqBody);
 
         // 🚀 Gửi API
-        const res = await fetch("http://localhost:3000/api/santhang/book", {
+        const res = await fetch("http://localhost:3000/api/admin/santhang/book", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(reqBody),
@@ -720,7 +720,7 @@ export function XacNhanDatSan() {
             formData.append("PaymentScreenshot", reqBody.PaymentScreenshot);
           }
 
-          const res = await fetch("http://localhost:3000/api/san/book", {
+          const res = await fetch("http://localhost:3000/api/admin/san/book", {
             method: "POST",
             body: formData,
           });

@@ -3,7 +3,7 @@ import axios from "axios";
 import "../../css/CaLamPage.css"; // đổi tên file CSS
 import { Link } from "react-router-dom";
 export default function CaLam() {
-  const API = "http://localhost:3000/api/calam";
+  const API = "http://localhost:3000/api/admin/calam";
 
   const user = JSON.parse(localStorage.getItem("user")) || {};
   const EMP_CODE = user.maNV || "";

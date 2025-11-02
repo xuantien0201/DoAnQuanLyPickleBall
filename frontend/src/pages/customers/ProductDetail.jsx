@@ -31,9 +31,9 @@ const ProductDetail = () => {
                 setSelectedColor(colors[0]);
             }
 
-            // Fetch related products
+            // Fetch related products - sử dụng category_slug để nhất quán với Shop.jsx
             const relatedResponse = await axios.get('/api/client/products', {
-                params: { category: response.data.category }
+                params: { category: response.data.category_slug } // Sử dụng category_slug ở đây
             });
             setRelatedProducts(relatedResponse.data.products.filter(p => p.id !== parseInt(id)).slice(0, 4));
         } catch (error) {
@@ -162,7 +162,8 @@ const ProductDetail = () => {
                             </div>
                             <div className="info-item">
                                 <span>Danh mục</span>
-                                <Link to={`/shop?category=${product.category}`}>{product.category}</Link>
+                                {/* Sử dụng category_slug cho liên kết và category_name cho hiển thị */}
+                                <Link to={`/shop?category=${product.category_slug}`}>{product.category_name}</Link>
                             </div>
                         </div>
                     </div>

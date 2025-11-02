@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
         let parsedLimit = 0;
 
         if (applyPagination) {
-            parsedLimit = parseInt(limit) || 10; 
+            parsedLimit = parseInt(limit) || 10;
             const parsedPage = parseInt(page) || 1;
             offset = (parsedPage - 1) * parsedLimit;
         }

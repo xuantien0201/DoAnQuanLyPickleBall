@@ -11,7 +11,7 @@ export function CheckSanNgay() {
   useEffect(() => {
     if (bookings.length === 0) {
       axios
-        .get("/api/san")
+        .get("/api/admin/san")
         .then((res) => {
           const pending = res.data
             .flatMap((san) => san.bookedSlots || [])
@@ -31,7 +31,7 @@ export function CheckSanNgay() {
 
   const handleAccept = (bookingId) => {
     axios
-      .post("/api/datsan/accept", { MaDatSan: bookingId })
+      .post("/api/admin/datsan/accept", { MaDatSan: bookingId })
       .then(() => {
         // Xóa booking vừa chấp nhận khỏi danh sách
         setBookings((prev) => prev.filter((b) => b.MaDatSan !== bookingId));

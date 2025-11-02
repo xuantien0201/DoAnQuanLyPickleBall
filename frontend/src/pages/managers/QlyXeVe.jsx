@@ -24,7 +24,7 @@ export function QlyXeVe() {
   const fetchXeVe = async () => {
     try {
       // 1️⃣ Lấy danh sách sự kiện
-      let url = `http://localhost:3000/api/xeve/sukien`;
+      let url = `http://localhost:3000/api/admin/xeve/sukien`;
       const params = new URLSearchParams();
 
       if (keyword) params.append("keyword", keyword);
@@ -35,7 +35,7 @@ export function QlyXeVe() {
 
       const [resSuKien, resCount] = await Promise.all([
         fetch(url),
-        fetch("http://localhost:3000/api/xeve/datve/count"),
+        fetch("http://localhost:3000/api/admin/xeve/datve/count"),
       ]);
 
       const dataSuKien = await resSuKien.json();
@@ -69,7 +69,7 @@ export function QlyXeVe() {
 
     try {
       const res = await fetch(
-        `http://localhost:3000/api/xeve/sukien/${item.MaXeVe}/status`,
+        `http://localhost:3000/api/admin/xeve/sukien/${item.MaXeVe}/status`,
         { method: "PUT" }
       );
       const data = await res.json();
@@ -91,7 +91,7 @@ export function QlyXeVe() {
     if (!ok) return;
 
     try {
-      const res = await fetch(`http://localhost:3000/api/xeve/${MaXeVe}`, {
+      const res = await fetch(`http://localhost:3000/api/admin/xeve/${MaXeVe}`, {
         method: "DELETE",
       });
       const result = await res.json();

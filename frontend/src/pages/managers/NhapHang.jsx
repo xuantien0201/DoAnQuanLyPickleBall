@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import '../../css/NhapHang.css';
 import { Sidebar } from '../../components/Sidebar'; 
 
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = 'http://localhost:3000/api/admin';
 
 const NhapHang = () => {
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ const NhapHang = () => {
       console.log('🔄 Đang tải danh sách sản phẩm...');
       
       // THỬ API ADMIN PRODUCTS TRƯỚC
-      const response = await fetch(`${API_BASE}/admin/products?limit=100`);
+      const response = await fetch(`${API_BASE}/products?limit=100`);
       
       if (response.ok) {
         const data = await response.json();

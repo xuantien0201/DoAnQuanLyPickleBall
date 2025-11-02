@@ -74,7 +74,7 @@ export function TTXeVe() {
   console.log("📦 Dữ liệu nhận tại TTXeVe:", bookingData);
 
   // ✅ Đường dẫn API chuẩn REST
-  const API_BASE = "http://localhost:3000/api";
+  const API_BASE = "http://localhost:3000/api/admin";
   const API_KHACHHANG = `${API_BASE}/khachhang`;
   const API_DATVE = `${API_BASE}/xeve/datve`;
 

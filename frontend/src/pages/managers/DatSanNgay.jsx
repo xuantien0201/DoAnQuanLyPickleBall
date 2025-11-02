@@ -76,7 +76,7 @@ export function DatSanNgay() {
   );
   // 🔹 Giả lập role và mã khách hàng (sau này sẽ lấy từ API đăng nhập)
 
-  const API_BASE = "http://localhost:3000/api/san";
+  const API_BASE = "http://localhost:3000/api/admin/san";
 
   const timeSlots = () => {
     const total = (closingHour - openingHour) * (60 / slotMinutes);
@@ -106,7 +106,7 @@ export function DatSanNgay() {
       const dateFormatted = formatDate(date.split("T")[0]);
 
       // 🔹 Lấy danh sách sân tháng từ API
-      const res = await fetch("http://localhost:3000/api/santhang/list");
+      const res = await fetch("http://localhost:3000/api/admin/santhang/list");
       if (!res.ok) throw new Error("Lỗi khi lấy danh sách đặt sân tháng");
       const result = await res.json();
       const data = Array.isArray(result) ? result : result.data || [];
@@ -223,7 +223,7 @@ export function DatSanNgay() {
 
       // sự kiện
       const resEvent = await fetch(
-        `http://localhost:3000/api/xeve/sukien/date?date=${date}`
+        `http://localhost:3000/api/admin/xeve/sukien/date?date=${date}`
       );
 
       let eventData = [];
@@ -567,7 +567,7 @@ if (role === "khachhang") {
 
   const handleAccept = (bookingId) => {
     axios
-      .put("http://localhost:3000/api/san/accept", { MaDatSan: bookingId }) // ✅ PUT
+      .put("http://localhost:3000/api/admin/san/accept", { MaDatSan: bookingId }) // ✅ PUT
       .then(() => {
         setPendingBookings((prev) =>
           prev.filter((b) => b.MaDatSan !== bookingId)
@@ -582,7 +582,7 @@ if (role === "khachhang") {
 
   const handleBellClick = () => {
     axios
-      .get(`${BASE_URL}/api/san?date=${selectedDate}`)
+      .get(`${BASE_URL}/api/admin/san?date=${selectedDate}`)
       .then((res) => {
         const pending = res.data
           .flatMap((san) => san.bookedSlots || [])

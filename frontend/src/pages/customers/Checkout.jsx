@@ -31,7 +31,7 @@ const Checkout = () => {
           if (khach.role === "khachhang" && khach.MaKH) { // Thay đổi: Điều kiện kiểm tra vai trò và ID khách hàng
             setIsLoggedIn(true);
             setCustomerId(khach.MaKH); // Lưu customerId vào state
-            const response = await axios.get(`http://localhost:3000/api/taikhoan/customer/profile?id=${khach.MaKH}`); // Thay đổi: Sử dụng khach.MaKH
+            const response = await axios.get(`http://localhost:3000/api/admin/taikhoan/customer/profile?id=${khach.MaKH}`); // Thay đổi: Sử dụng khach.MaKH
             if (response.data.success) {
               const customer = response.data.customer;
               let address = customer.DiaChi || '';

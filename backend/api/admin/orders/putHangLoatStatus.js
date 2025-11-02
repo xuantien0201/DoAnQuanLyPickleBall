@@ -22,7 +22,7 @@ router.put('/hangloat/status', async (req, res) => {
             da_nhan: ['doi_hang', 'tra_hang'],
             doi_hang: ['da_nhan', 'tra_hang'],
             tra_hang: ['hoan_tien'],
-            hoan_tien: [], 
+            hoan_tien: [],
             da_huy: [],
             huy_sau_xac_nhan: [],
             giao_that_bai: [],

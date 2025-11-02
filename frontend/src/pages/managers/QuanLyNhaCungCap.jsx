@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import '../../css/QuanLyNhaCungCap.css';
 import { Sidebar } from '../../components/Sidebar';
 
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = 'http://localhost:3000/api/admin';
 
 const QuanLyNhaCungCap = () => {
   const navigate = useNavigate();

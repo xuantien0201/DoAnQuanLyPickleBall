@@ -41,7 +41,7 @@ export function DatSanThang() {
   const [searchSdt, setSearchSdt] = useState([]);
   const typingTimeout = useRef(null);
 
-  const API_BASE = "http://localhost:3000/api/khachhang";
+  const API_BASE = "http://localhost:3000/api/admin/khachhang";
 
   const timKiemKhachHang = async (tuKhoa, type) => {
     if (!tuKhoa.trim())

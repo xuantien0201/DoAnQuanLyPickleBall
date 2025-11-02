@@ -13,7 +13,7 @@ export default function Login() {
     try {
       let res;
       if (role === "employee") {
-        res = await axios.post("http://localhost:3000/api/taikhoan/login", {
+        res = await axios.post("http://localhost:3000/api/admin/taikhoan/login", {
           userName: username,
           passWord: password,
           role: "Nhân viên",
@@ -24,7 +24,7 @@ export default function Login() {
           window.location.href = "/";
         } else alert("❌ Sai tài khoản hoặc mật khẩu!");
       } else if (role === "Quản lý") {
-        res = await axios.post("http://localhost:3000/api/taikhoan/login", {
+        res = await axios.post("http://localhost:3000/api/admin/taikhoan/login", {
           userName: username,
           passWord: password,
           role: "Quản lý",
@@ -36,7 +36,7 @@ export default function Login() {
         } else alert("❌ Sai tài khoản hoặc mật khẩu!");
       } else {
         res = await axios.post(
-          "http://localhost:3000/api/taikhoan/loginKhachHang",
+          "http://localhost:3000/api/admin/taikhoan/loginKhachHang",
           {
             userName: username,
             passWord: password,
