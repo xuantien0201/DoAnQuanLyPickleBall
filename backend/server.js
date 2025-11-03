@@ -27,7 +27,7 @@ app.get("/", (req, res) => {
   res.send("✅ Pickleball Backend đang chạy!");
 });
 
-const PORT = 3000; // Đổi cổng thành 5000 để khớp với proxy của frontend
+const PORT = 3000; 
 app.listen(PORT, () => {
   console.log(`🚀 Server chạy tại http://localhost:${PORT}`);
 });
