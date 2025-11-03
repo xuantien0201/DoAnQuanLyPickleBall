@@ -1,5 +1,15 @@
 import mysql from 'mysql2/promise';
 
+// --- BẮT ĐẦU DEBUG ---
+// In các biến môi trường database ra để kiểm tra
+console.log({
+  host: process.env.MYSQLHOST,
+  user: process.env.MYSQLUSER,
+  database: process.env.MYSQLDATABASE,
+  port: process.env.MYSQLPORT,
+});
+// --- KẾT THÚC DEBUG ---
+
 const pool = mysql.createPool({
   host: process.env.MYSQLHOST,
   user: process.env.MYSQLUSER,
